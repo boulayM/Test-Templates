@@ -33,7 +33,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "url": "{{baseUrl}}/api/auth/login",
             "body": {
@@ -60,7 +63,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "url": "{{baseUrl}}/api/auth/login",
             "body": {
@@ -99,7 +105,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "url": "{{baseUrl}}/api/auth/register",
             "body": {
@@ -127,7 +136,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
             "url": "{{baseUrl}}/api/auth/logout"
           }
@@ -142,7 +154,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "url": "{{baseUrl}}/api/users/register",
             "body": {
@@ -176,8 +191,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
             "url": "{{baseUrl}}/api/users/{{createdUserId}}",
             "body": {
@@ -191,7 +212,10 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
             "url": "{{baseUrl}}/api/users/{{createdUserId}}"
           }
@@ -206,10 +230,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/categories",
+            "url": "{{baseUrl}}/api/admin/categories",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Electronics\"\n}"
@@ -233,7 +263,7 @@
           "name": "Get Categories",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/categories"
+            "url": "{{baseUrl}}/api/admin/categories"
           }
         },
         {
@@ -241,10 +271,16 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/categories/{{categoryId}}",
+            "url": "{{baseUrl}}/api/admin/categories/{{categoryId}}",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Electronics Updated\"\n}"
@@ -256,9 +292,12 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/categories/{{categoryId}}"
+            "url": "{{baseUrl}}/api/admin/categories/{{categoryId}}"
           }
         }
       ]
@@ -271,10 +310,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/products",
+            "url": "{{baseUrl}}/api/admin/products",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Product A\",\n  \"description\": \"Sample product\",\n  \"priceCents\": 1999,\n  \"currency\": \"EUR\",\n  \"sku\": \"SKU-001\",\n  \"isActive\": true,\n  \"categoryIds\": [{{categoryId}}],\n  \"images\": [\n    {\"url\": \"https://picsum.photos/seed/p1/800/600\", \"alt\": \"img1\", \"position\": 1}\n  ]\n}"
@@ -298,14 +343,14 @@
           "name": "Get Products",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/products"
+            "url": "{{baseUrl}}/api/admin/products"
           }
         },
         {
           "name": "Get Product",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/products/{{productId}}"
+            "url": "{{baseUrl}}/api/public/products/{{productId}}"
           }
         },
         {
@@ -313,10 +358,16 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/products/{{productId}}",
+            "url": "{{baseUrl}}/api/admin/products/{{productId}}",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Product A2\",\n  \"priceCents\": 2999\n}"
@@ -328,9 +379,12 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/products/{{productId}}"
+            "url": "{{baseUrl}}/api/admin/products/{{productId}}"
           }
         }
       ]
@@ -343,10 +397,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/addresses",
+            "url": "{{baseUrl}}/api/public/addresses",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"label\": \"Home\",\n  \"fullName\": \"John Doe\",\n  \"phone\": \"0102030405\",\n  \"line1\": \"1 Main St\",\n  \"line2\": null,\n  \"postalCode\": \"75001\",\n  \"city\": \"Paris\",\n  \"country\": \"FR\",\n  \"isDefault\": true\n}"
@@ -370,7 +430,7 @@
           "name": "Get Addresses",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/addresses"
+            "url": "{{baseUrl}}/api/public/addresses"
           }
         },
         {
@@ -378,10 +438,16 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/addresses/{{addressId}}",
+            "url": "{{baseUrl}}/api/public/addresses/{{addressId}}",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"city\": \"Lyon\"\n}"
@@ -393,9 +459,12 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/addresses/{{addressId}}"
+            "url": "{{baseUrl}}/api/public/addresses/{{addressId}}"
           }
         }
       ]
@@ -407,7 +476,7 @@
           "name": "Get My Cart",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/carts"
+            "url": "{{baseUrl}}/api/public/cart"
           }
         },
         {
@@ -415,10 +484,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/carts/items",
+            "url": "{{baseUrl}}/api/public/cart/items",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
@@ -430,10 +505,16 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/carts/items/{{productId}}",
+            "url": "{{baseUrl}}/api/public/cart/items/{{productId}}",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"quantity\": 2\n}"
@@ -445,24 +526,12 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/carts/items/{{productId}}"
-          }
-        },
-        {
-          "name": "Update Cart Status",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/carts/status",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"ABANDONED\"\n}"
-            }
+            "url": "{{baseUrl}}/api/public/cart/items/{{productId}}"
           }
         }
       ]
@@ -475,10 +544,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/orders",
+            "url": "{{baseUrl}}/api/public/orders",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"items\": [\n    {\"productId\": {{productId}}, \"quantity\": 1}\n  ],\n  \"shippingAddressId\": {{addressId}},\n  \"billingAddressId\": {{addressId}},\n  \"currency\": \"EUR\",\n  \"shippingCents\": 500,\n  \"discountCents\": 0\n}"
@@ -502,14 +577,14 @@
           "name": "Get Orders",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/orders"
+            "url": "{{baseUrl}}/api/public/orders"
           }
         },
         {
           "name": "Get Order",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/orders/{{orderId}}"
+            "url": "{{baseUrl}}/api/public/orders/{{orderId}}"
           }
         },
         {
@@ -517,49 +592,20 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/orders/{{orderId}}/status",
+            "url": "{{baseUrl}}/api/admin/orders/{{orderId}}/status",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"status\": \"PAID\"\n}"
             }
-          }
-        },
-        {
-          "name": "Add Item To Order",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/orders/{{orderId}}/items",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
-            }
-          }
-        },
-        {
-          "name": "Remove Item From Order",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/orders/{{orderId}}/items/{{productId}}"
-          }
-        },
-        {
-          "name": "Delete Order",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/orders/{{orderId}}"
           }
         }
       ]
@@ -572,10 +618,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/coupons",
+            "url": "{{baseUrl}}/api/admin/coupons",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"code\": \"WELCOME10\",\n  \"type\": \"PERCENT\",\n  \"value\": 10,\n  \"isActive\": true\n}"
@@ -599,7 +651,7 @@
           "name": "Get Coupons",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/coupons"
+            "url": "{{baseUrl}}/api/admin/coupons"
           }
         },
         {
@@ -607,10 +659,16 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/coupons/{{couponId}}",
+            "url": "{{baseUrl}}/api/admin/coupons/{{couponId}}",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"value\": 15\n}"
@@ -622,9 +680,12 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/coupons/{{couponId}}"
+            "url": "{{baseUrl}}/api/admin/coupons/{{couponId}}"
           }
         }
       ]
@@ -637,10 +698,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/reviews",
+            "url": "{{baseUrl}}/api/public/reviews",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"productId\": {{productId}},\n  \"rating\": 5,\n  \"comment\": \"Great\"\n}"
@@ -664,7 +731,7 @@
           "name": "Get Reviews",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/reviews"
+            "url": "{{baseUrl}}/api/public/reviews"
           }
         },
         {
@@ -672,10 +739,16 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/reviews/{{reviewId}}",
+            "url": "{{baseUrl}}/api/public/reviews/{{reviewId}}",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"rating\": 4\n}"
@@ -687,9 +760,12 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/reviews/{{reviewId}}"
+            "url": "{{baseUrl}}/api/public/reviews/{{reviewId}}"
           }
         }
       ]
@@ -702,10 +778,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/payments",
+            "url": "{{baseUrl}}/api/public/payments",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"orderId\": {{orderId}},\n  \"provider\": \"STRIPE\",\n  \"amountCents\": 1000,\n  \"currency\": \"EUR\"\n}"
@@ -729,7 +811,7 @@
           "name": "Get Payments",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/payments"
+            "url": "{{baseUrl}}/api/public/payments"
           }
         },
         {
@@ -737,10 +819,16 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/payments/{{paymentId}}",
+            "url": "{{baseUrl}}/api/admin/payments/{{paymentId}}/status",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"status\": \"CAPTURED\"\n}"
@@ -757,10 +845,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/shipments",
+            "url": "{{baseUrl}}/api/admin/shipments",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"orderId\": {{orderId}},\n  \"carrier\": \"DHL\",\n  \"trackingNumber\": \"TRACK123\",\n  \"status\": \"IN_TRANSIT\"\n}"
@@ -784,7 +878,7 @@
           "name": "Get Shipments",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/shipments"
+            "url": "{{baseUrl}}/api/admin/shipments"
           }
         },
         {
@@ -792,10 +886,16 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-csrf-token",
+                "value": "{{csrfToken}}"
+              }
             ],
-            "url": "{{baseUrl}}/api/shipments/{{shipmentId}}",
+            "url": "{{baseUrl}}/api/admin/shipments/{{shipmentId}}",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"status\": \"DELIVERED\"\n}"
@@ -808,10 +908,17 @@
       "name": "Admin",
       "item": [
         {
-          "name": "Admin Metrics",
+          "name": "Admin Users List",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/admin/metrics"
+            "url": "{{baseUrl}}/api/admin/users"
+          }
+        },
+        {
+          "name": "Admin Users Me",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/users/me"
           }
         },
         {
@@ -822,17 +929,10 @@
           }
         },
         {
-          "name": "Admin Products Export",
+          "name": "Admin Audit Logs List",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/admin/products/export"
-          }
-        },
-        {
-          "name": "Admin Orders Export",
-          "request": {
-            "method": "GET",
-            "url": "{{baseUrl}}/api/admin/orders/export"
+            "url": "{{baseUrl}}/api/admin/audit-logs"
           }
         },
         {
@@ -851,41 +951,107 @@
           "name": "Get Audit Logs",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/audit-logs"
+            "url": "{{baseUrl}}/api/admin/audit-logs"
           }
         },
         {
           "name": "Get Audit Log By Id",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/audit-logs/{{auditLogId}}"
+            "url": "{{baseUrl}}/api/admin/audit-logs/{{auditLogId}}"
           }
         }
       ]
     }
   ],
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:3000" },
-    { "key": "adminEmail", "value": "admin@example.com" },
-    { "key": "adminPassword", "value": "Admin123!" },
-    { "key": "userEmail", "value": "alice@example.com" },
-    { "key": "userPassword", "value": "User123!" },
-    { "key": "newUserEmail", "value": "new.user@example.com" },
-    { "key": "createdUserEmail", "value": "created.user@example.com" },
-    { "key": "captchaToken", "value": "" },
-    { "key": "verifyToken", "value": "" },
-    { "key": "csrfToken", "value": "" },
-    { "key": "adminId", "value": "" },
-    { "key": "userId", "value": "" },
-    { "key": "createdUserId", "value": "" },
-    { "key": "categoryId", "value": "" },
-    { "key": "productId", "value": "" },
-    { "key": "addressId", "value": "" },
-    { "key": "orderId", "value": "" },
-    { "key": "couponId", "value": "" },
-    { "key": "reviewId", "value": "" },
-    { "key": "paymentId", "value": "" },
-    { "key": "shipmentId", "value": "" },
-    { "key": "auditLogId", "value": "" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@example.com"
+    },
+    {
+      "key": "adminPassword",
+      "value": "Admin123!"
+    },
+    {
+      "key": "userEmail",
+      "value": "alice@example.com"
+    },
+    {
+      "key": "userPassword",
+      "value": "User123!"
+    },
+    {
+      "key": "newUserEmail",
+      "value": "new.user@example.com"
+    },
+    {
+      "key": "createdUserEmail",
+      "value": "created.user@example.com"
+    },
+    {
+      "key": "captchaToken",
+      "value": ""
+    },
+    {
+      "key": "verifyToken",
+      "value": ""
+    },
+    {
+      "key": "csrfToken",
+      "value": ""
+    },
+    {
+      "key": "adminId",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "createdUserId",
+      "value": ""
+    },
+    {
+      "key": "categoryId",
+      "value": ""
+    },
+    {
+      "key": "productId",
+      "value": ""
+    },
+    {
+      "key": "addressId",
+      "value": ""
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    },
+    {
+      "key": "couponId",
+      "value": ""
+    },
+    {
+      "key": "reviewId",
+      "value": ""
+    },
+    {
+      "key": "paymentId",
+      "value": ""
+    },
+    {
+      "key": "shipmentId",
+      "value": ""
+    },
+    {
+      "key": "auditLogId",
+      "value": ""
+    }
   ]
 }

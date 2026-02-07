@@ -221,6 +221,343 @@ components:
           type: string
           enum: [USER, ADMIN]
 
+    CategoryCreateInput:
+      type: object
+      required: [name, slug]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        parentId:
+          type: integer
+          nullable: true
+
+    CategoryUpdateInput:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        parentId:
+          type: integer
+          nullable: true
+
+    ProductCreateInput:
+      type: object
+      required: [name, slug, description, priceCents, currency, sku]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        priceCents:
+          type: integer
+          minimum: 0
+        currency:
+          type: string
+        sku:
+          type: string
+        isActive:
+          type: boolean
+        categoryIds:
+          type: array
+          items:
+            type: integer
+
+    ProductUpdateInput:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        priceCents:
+          type: integer
+          minimum: 0
+        currency:
+          type: string
+        sku:
+          type: string
+        isActive:
+          type: boolean
+        categoryIds:
+          type: array
+          items:
+            type: integer
+
+    ImageCreateInput:
+      type: object
+      required: [productId, url]
+      properties:
+        productId:
+          type: integer
+        url:
+          type: string
+          format: uri
+        alt:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+          minimum: 0
+
+    InventoryCreateInput:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId:
+          type: integer
+        quantity:
+          type: integer
+          minimum: 0
+        reserved:
+          type: integer
+          minimum: 0
+
+    InventoryUpdateInput:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          minimum: 0
+        reserved:
+          type: integer
+          minimum: 0
+
+    CouponCreateInput:
+      type: object
+      required: [code, type, value]
+      properties:
+        code:
+          type: string
+        type:
+          type: string
+          enum: [PERCENT, FIXED]
+        value:
+          type: integer
+          minimum: 0
+        minOrderCents:
+          type: integer
+          nullable: true
+          minimum: 0
+        startsAt:
+          type: string
+          format: date-time
+        endsAt:
+          type: string
+          format: date-time
+        usageLimit:
+          type: integer
+          nullable: true
+          minimum: 1
+        isActive:
+          type: boolean
+
+    CouponUpdateInput:
+      type: object
+      properties:
+        code:
+          type: string
+        type:
+          type: string
+          enum: [PERCENT, FIXED]
+        value:
+          type: integer
+          minimum: 0
+        minOrderCents:
+          type: integer
+          nullable: true
+          minimum: 0
+        startsAt:
+          type: string
+          format: date-time
+        endsAt:
+          type: string
+          format: date-time
+        usageLimit:
+          type: integer
+          nullable: true
+          minimum: 1
+        isActive:
+          type: boolean
+
+    ShipmentCreateInput:
+      type: object
+      required: [orderId]
+      properties:
+        orderId:
+          type: integer
+        carrier:
+          type: string
+          nullable: true
+        trackingNumber:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [CREATED, IN_TRANSIT, DELIVERED, LOST]
+        shippedAt:
+          type: string
+          format: date-time
+        deliveredAt:
+          type: string
+          format: date-time
+
+    ShipmentUpdateInput:
+      type: object
+      properties:
+        carrier:
+          type: string
+          nullable: true
+        trackingNumber:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [CREATED, IN_TRANSIT, DELIVERED, LOST]
+        shippedAt:
+          type: string
+          format: date-time
+        deliveredAt:
+          type: string
+          format: date-time
+
+    OrderStatusUpdateInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [PENDING, PAID, PREPARING, SHIPPED, DELIVERED, CANCELLED, REFUNDED]
+
+    PaymentStatusUpdateInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [CREATED, AUTHORIZED, CAPTURED, FAILED, REFUNDED]
+
+    CartAddItemInput:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId:
+          type: integer
+        quantity:
+          type: integer
+          minimum: 1
+
+    CartUpdateItemInput:
+      type: object
+      required: [quantity]
+      properties:
+        quantity:
+          type: integer
+          minimum: 1
+
+    AddressCreateInput:
+      type: object
+      required: [label, fullName, phone, line1, postalCode, city, country]
+      properties:
+        label:
+          type: string
+        fullName:
+          type: string
+        phone:
+          type: string
+        line1:
+          type: string
+        line2:
+          type: string
+          nullable: true
+        postalCode:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        isDefault:
+          type: boolean
+
+    AddressUpdateInput:
+      type: object
+      properties:
+        label:
+          type: string
+        fullName:
+          type: string
+        phone:
+          type: string
+        line1:
+          type: string
+        line2:
+          type: string
+          nullable: true
+        postalCode:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        isDefault:
+          type: boolean
+
+    OrderCreateInput:
+      type: object
+      required: [shippingAddressId, billingAddressId]
+      properties:
+        shippingAddressId:
+          type: integer
+        billingAddressId:
+          type: integer
+        couponCode:
+          type: string
+
+    PaymentCreateInput:
+      type: object
+      required: [orderId]
+      properties:
+        orderId:
+          type: integer
+        provider:
+          type: string
+          enum: [STRIPE, PAYPAL, MANUAL]
+        providerRef:
+          type: string
+          nullable: true
+
+    ReviewCreateInput:
+      type: object
+      required: [productId, rating]
+      properties:
+        productId:
+          type: integer
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          nullable: true
+
+    ReviewUpdateInput:
+      type: object
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          nullable: true
+
     PaginatedUsers:
       type: object
       properties:
@@ -755,6 +1092,9 @@ paths:
       summary: List categories
       security:
         - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
       responses:
         "200":
           description: Categories list
@@ -763,6 +1103,12 @@ paths:
       summary: Create category
       security:
         - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryCreateInput"
       responses:
         "201":
           description: Category created
@@ -775,6 +1121,12 @@ paths:
         - cookieAuth: []
       parameters:
         - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryUpdateInput"
       responses:
         "200":
           description: Category updated
@@ -795,6 +1147,10 @@ paths:
       summary: List products
       security:
         - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
+        - $ref: "#/components/parameters/QParam"
       responses:
         "200":
           description: Products list
@@ -803,6 +1159,12 @@ paths:
       summary: Create product
       security:
         - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCreateInput"
       responses:
         "201":
           description: Product created
@@ -815,6 +1177,12 @@ paths:
         - cookieAuth: []
       parameters:
         - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductUpdateInput"
       responses:
         "200":
           description: Product updated
@@ -835,6 +1203,11 @@ paths:
       summary: List product images
       security:
         - cookieAuth: []
+      parameters:
+        - in: query
+          name: productId
+          schema:
+            type: integer
       responses:
         "200":
           description: Images list
@@ -843,6 +1216,12 @@ paths:
       summary: Create product image
       security:
         - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImageCreateInput"
       responses:
         "201":
           description: Image created
@@ -873,6 +1252,12 @@ paths:
       summary: Create inventory record
       security:
         - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InventoryCreateInput"
       responses:
         "201":
           description: Inventory created
@@ -885,6 +1270,12 @@ paths:
         - cookieAuth: []
       parameters:
         - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InventoryUpdateInput"
       responses:
         "200":
           description: Inventory updated
@@ -895,6 +1286,9 @@ paths:
       summary: List orders
       security:
         - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
       responses:
         "200":
           description: Orders list
@@ -919,6 +1313,12 @@ paths:
         - cookieAuth: []
       parameters:
         - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderStatusUpdateInput"
       responses:
         "200":
           description: Order updated
@@ -941,6 +1341,12 @@ paths:
         - cookieAuth: []
       parameters:
         - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentStatusUpdateInput"
       responses:
         "200":
           description: Payment updated
@@ -959,6 +1365,12 @@ paths:
       summary: Create shipment
       security:
         - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShipmentCreateInput"
       responses:
         "201":
           description: Shipment created
@@ -971,6 +1383,12 @@ paths:
         - cookieAuth: []
       parameters:
         - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShipmentUpdateInput"
       responses:
         "200":
           description: Shipment updated
@@ -999,6 +1417,12 @@ paths:
       summary: Create coupon
       security:
         - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CouponCreateInput"
       responses:
         "201":
           description: Coupon created
@@ -1011,6 +1435,12 @@ paths:
         - cookieAuth: []
       parameters:
         - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CouponUpdateInput"
       responses:
         "200":
           description: Coupon updated
@@ -1051,6 +1481,9 @@ paths:
     get:
       tags: [Public]
       summary: List public categories
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
       responses:
         "200":
           description: Categories list
@@ -1069,6 +1502,15 @@ paths:
     get:
       tags: [Public]
       summary: List public products
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
+        - $ref: "#/components/parameters/QParam"
+        - in: query
+          name: activeOnly
+          schema:
+            type: string
+            enum: [true, false]
       responses:
         "200":
           description: Products list
@@ -1101,6 +1543,12 @@ paths:
       summary: Add item to cart
       security:
         - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartAddItemInput"
       responses:
         "201":
           description: Cart item created
@@ -1115,6 +1563,12 @@ paths:
         - cookieAuth: []
       parameters:
         - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartUpdateItemInput"
       responses:
         "200":
           description: Cart item updated
@@ -1143,6 +1597,12 @@ paths:
       summary: Create address
       security:
         - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddressCreateInput"
       responses:
         "201":
           description: Address created
@@ -1155,6 +1615,12 @@ paths:
         - cookieAuth: []
       parameters:
         - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddressUpdateInput"
       responses:
         "200":
           description: Address updated
@@ -1175,6 +1641,9 @@ paths:
       summary: List my orders
       security:
         - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
       responses:
         "200":
           description: Orders list
@@ -1183,6 +1652,12 @@ paths:
       summary: Create order from active cart
       security:
         - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderCreateInput"
       responses:
         "201":
           description: Order created
@@ -1213,6 +1688,12 @@ paths:
       summary: Create payment for my order
       security:
         - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentCreateInput"
       responses:
         "201":
           description: Payment created
@@ -1227,6 +1708,11 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: orderTotalCents
+          schema:
+            type: integer
+            minimum: 0
       responses:
         "200":
           description: Coupon validation result
@@ -1237,6 +1723,11 @@ paths:
     get:
       tags: [Public]
       summary: List reviews
+      parameters:
+        - in: query
+          name: productId
+          schema:
+            type: integer
       responses:
         "200":
           description: Reviews list
@@ -1245,6 +1736,12 @@ paths:
       summary: Create review (must be authenticated and have purchased product)
       security:
         - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewCreateInput"
       responses:
         "201":
           description: Review created
@@ -1261,6 +1758,12 @@ paths:
         - cookieAuth: []
       parameters:
         - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewUpdateInput"
       responses:
         "200":
           description: Review updated

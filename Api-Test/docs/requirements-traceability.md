@@ -25,9 +25,9 @@ Légende statut:
 
 | Besoin | Endpoints | Tests | Statut |
 |---|---|---|---|
-| Catégories CRUD admin | `/api/admin/categories`, `/api/admin/categories/{id}` | `tests/api/admin.spec.js`, `tests/api/validation.spec.js`, `tests/api/e2e-client-flow.spec.js` | PARTIEL |
-| Produits CRUD admin | `/api/admin/products`, `/api/admin/products/{id}` | `tests/api/admin.spec.js`, `tests/api/validation.spec.js`, `tests/api/e2e-client-flow.spec.js` | PARTIEL |
-| Images produits admin | `/api/admin/images`, `/api/admin/images/{id}` | `tests/api/admin.spec.js` | PARTIEL |
+| Catégories CRUD admin | `/api/admin/categories`, `/api/admin/categories/{id}` | `tests/api/admin.spec.js`, `tests/api/validation.spec.js`, `tests/api/e2e-client-flow.spec.js` | COUVERT |
+| Produits CRUD admin | `/api/admin/products`, `/api/admin/products/{id}` | `tests/api/admin.spec.js`, `tests/api/validation.spec.js`, `tests/api/e2e-client-flow.spec.js` | COUVERT |
+| Images produits admin | `/api/admin/images`, `/api/admin/images/{id}` | `tests/api/admin.spec.js` | COUVERT |
 | Listing public produits/catégories | `/api/public/products*`, `/api/public/categories*` | `tests/api/public.spec.js`, `tests/api/e2e-client-flow.spec.js` | COUVERT |
 | Slugs uniques SEO | contraintes Prisma (`@unique`) | tests indirects | PARTIEL |
 
@@ -80,7 +80,7 @@ Légende statut:
 
 | Besoin | Endpoints | Tests | Statut |
 |---|---|---|---|
-| CRUD coupons admin | `/api/admin/coupons*` | `tests/api/admin.spec.js`, `tests/api/rbac-roles.spec.js` | PARTIEL |
+| CRUD coupons admin | `/api/admin/coupons*` | `tests/api/admin.spec.js`, `tests/api/rbac-roles.spec.js` | COUVERT |
 | Validation coupon public | `GET /api/public/coupons/validate` | `tests/api/public.spec.js`, `tests/api/validation.spec.js` | COUVERT |
 | Usage coupon en commande | `POST /api/public/orders` (couponCode) | `tests/api/business-rules.spec.js` | COUVERT |
 
@@ -112,8 +112,5 @@ Légende statut:
 
 ## 12) Gaps prioritaires recommandés
 
-1. Renforcer tests CRUD complets par domaine admin:
-- catégories, produits, coupons, images, inventory, shipments.
-
-2. Ajouter assertions métier chiffrées:
+1. Ajouter assertions métier chiffrées:
 - cohérence `subtotal + shipping - discount = total` sur création commande.

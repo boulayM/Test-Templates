@@ -12,10 +12,20 @@
 }
 
 input {
-  min-width: 220px;
+  min-width: 120px;
 }
 
-code {
-  white-space: pre-wrap;
-  word-break: break-word;
+.create-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pager {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
 }

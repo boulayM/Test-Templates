@@ -14,6 +14,10 @@ const logisticsEmail = "e2e_log_" + stamp + "@test.local";
 const accountingEmail = "e2e_comp_" + stamp + "@test.local";
 const password = "User123!";
 
+function expectOrderTotalsConsistent(order) {
+  expect(order.subtotalCents + order.shippingCents - order.discountCents).toBe(order.totalCents);
+}
+
 async function upsertUser(email, role, pass = password) {
   const hash = await bcrypt.hash(pass, 10);
   return prisma.user.upsert({
@@ -142,6 +146,7 @@ describe("e2e client flow", () => {
     });
     expect(orderRes.status).toBe(201);
     expect(orderRes.body.order.status).toBe("PENDING");
+    expectOrderTotalsConsistent(orderRes.body.order);
     const orderId = orderRes.body.order.id;
 
     const paymentRes = await customerAgent.post("/api/public/payments").send({
@@ -189,4 +194,3 @@ describe("e2e client flow", () => {
     expect(logoutAll.status).toBe(200);
   });
 });
-

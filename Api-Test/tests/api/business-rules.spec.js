@@ -246,6 +246,7 @@ describe("business rules", () => {
     expect(order.subtotalCents).toBe(3000);
     expect(order.discountCents).toBe(300);
     expect(order.totalCents).toBe(2700);
+    expect(order.subtotalCents + order.shippingCents - order.discountCents).toBe(order.totalCents);
 
     const coupon = await prisma.coupon.findUnique({ where: { code } });
     expect(coupon.usedCount).toBe(1);

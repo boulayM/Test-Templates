@@ -107,10 +107,13 @@ Légende statut:
 | CSRF sur routes mutantes | middleware `verifyCsrf` | `tests/api/security.spec.js`, `tests/api/users.spec.js` | COUVERT |
 | Rotation refresh token + revoke | auth refresh/logout-all | `tests/api/security.spec.js` | COUVERT |
 | Validation Zod | middlewares validation | `tests/api/validation.spec.js` | COUVERT |
-| Montants en centimes (pas float) | schéma Prisma + controllers | couvert implicitement | PARTIEL |
+| Montants en centimes (pas float) | schéma Prisma + controllers | `tests/api/workflow.spec.js`, `tests/api/business-rules.spec.js`, `tests/api/e2e-client-flow.spec.js` | COUVERT |
 | Traçabilité timestamps | champs `createdAt/updatedAt` | couverture indirecte | PARTIEL |
 
 ## 12) Gaps prioritaires recommandés
 
-1. Ajouter assertions métier chiffrées:
-- cohérence `subtotal + shipping - discount = total` sur création commande.
+1. Renforcer couverture profil/adresses:
+- `/api/users/me`, `/api/public/addresses*` (cas update/default détaillés).
+
+2. Étendre couverture avis:
+- update/delete côté client, modération admin avec assertions de contenu.

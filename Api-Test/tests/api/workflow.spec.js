@@ -99,6 +99,10 @@ async function createOrderFromCart(userAgent, productId, addressId) {
   return orderRes.body.order;
 }
 
+function expectOrderTotalsConsistent(order) {
+  expect(order.subtotalCents + order.shippingCents - order.discountCents).toBe(order.totalCents);
+}
+
 describe("workflow", () => {
   let customerId;
 
@@ -144,6 +148,7 @@ describe("workflow", () => {
 
     const order = await createOrderFromCart(userAgent, product.id, address.id);
     expect(order.status).toBe("PENDING");
+    expectOrderTotalsConsistent(order);
 
     const paymentRes = await userAgent.post("/api/public/payments").send({
       orderId: order.id,
@@ -191,6 +196,7 @@ describe("workflow", () => {
 
     const order = await createOrderFromCart(userAgent, product.id, address.id);
     expect(order.status).toBe("PENDING");
+    expectOrderTotalsConsistent(order);
 
     const invalidRes = await logAgent
       .patch("/api/admin/orders/" + order.id + "/status")

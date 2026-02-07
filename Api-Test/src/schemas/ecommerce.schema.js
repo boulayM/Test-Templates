@@ -7,10 +7,34 @@ const optionalDate = z
   .datetime()
   .optional()
   .or(z.literal("").transform(() => undefined));
+const pageInt = z.coerce.number().int().min(1);
+const limitInt = z.coerce.number().int().min(1).max(100);
 
 export const idParamSchema = z
   .object({
     id: z.coerce.number().int().positive()
+  })
+  .strict();
+
+export const listPageQuerySchema = z
+  .object({
+    page: pageInt.optional(),
+    limit: limitInt.optional()
+  })
+  .strict();
+
+export const productListQuerySchema = z
+  .object({
+    page: pageInt.optional(),
+    limit: limitInt.optional(),
+    q: z.string().max(120).optional(),
+    activeOnly: z.enum(["true", "false"]).optional()
+  })
+  .strict();
+
+export const reviewListQuerySchema = z
+  .object({
+    productId: z.coerce.number().int().positive().optional()
   })
   .strict();
 

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authRequired } from "../../middlewares/auth.js";
-import { validateBody, validateParams } from "../../middlewares/zodValidate.js";
+import { validateBody, validateParams, validateQuery } from "../../middlewares/zodValidate.js";
 import {
   listReviews,
   createReview,
@@ -10,12 +10,13 @@ import {
 import {
   idParamSchema,
   reviewCreateSchema,
+  reviewListQuerySchema,
   reviewUpdateSchema
 } from "../../schemas/ecommerce.schema.js";
 
 const router = Router();
 
-router.get("/", listReviews);
+router.get("/", validateQuery(reviewListQuerySchema), listReviews);
 router.post("/", authRequired, validateBody(reviewCreateSchema), createReview);
 router.patch(
   "/:id",

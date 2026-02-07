@@ -1,0 +1,11 @@
+@use '../abstracts' as *;
+
+.card-ui {
+  @include card-style();
+  padding: $space-4;
+}
+
+.card-ui__title {
+  font-weight: $heading-weight;
+  margin-bottom: $space-3;
+}

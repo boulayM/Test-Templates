@@ -1,0 +1,39 @@
+# ENV
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# Angular
+.angular/
+
+# Logs
+logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Docker (optionnel)
+docker-data/
+
+# Tests
+*.storage.json
+BackOffice-Test/e2e.storage.json
+

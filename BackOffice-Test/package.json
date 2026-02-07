@@ -1,0 +1,78 @@
+{
+  "name": "admin-angular",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "check:encoding": "powershell -ExecutionPolicy Bypass -File scripts/check-encoding.ps1",
+    "prestart": "npm run check:encoding",
+    "start": "ng serve",
+    "prebuild": "npm run check:encoding",
+    "build": "ng build",
+    "prewatch": "npm run check:encoding",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test:unit": "ng test --watch=false --browsers=ChromeHeadless",
+    "predev": "npm run check:encoding",
+    "setup:e2e": "powershell -ExecutionPolicy Bypass -File scripts/setup-e2e.ps1",
+    "prepreview": "npm run check:encoding",
+    "e2e": "set E2E_API_URL=http://localhost:3001/api&& playwright test",
+    "e2e:full": "set E2E_API_URL=http://localhost:3001/api&& set E2E_RUN_LOGOUT=1&& playwright test",
+    "e2e:ui": "set E2E_API_URL=http://localhost:3001/api&& playwright test --ui",
+    "e2e:debug": "set E2E_API_URL=http://localhost:3001/api&& playwright test --debug",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "packageManager": "npm@11.7.0",
+  "dependencies": {
+    "@angular/common": "^21.1.0",
+    "@angular/compiler": "^21.1.0",
+    "@angular/core": "^21.1.0",
+    "@angular/forms": "^21.1.0",
+    "@angular/platform-browser": "^21.1.0",
+    "@angular/router": "^21.1.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.1"
+  },
+  "devDependencies": {
+    "@angular-eslint/eslint-plugin": "^18.4.3",
+    "@angular-eslint/eslint-plugin-template": "^18.4.3",
+    "@angular-eslint/template-parser": "^18.4.3",
+    "@angular/build": "^21.1.1",
+    "@angular/cli": "^21.1.1",
+    "@angular/compiler-cli": "^21.1.0",
+    "@playwright/test": "^1.58.0",
+    "@types/jasmine": "^6.0.0",
+    "@types/node": "^25.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
+    "dotenv": "^17.2.3",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^9.1.2",
+    "globals": "^15.15.0",
+    "jasmine-core": "^6.0.1",
+    "karma": "^6.4.4",
+    "karma-chrome-launcher": "^3.2.0",
+    "karma-coverage": "^2.2.1",
+    "karma-jasmine": "^5.1.0",
+    "karma-jasmine-html-reporter": "^2.2.0",
+    "prettier": "^3.8.1",
+    "typescript": "~5.9.2"
+  }
+}

@@ -4,12 +4,16 @@ const PERMISSIONS = {
   ADMIN: ["*"],
 
   LOGISTIQUE: [
+    "catalog.read",
     "orders.read",
+    "orders.own.read",
+    "orders.own.create",
     "orders.prepare",
     "orders.ship",
     "orders.deliver",
     "orders.updateStatus",
     "shipments.read",
+    "shipments.own.read",
     "shipments.create",
     "shipments.update",
     "inventory.read",
@@ -18,11 +22,15 @@ const PERMISSIONS = {
   ],
 
   COMPTABILITE: [
+    "catalog.read",
     "payments.read",
+    "payments.own.create",
     "payments.validate",
     "payments.refund",
     "orders.read",
+    "orders.own.read",
     "coupons.read",
+    "coupons.write",
     "reports.finance.read",
     "audit-logs.read"
   ],

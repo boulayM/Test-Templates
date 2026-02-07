@@ -6,13 +6,15 @@ process.env.DISABLE_RATE_LIMIT = "true";
 
 let app;
 
-const userEmail = "public_user_" + Date.now() + "@test.local";
+const stamp = Date.now();
+const userEmail = "public_user_" + stamp + "@test.local";
+const secondUserEmail = "public_user_2_" + stamp + "@test.local";
 const userPassword = "User123!";
 
-async function ensureUser() {
+async function ensureUser(email) {
   const hash = await bcrypt.hash(userPassword, 10);
   await prisma.user.upsert({
-    where: { email: userEmail },
+    where: { email },
     update: {
       firstName: "Public",
       lastName: "User",
@@ -24,7 +26,7 @@ async function ensureUser() {
     create: {
       firstName: "Public",
       lastName: "User",
-      email: userEmail,
+      email,
       passwordHash: hash,
       role: "USER",
       emailVerified: true,
@@ -69,6 +71,16 @@ async function loginUser() {
   return { agent };
 }
 
+async function loginUserByEmail(email) {
+  const agent = request.agent(app);
+  const res = await agent.post("/api/auth/login").send({
+    email,
+    password: userPassword
+  });
+  expect(res.status).toBe(200);
+  return { agent };
+}
+
 describe("public api", () => {
   beforeAll(async () => {
     const mod = await import("../../src/app.js");
@@ -93,7 +105,8 @@ describe("public api", () => {
     await prisma.verificationToken.deleteMany();
     await prisma.user.deleteMany();
 
-    await ensureUser();
+    await ensureUser(userEmail);
+    await ensureUser(secondUserEmail);
     await seedCatalog();
   });
 
@@ -200,5 +213,76 @@ describe("public api", () => {
     const secondState2 = list2.body.data.find((x) => x.id === addr2);
     expect(secondState1.isDefault).toBe(true);
     expect(secondState2.isDefault).toBe(false);
+  });
+
+  test("orders history and details are isolated per user", async () => {
+    const { agent: user1 } = await loginUserByEmail(userEmail);
+    const { agent: user2 } = await loginUserByEmail(secondUserEmail);
+    const product = await prisma.product.findFirst({ select: { id: true } });
+    expect(product).toBeTruthy();
+
+    const addr1Res = await user1.post("/api/public/addresses").send({
+      label: "User1",
+      fullName: "User One",
+      phone: "0600000011",
+      line1: "1 user one st",
+      line2: null,
+      postalCode: "75001",
+      city: "Paris",
+      country: "FR",
+      isDefault: true
+    });
+    expect(addr1Res.status).toBe(201);
+    const addr1 = addr1Res.body.address.id;
+
+    const addr2Res = await user2.post("/api/public/addresses").send({
+      label: "User2",
+      fullName: "User Two",
+      phone: "0600000022",
+      line1: "2 user two st",
+      line2: null,
+      postalCode: "75002",
+      city: "Paris",
+      country: "FR",
+      isDefault: true
+    });
+    expect(addr2Res.status).toBe(201);
+    const addr2 = addr2Res.body.address.id;
+
+    const add1 = await user1.post("/api/public/cart/items").send({
+      productId: product.id,
+      quantity: 1
+    });
+    expect(add1.status).toBe(201);
+    const order1Res = await user1.post("/api/public/orders").send({
+      shippingAddressId: addr1,
+      billingAddressId: addr1
+    });
+    expect(order1Res.status).toBe(201);
+    const order1Id = order1Res.body.order.id;
+
+    const add2 = await user2.post("/api/public/cart/items").send({
+      productId: product.id,
+      quantity: 1
+    });
+    expect(add2.status).toBe(201);
+    const order2Res = await user2.post("/api/public/orders").send({
+      shippingAddressId: addr2,
+      billingAddressId: addr2
+    });
+    expect(order2Res.status).toBe(201);
+    const order2Id = order2Res.body.order.id;
+
+    const user1List = await user1.get("/api/public/orders");
+    expect(user1List.status).toBe(200);
+    expect(user1List.body.data.some((o) => o.id === order1Id)).toBe(true);
+    expect(user1List.body.data.some((o) => o.id === order2Id)).toBe(false);
+
+    const ownDetail = await user1.get("/api/public/orders/" + order1Id);
+    expect(ownDetail.status).toBe(200);
+    expect(ownDetail.body.order.id).toBe(order1Id);
+
+    const foreignDetail = await user1.get("/api/public/orders/" + order2Id);
+    expect(foreignDetail.status).toBe(404);
   });
 });

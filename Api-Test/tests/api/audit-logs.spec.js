@@ -78,4 +78,34 @@ describe("audit-logs", () => {
     expect(res.headers["content-type"]).toContain("text/csv");
     expect(res.text).toContain("id,action,actorEmail,actorId,actorRole,targetType,targetId,status,requestId,createdAt");
   });
+
+  it("records key auth actions in audit logs", async () => {
+    if (!mongoReady) return;
+
+    const wrongLogin = await request(app).post("/api/auth/login").send({
+      email: adminEmail,
+      password: "WrongPassword!"
+    });
+    expect(wrongLogin.status).toBe(400);
+
+    const { agent: firstAgent, csrfToken } = await loginAdmin();
+    const logoutAll = await firstAgent.post("/api/auth/logout-all").set("x-csrf-token", csrfToken);
+    expect(logoutAll.status).toBe(200);
+
+    const { agent: adminAgent } = await loginAdmin();
+
+    const failLogs = await adminAgent
+      .get("/api/audit-logs")
+      .query({ filters: JSON.stringify({ action: "LOGIN_FAIL" }), limit: 5 });
+    expect(failLogs.status).toBe(200);
+    expect(Array.isArray(failLogs.body.data)).toBe(true);
+    expect(failLogs.body.data.length).toBeGreaterThan(0);
+
+    const logoutAllLogs = await adminAgent
+      .get("/api/audit-logs")
+      .query({ filters: JSON.stringify({ action: "LOGOUT_ALL" }), limit: 5 });
+    expect(logoutAllLogs.status).toBe(200);
+    expect(Array.isArray(logoutAllLogs.body.data)).toBe(true);
+    expect(logoutAllLogs.body.data.length).toBeGreaterThan(0);
+  });
 });

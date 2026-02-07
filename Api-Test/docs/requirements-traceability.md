@@ -55,7 +55,7 @@ Légende statut:
 | Besoin | Endpoints | Tests | Statut |
 |---|---|---|---|
 | Création commande depuis panier | `POST /api/public/orders` | `tests/api/workflow.spec.js`, `tests/api/e2e-client-flow.spec.js`, `tests/api/business-rules.spec.js` | COUVERT |
-| Historique client + détail | `GET /api/public/orders`, `GET /api/public/orders/{id}` | `tests/api/public.spec.js` | PARTIEL |
+| Historique client + détail | `GET /api/public/orders`, `GET /api/public/orders/{id}` | `tests/api/public.spec.js` | COUVERT |
 | Suivi admin + transitions | `GET /api/admin/orders*`, `PATCH /api/admin/orders/{id}/status` | `tests/api/workflow.spec.js`, `tests/api/rbac-roles.spec.js` | COUVERT |
 | Règle transition invalide rejetée | transition `PENDING -> SHIPPED` | `tests/api/workflow.spec.js` | COUVERT |
 | Règle annulation libère stock réservé | `PATCH /api/admin/orders/{id}/status` (`CANCELLED`) | `tests/api/business-rules.spec.js` | COUVERT |
@@ -99,6 +99,7 @@ Légende statut:
 | Besoin | Endpoints | Tests | Statut |
 |---|---|---|---|
 | Consultation audit logs admin | `/api/audit-logs*`, `/api/admin/audit-logs*` | `tests/api/audit-logs.spec.js`, `tests/api/permissions.spec.js` | COUVERT |
+| Actions auth clés tracées (`LOGIN_FAIL`, `LOGOUT_ALL`) | `POST /api/auth/login`, `POST /api/auth/logout-all`, `GET /api/audit-logs` | `tests/api/audit-logs.spec.js` | COUVERT |
 | Stockage base séparée MongoDB | couche audit log en place | testé partiellement selon env | PARTIEL |
 
 ## 11) Exigences sécurité et techniques
@@ -113,8 +114,8 @@ Légende statut:
 
 ## 12) Gaps prioritaires recommandés
 
-1. Renforcer la couverture observabilité:
-- assertions dédiées sur audit logs (actions métier clés) selon environnement Mongo.
+1. Finaliser la couverture environnement observabilité:
+- conserver les tests audit sur un environnement où MongoDB est disponible pour valider la persistance réelle.
 
 2. Surveiller la stabilité de la couverture traçabilité:
 - maintenir les validations explicites `createdAt/updatedAt` si de nouvelles ressources critiques sont ajoutées.

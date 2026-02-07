@@ -48,6 +48,7 @@ Légende statut:
 |---|---|---|---|
 | Panier actif unique, ajout/modif/suppression lignes | `/api/public/cart`, `/api/public/cart/items`, `/api/public/cart/items/{id}` | `tests/api/public.spec.js`, `tests/api/validation.spec.js`, `tests/api/e2e-client-flow.spec.js` | COUVERT |
 | Statuts panier ACTIVE/CONVERTED/ABANDONED | logique create order -> CONVERTED implémentée | couverture indirecte | PARTIEL |
+| Stock insuffisant bloque la commande et rollback réservations | `POST /api/public/orders` | `tests/api/business-rules.spec.js` | COUVERT |
 
 ## 5) Commandes
 
@@ -112,5 +113,8 @@ Légende statut:
 
 ## 12) Gaps prioritaires recommandés
 
-1. Améliorer la couverture des contraintes de stock:
-- tests additionnels sur bornes de stock/réservations et cas limites multi-lignes panier.
+1. Renforcer la couverture observabilité:
+- assertions dédiées sur audit logs (actions métier clés) selon environnement Mongo.
+
+2. Renforcer la couverture traçabilité:
+- validations explicites sur `createdAt/updatedAt` dans les ressources critiques.

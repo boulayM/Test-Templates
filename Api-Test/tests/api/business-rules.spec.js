@@ -124,6 +124,24 @@ async function createOrderFlow(userAgent, productId, addressId, couponCode = nul
   return orderRes.body.order;
 }
 
+async function addToCart(userAgent, productId, quantity) {
+  const add = await userAgent.post("/api/public/cart/items").send({
+    productId,
+    quantity
+  });
+  expect(add.status).toBe(201);
+}
+
+async function resetUserCarts(userId) {
+  await prisma.cartItem.deleteMany({
+    where: { cart: { userId } }
+  });
+  await prisma.cart.updateMany({
+    where: { userId, status: "ACTIVE" },
+    data: { status: "ABANDONED" }
+  });
+}
+
 describe("business rules", () => {
   beforeAll(async () => {
     const mod = await import("../../src/app.js");
@@ -312,5 +330,105 @@ describe("business rules", () => {
     });
 
     expect(res.status).toBe(400);
+  });
+
+  test("order creation with insufficient inventory on one line rolls back all reservations", async () => {
+    const user = await prisma.user.findUnique({ where: { email: userEmail } });
+    await resetUserCarts(user.id);
+    const { address } = await seedProductForUser(user.id);
+
+    const stamp = Date.now();
+    const p1 = await prisma.product.create({
+      data: {
+        name: "Stock Product A " + stamp,
+        slug: "stock-a-" + stamp,
+        description: "A",
+        priceCents: 1000,
+        currency: "EUR",
+        sku: "STOCK-A-" + stamp,
+        isActive: true
+      }
+    });
+    const p2 = await prisma.product.create({
+      data: {
+        name: "Stock Product B " + stamp,
+        slug: "stock-b-" + stamp,
+        description: "B",
+        priceCents: 1200,
+        currency: "EUR",
+        sku: "STOCK-B-" + stamp,
+        isActive: true
+      }
+    });
+
+    await prisma.inventory.create({ data: { productId: p1.id, quantity: 5, reserved: 0 } });
+    await prisma.inventory.create({ data: { productId: p2.id, quantity: 1, reserved: 0 } });
+
+    const { agent: userAgent } = await login(userEmail, userPassword);
+    await addToCart(userAgent, p1.id, 2);
+    await addToCart(userAgent, p2.id, 3);
+
+    const res = await userAgent.post("/api/public/orders").send({
+      shippingAddressId: address.id,
+      billingAddressId: address.id
+    });
+    expect(res.status).toBe(400);
+
+    const i1 = await prisma.inventory.findUnique({ where: { productId: p1.id } });
+    const i2 = await prisma.inventory.findUnique({ where: { productId: p2.id } });
+    expect(i1.reserved).toBe(0);
+    expect(i2.reserved).toBe(0);
+  });
+
+  test("order creation reserves exact quantities for each cart line", async () => {
+    const user = await prisma.user.findUnique({ where: { email: userEmail } });
+    await resetUserCarts(user.id);
+    const { address } = await seedProductForUser(user.id);
+
+    const stamp = Date.now();
+    const p1 = await prisma.product.create({
+      data: {
+        name: "Reserve Product A " + stamp,
+        slug: "reserve-a-" + stamp,
+        description: "A",
+        priceCents: 1000,
+        currency: "EUR",
+        sku: "RESERVE-A-" + stamp,
+        isActive: true
+      }
+    });
+    const p2 = await prisma.product.create({
+      data: {
+        name: "Reserve Product B " + stamp,
+        slug: "reserve-b-" + stamp,
+        description: "B",
+        priceCents: 2000,
+        currency: "EUR",
+        sku: "RESERVE-B-" + stamp,
+        isActive: true
+      }
+    });
+
+    await prisma.inventory.create({ data: { productId: p1.id, quantity: 10, reserved: 0 } });
+    await prisma.inventory.create({ data: { productId: p2.id, quantity: 10, reserved: 0 } });
+
+    const { agent: userAgent } = await login(userEmail, userPassword);
+    await addToCart(userAgent, p1.id, 2);
+    await addToCart(userAgent, p2.id, 3);
+
+    const orderRes = await userAgent.post("/api/public/orders").send({
+      shippingAddressId: address.id,
+      billingAddressId: address.id
+    });
+    expect(orderRes.status).toBe(201);
+    const order = orderRes.body.order;
+
+    const i1 = await prisma.inventory.findUnique({ where: { productId: p1.id } });
+    const i2 = await prisma.inventory.findUnique({ where: { productId: p2.id } });
+    expect(i1.reserved).toBe(2);
+    expect(i2.reserved).toBe(3);
+
+    const items = await prisma.orderItem.findMany({ where: { orderId: order.id } });
+    expect(items).toHaveLength(2);
   });
 });

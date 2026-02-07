@@ -1,25 +1,59 @@
-<section class='ds-container'>
-  <div class='card-ui'>
-    <div class='toolbar'>
+<section class="ds-container">
+  <div class="card-ui">
+    <div class="toolbar">
       <h1>Shipments</h1>
-      <div class='actions'>
-        <input [(ngModel)]='q' placeholder='Search...' />
-        <button class='btn-ui' (click)='load()'>Refresh</button>
+      <div class="actions">
+        <input [(ngModel)]="q" placeholder="Search by order/carrier/status" />
+        <button class="btn-ui" (click)="load()">Refresh</button>
       </div>
     </div>
-    <table class='table-ui'>
+
+    <div class="create-row">
+      <input [(ngModel)]="form.orderId" placeholder="Order ID" />
+      <input [(ngModel)]="form.carrier" placeholder="Carrier" />
+      <input [(ngModel)]="form.trackingNumber" placeholder="Tracking number" />
+      <select [(ngModel)]="form.status">
+        <option *ngFor="let st of statuses" [ngValue]="st">{{ st }}</option>
+      </select>
+      <button class="btn-ui" (click)="createShipment()">Create</button>
+    </div>
+
+    <table class="table-ui">
       <thead>
         <tr>
-          <th>#</th>
-          <th>Payload</th>
+          <th>ID</th>
+          <th>Order</th>
+          <th>Carrier</th>
+          <th>Tracking</th>
+          <th>Status</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor='let item of data; let i = index'>
-          <td>{{ i + 1 }}</td>
-          <td><code>{{ item | json }}</code></td>
+        <tr *ngFor="let item of data">
+          <td>{{ item.id }}</td>
+          <td>{{ item.orderId }}</td>
+          <td>{{ item.carrier || '-' }}</td>
+          <td>{{ item.trackingNumber || '-' }}</td>
+          <td>
+            <select [(ngModel)]="statusDraft[item.id]">
+              <option *ngFor="let st of statuses" [ngValue]="st">{{ st }}</option>
+            </select>
+          </td>
+          <td>
+            <button class="btn-ui" (click)="updateStatus(item)">Update</button>
+            <button class="btn-ui btn-danger" (click)="deleteShipment(item)">Delete</button>
+          </td>
         </tr>
       </tbody>
     </table>
+
+    <div class="pager">
+      <button class="btn-ui" [disabled]="page <= 1 || loading" (click)="prevPage()">Prev</button>
+      <span>Page {{ page }} / {{ totalPages }}</span>
+      <button class="btn-ui" [disabled]="page >= totalPages || loading" (click)="nextPage()">
+        Next
+      </button>
+    </div>
   </div>
 </section>

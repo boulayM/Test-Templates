@@ -11,10 +11,23 @@ import { ToastService } from '../../../shared/services/toast.service';
   styleUrl: './shipments.component.scss',
 })
 export class ShipmentsComponent implements OnInit {
-  data: Array<Record<string, unknown>> = [];
+  data: ShipmentItem[] = [];
+  total = 0;
+  totalPages = 1;
   page = 1;
   limit = 10;
   q = '';
+  loading = false;
+  statusDraft: Record<number, string> = {};
+
+  form = {
+    orderId: '',
+    carrier: '',
+    trackingNumber: '',
+    status: 'CREATED',
+  };
+
+  readonly statuses = ['CREATED', 'IN_TRANSIT', 'DELIVERED', 'LOST'];
 
   constructor(
     private service: AdminShipmentsService,
@@ -27,18 +40,127 @@ export class ShipmentsComponent implements OnInit {
   }
 
   load(): void {
+    this.loading = true;
     this.service.list({ page: this.page, limit: this.limit, q: this.q }).subscribe({
       next: (res: unknown) => {
-        this.data = this.extractData(res);
+        const list = this.extractData(res);
+        this.data = list;
+        this.total = this.extractTotal(res);
+        this.totalPages = Math.max(1, Math.ceil(this.total / this.limit));
+        this.statusDraft = {};
+        for (const item of list) {
+          this.statusDraft[item.id] = item.status;
+        }
+        this.loading = false;
         this.cdr.detectChanges();
       },
-      error: () => this.toast.show('Unable to load shipments'),
+      error: () => {
+        this.loading = false;
+        this.toast.show('Unable to load shipments');
+      },
     });
   }
 
-  private extractData(res: unknown): Array<Record<string, unknown>> {
+  createShipment(): void {
+    const orderId = Number(this.form.orderId);
+    if (!orderId) {
+      this.toast.show('Order id is required');
+      return;
+    }
+    this.service
+      .create({
+        orderId,
+        carrier: this.form.carrier || null,
+        trackingNumber: this.form.trackingNumber || null,
+        status: this.form.status,
+      })
+      .subscribe({
+        next: () => {
+          this.toast.show('Shipment created');
+          this.form = { orderId: '', carrier: '', trackingNumber: '', status: 'CREATED' };
+          this.load();
+        },
+        error: () => this.toast.show('Unable to create shipment'),
+      });
+  }
+
+  updateStatus(item: ShipmentItem): void {
+    const nextStatus = this.statusDraft[item.id];
+    if (!nextStatus || nextStatus === item.status) return;
+    this.service.update(item.id, { status: nextStatus }).subscribe({
+      next: () => {
+        this.toast.show('Shipment status updated');
+        this.load();
+      },
+      error: () => this.toast.show('Unable to update shipment'),
+    });
+  }
+
+  deleteShipment(item: ShipmentItem): void {
+    if (!confirm('Delete this shipment?')) return;
+    this.service.delete(item.id).subscribe({
+      next: () => {
+        this.toast.show('Shipment deleted');
+        this.load();
+      },
+      error: () => this.toast.show('Unable to delete shipment'),
+    });
+  }
+
+  prevPage(): void {
+    if (this.page <= 1) return;
+    this.page -= 1;
+    this.load();
+  }
+
+  nextPage(): void {
+    if (this.page >= this.totalPages) return;
+    this.page += 1;
+    this.load();
+  }
+
+  private extractData(res: unknown): ShipmentItem[] {
     if (!res || typeof res !== 'object') return [];
     const obj = res as Record<string, unknown>;
-    return Array.isArray(obj['data']) ? (obj['data'] as Array<Record<string, unknown>>) : [];
+    if (!Array.isArray(obj['data'])) return [];
+    return (obj['data'] as unknown[])
+      .filter((item) => !!item && typeof item === 'object')
+      .map((item) => {
+        const row = item as Record<string, unknown>;
+        return {
+          id: this.toNumber(row['id']),
+          orderId: this.toNumber(row['orderId']),
+          carrier: this.toNullableString(row['carrier']),
+          trackingNumber: this.toNullableString(row['trackingNumber']),
+          status: this.toString(row['status']),
+        };
+      })
+      .filter((item) => item.id > 0);
   }
+
+  private extractTotal(res: unknown): number {
+    if (!res || typeof res !== 'object') return 0;
+    const obj = res as Record<string, unknown>;
+    return this.toNumber(obj['total']);
+  }
+
+  private toNumber(value: unknown): number {
+    return typeof value === 'number' ? value : 0;
+  }
+
+  private toString(value: unknown): string {
+    return typeof value === 'string' ? value : '';
+  }
+
+  private toNullableString(value: unknown): string | null {
+    return typeof value === 'string' ? value : null;
+  }
+}
+
+interface ShipmentItem {
+  id: number;
+  orderId: number;
+  carrier: string | null;
+  trackingNumber: string | null;
+  status: string;
 }

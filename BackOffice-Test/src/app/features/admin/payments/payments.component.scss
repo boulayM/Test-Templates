@@ -15,7 +15,10 @@ input {
   min-width: 220px;
 }
 
-code {
-  white-space: pre-wrap;
-  word-break: break-word;
+.pager {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
 }

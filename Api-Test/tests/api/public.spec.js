@@ -149,4 +149,56 @@ describe("public api", () => {
     const shipments = await agent.get("/api/public/shipments");
     expect(shipments.status).toBe(200);
   });
+
+  test("addresses support multiple entries and single default switch", async () => {
+    const { agent } = await loginUser();
+    const stamp = Date.now();
+
+    const a1 = await agent.post("/api/public/addresses").send({
+      label: "Home",
+      fullName: "Public User",
+      phone: "0600000000",
+      line1: "10 test road",
+      line2: null,
+      postalCode: "75000",
+      city: "Paris",
+      country: "FR",
+      isDefault: true
+    });
+    expect(a1.status).toBe(201);
+    const addr1 = a1.body.address.id;
+
+    const a2 = await agent.post("/api/public/addresses").send({
+      label: "Work " + stamp,
+      fullName: "Public User",
+      phone: "0600000001",
+      line1: "11 test road",
+      line2: null,
+      postalCode: "75000",
+      city: "Paris",
+      country: "FR",
+      isDefault: true
+    });
+    expect(a2.status).toBe(201);
+    const addr2 = a2.body.address.id;
+
+    const list1 = await agent.get("/api/public/addresses");
+    expect(list1.status).toBe(200);
+    const firstState1 = list1.body.data.find((x) => x.id === addr1);
+    const firstState2 = list1.body.data.find((x) => x.id === addr2);
+    expect(firstState1.isDefault).toBe(false);
+    expect(firstState2.isDefault).toBe(true);
+
+    const switchDefault = await agent.patch("/api/public/addresses/" + addr1).send({
+      isDefault: true
+    });
+    expect(switchDefault.status).toBe(200);
+
+    const list2 = await agent.get("/api/public/addresses");
+    expect(list2.status).toBe(200);
+    const secondState1 = list2.body.data.find((x) => x.id === addr1);
+    const secondState2 = list2.body.data.find((x) => x.id === addr2);
+    expect(secondState1.isDefault).toBe(true);
+    expect(secondState2.isDefault).toBe(false);
+  });
 });

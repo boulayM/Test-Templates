@@ -179,4 +179,12 @@ describe("users", () => {
     expect(res.headers["content-type"]).toContain("text/csv");
     expect(res.text).toContain("id,firstName,lastName,email,role,emailVerified,isActive,createdAt");
   });
+
+  it("returns current profile on /api/users/me", async () => {
+    const { agent } = await loginAdmin();
+    const res = await agent.get("/api/users/me");
+    expect(res.status).toBe(200);
+    expect(res.body.user).toBeDefined();
+    expect(res.body.user.email).toBe(adminEmail);
+  });
 });

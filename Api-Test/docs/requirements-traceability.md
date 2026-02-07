@@ -38,8 +38,8 @@ Légende statut:
 | Authentification login/refresh/logout/logout-all | `/api/auth/login`, `/api/auth/refresh`, `/api/auth/logout`, `/api/auth/logout-all` | `tests/api/security.spec.js`, `tests/api/auth.spec.js`, `tests/api/e2e-client-flow.spec.js` | COUVERT |
 | Rôles USER/ADMIN/LOGISTIQUE/COMPTABILITE | `User.role`, middleware permissions | `tests/api/permissions.spec.js`, `tests/api/rbac-roles.spec.js` | COUVERT |
 | Utilisateurs admin (liste/create/update/delete/export) | `/api/users*`, `/api/admin/users*` | `tests/api/users.spec.js` | COUVERT |
-| Profil utilisateur courant | `/api/auth/me`, `/api/users/me`, `/api/admin/users/me` | couverture partielle via smoke | PARTIEL |
-| Adresses multiples + défaut | `/api/public/addresses*` | `tests/api/public.spec.js`, `tests/api/e2e-client-flow.spec.js` | PARTIEL |
+| Profil utilisateur courant | `/api/auth/me`, `/api/users/me`, `/api/admin/users/me` | `tests/api/users.spec.js`, `tests/api/security.spec.js` | COUVERT |
+| Adresses multiples + défaut | `/api/public/addresses*` | `tests/api/public.spec.js`, `tests/api/e2e-client-flow.spec.js` | COUVERT |
 | Désactivation compte | login/refresh/auth guard vérifient `isActive` | `tests/api/security.spec.js` | COUVERT |
 
 ## 4) Panier
@@ -112,8 +112,5 @@ Légende statut:
 
 ## 12) Gaps prioritaires recommandés
 
-1. Renforcer couverture profil/adresses:
-- `/api/users/me`, `/api/public/addresses*` (cas update/default détaillés).
-
-2. Étendre couverture avis:
+1. Étendre couverture avis:
 - update/delete côté client, modération admin avec assertions de contenu.

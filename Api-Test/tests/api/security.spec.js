@@ -140,4 +140,57 @@ describe("security L2", () => {
 
     expect(res.status).toBe(403);
   });
+
+  it("disabled user cannot login", async () => {
+    const email = "disabled_login_" + Date.now() + "@test.local";
+    const hash = await bcrypt.hash("User123!", 10);
+    await prisma.user.create({
+      data: {
+        firstName: "Disabled",
+        lastName: "Login",
+        email,
+        passwordHash: hash,
+        role: "USER",
+        emailVerified: true,
+        isActive: false
+      }
+    });
+
+    const res = await request(app).post("/api/auth/login").send({
+      email,
+      password: "User123!"
+    });
+    expect(res.status).toBe(403);
+  });
+
+  it("disabled user cannot access protected endpoint with existing token", async () => {
+    const email = "disabled_token_" + Date.now() + "@test.local";
+    const hash = await bcrypt.hash("User123!", 10);
+    await prisma.user.create({
+      data: {
+        firstName: "Disabled",
+        lastName: "Token",
+        email,
+        passwordHash: hash,
+        role: "USER",
+        emailVerified: true,
+        isActive: true
+      }
+    });
+
+    const agent = request.agent(app);
+    const login = await agent.post("/api/auth/login").send({
+      email,
+      password: "User123!"
+    });
+    expect(login.status).toBe(200);
+
+    await prisma.user.update({
+      where: { email },
+      data: { isActive: false }
+    });
+
+    const me = await agent.get("/api/auth/me");
+    expect(me.status).toBe(403);
+  });
 });

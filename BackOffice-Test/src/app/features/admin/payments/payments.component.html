@@ -1,0 +1,25 @@
+<section class='ds-container'>
+  <div class='card-ui'>
+    <div class='toolbar'>
+      <h1>Payments</h1>
+      <div class='actions'>
+        <input [(ngModel)]='q' placeholder='Search...' />
+        <button class='btn-ui' (click)='load()'>Refresh</button>
+      </div>
+    </div>
+    <table class='table-ui'>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Payload</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor='let item of data; let i = index'>
+          <td>{{ i + 1 }}</td>
+          <td><code>{{ item | json }}</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

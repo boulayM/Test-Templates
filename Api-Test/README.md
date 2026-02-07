@@ -111,3 +111,5 @@ npm run dev
 - Verification complete locale:
   - `npm run lint`
   - `npm test`
+- Rapport de cloture adaptation:
+  - `docs/adaptation-final-report.md`

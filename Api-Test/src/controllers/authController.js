@@ -68,6 +68,7 @@ export const login = async (req, res, next) => {
         email: true,
         role: true,
         emailVerified: true,
+        isActive: true,
         passwordHash: true
       }
     });
@@ -110,6 +111,19 @@ export const login = async (req, res, next) => {
         metadata: { reason: "email_not_verified" }
       });
       return res.status(403).json({ message: "Email non verifie" });
+    }
+
+    if (!user.isActive) {
+      await createAuditLog({
+        userId: user.id,
+        action: "LOGIN_BLOCKED",
+        resourceType: "User",
+        resourceId: String(user.id),
+        status: "DENIED",
+        req,
+        metadata: { reason: "account_disabled" }
+      });
+      return res.status(403).json({ message: "Compte desactive" });
     }
 
     const accessToken = generateAccessToken(user);
@@ -423,6 +437,16 @@ export const refresh = async (req, res, next) => {
 
     const user = await prisma.user.findUnique({ where: { id: payload.id } });
     if (!user) return res.status(401).json({ message: "User not found" });
+    if (!user.isActive) {
+      await prisma.refreshToken.updateMany({
+        where: { userId: user.id },
+        data: { revokedAt: new Date() }
+      });
+      res.clearCookie("accessToken", accessCookieClearOptions);
+      res.clearCookie("refreshToken", refreshCookieClearOptions);
+      res.clearCookie("csrfToken", csrfCookieClearOptions);
+      return res.status(403).json({ message: "Compte desactive" });
+    }
 
     const newAccessToken = generateAccessToken(user);
     const newRefreshToken = generateRefreshToken(user);

@@ -19,6 +19,10 @@ tags:
     description: User management
   - name: AuditLogs
     description: Audit logs
+  - name: Admin
+    description: Back-office endpoints
+  - name: Public
+    description: Public and customer endpoints
   - name: Docs
     description: Swagger endpoints
 
@@ -216,6 +220,343 @@ components:
         role:
           type: string
           enum: [USER, ADMIN]
+
+    CategoryCreateInput:
+      type: object
+      required: [name, slug]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        parentId:
+          type: integer
+          nullable: true
+
+    CategoryUpdateInput:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        parentId:
+          type: integer
+          nullable: true
+
+    ProductCreateInput:
+      type: object
+      required: [name, slug, description, priceCents, currency, sku]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        priceCents:
+          type: integer
+          minimum: 0
+        currency:
+          type: string
+        sku:
+          type: string
+        isActive:
+          type: boolean
+        categoryIds:
+          type: array
+          items:
+            type: integer
+
+    ProductUpdateInput:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        priceCents:
+          type: integer
+          minimum: 0
+        currency:
+          type: string
+        sku:
+          type: string
+        isActive:
+          type: boolean
+        categoryIds:
+          type: array
+          items:
+            type: integer
+
+    ImageCreateInput:
+      type: object
+      required: [productId, url]
+      properties:
+        productId:
+          type: integer
+        url:
+          type: string
+          format: uri
+        alt:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+          minimum: 0
+
+    InventoryCreateInput:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId:
+          type: integer
+        quantity:
+          type: integer
+          minimum: 0
+        reserved:
+          type: integer
+          minimum: 0
+
+    InventoryUpdateInput:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          minimum: 0
+        reserved:
+          type: integer
+          minimum: 0
+
+    CouponCreateInput:
+      type: object
+      required: [code, type, value]
+      properties:
+        code:
+          type: string
+        type:
+          type: string
+          enum: [PERCENT, FIXED]
+        value:
+          type: integer
+          minimum: 0
+        minOrderCents:
+          type: integer
+          nullable: true
+          minimum: 0
+        startsAt:
+          type: string
+          format: date-time
+        endsAt:
+          type: string
+          format: date-time
+        usageLimit:
+          type: integer
+          nullable: true
+          minimum: 1
+        isActive:
+          type: boolean
+
+    CouponUpdateInput:
+      type: object
+      properties:
+        code:
+          type: string
+        type:
+          type: string
+          enum: [PERCENT, FIXED]
+        value:
+          type: integer
+          minimum: 0
+        minOrderCents:
+          type: integer
+          nullable: true
+          minimum: 0
+        startsAt:
+          type: string
+          format: date-time
+        endsAt:
+          type: string
+          format: date-time
+        usageLimit:
+          type: integer
+          nullable: true
+          minimum: 1
+        isActive:
+          type: boolean
+
+    ShipmentCreateInput:
+      type: object
+      required: [orderId]
+      properties:
+        orderId:
+          type: integer
+        carrier:
+          type: string
+          nullable: true
+        trackingNumber:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [CREATED, IN_TRANSIT, DELIVERED, LOST]
+        shippedAt:
+          type: string
+          format: date-time
+        deliveredAt:
+          type: string
+          format: date-time
+
+    ShipmentUpdateInput:
+      type: object
+      properties:
+        carrier:
+          type: string
+          nullable: true
+        trackingNumber:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [CREATED, IN_TRANSIT, DELIVERED, LOST]
+        shippedAt:
+          type: string
+          format: date-time
+        deliveredAt:
+          type: string
+          format: date-time
+
+    OrderStatusUpdateInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [PENDING, PAID, PREPARING, SHIPPED, DELIVERED, CANCELLED, REFUNDED]
+
+    PaymentStatusUpdateInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [CREATED, AUTHORIZED, CAPTURED, FAILED, REFUNDED]
+
+    CartAddItemInput:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId:
+          type: integer
+        quantity:
+          type: integer
+          minimum: 1
+
+    CartUpdateItemInput:
+      type: object
+      required: [quantity]
+      properties:
+        quantity:
+          type: integer
+          minimum: 1
+
+    AddressCreateInput:
+      type: object
+      required: [label, fullName, phone, line1, postalCode, city, country]
+      properties:
+        label:
+          type: string
+        fullName:
+          type: string
+        phone:
+          type: string
+        line1:
+          type: string
+        line2:
+          type: string
+          nullable: true
+        postalCode:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        isDefault:
+          type: boolean
+
+    AddressUpdateInput:
+      type: object
+      properties:
+        label:
+          type: string
+        fullName:
+          type: string
+        phone:
+          type: string
+        line1:
+          type: string
+        line2:
+          type: string
+          nullable: true
+        postalCode:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        isDefault:
+          type: boolean
+
+    OrderCreateInput:
+      type: object
+      required: [shippingAddressId, billingAddressId]
+      properties:
+        shippingAddressId:
+          type: integer
+        billingAddressId:
+          type: integer
+        couponCode:
+          type: string
+
+    PaymentCreateInput:
+      type: object
+      required: [orderId]
+      properties:
+        orderId:
+          type: integer
+        provider:
+          type: string
+          enum: [STRIPE, PAYPAL, MANUAL]
+        providerRef:
+          type: string
+          nullable: true
+
+    ReviewCreateInput:
+      type: object
+      required: [productId, rating]
+      properties:
+        productId:
+          type: integer
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          nullable: true
+
+    ReviewUpdateInput:
+      type: object
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          nullable: true
 
     PaginatedUsers:
       type: object
@@ -618,6 +959,844 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         "404":
           $ref: "#/components/responses/NotFoundError"
+
+  /admin/users:
+    get:
+      tags: [Admin]
+      summary: List users (admin namespace)
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Users list
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+  /admin/users/register:
+    post:
+      tags: [Admin]
+      summary: Create user (admin namespace)
+      security:
+        - cookieAuth: []
+          csrfToken: []
+      responses:
+        "201":
+          description: User created
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+  /admin/users/{id}:
+    patch:
+      tags: [Admin]
+      summary: Update user (admin namespace)
+      security:
+        - cookieAuth: []
+          csrfToken: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: User updated
+    delete:
+      tags: [Admin]
+      summary: Delete user (admin namespace)
+      security:
+        - cookieAuth: []
+          csrfToken: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: User deleted
+
+  /admin/users/export:
+    get:
+      tags: [Admin]
+      summary: Export users CSV (admin namespace)
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: CSV export
+          content:
+            text/csv:
+              schema:
+                type: string
+
+  /admin/users/me:
+    get:
+      tags: [Admin]
+      summary: Get current authenticated user (admin namespace)
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /admin/audit-logs:
+    get:
+      tags: [Admin]
+      summary: List audit logs (admin namespace)
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Audit logs list
+
+  /admin/audit-logs/export:
+    get:
+      tags: [Admin]
+      summary: Export audit logs CSV (admin namespace)
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: CSV export
+          content:
+            text/csv:
+              schema:
+                type: string
+
+  /admin/audit-logs/{id}:
+    get:
+      tags: [Admin]
+      summary: Get audit log by id (admin namespace)
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Audit log
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /admin/categories:
+    get:
+      tags: [Admin]
+      summary: List categories
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
+      responses:
+        "200":
+          description: Categories list
+    post:
+      tags: [Admin]
+      summary: Create category
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryCreateInput"
+      responses:
+        "201":
+          description: Category created
+
+  /admin/categories/{id}:
+    patch:
+      tags: [Admin]
+      summary: Update category
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryUpdateInput"
+      responses:
+        "200":
+          description: Category updated
+    delete:
+      tags: [Admin]
+      summary: Delete category
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Category deleted
+
+  /admin/products:
+    get:
+      tags: [Admin]
+      summary: List products
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
+        - $ref: "#/components/parameters/QParam"
+      responses:
+        "200":
+          description: Products list
+    post:
+      tags: [Admin]
+      summary: Create product
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCreateInput"
+      responses:
+        "201":
+          description: Product created
+
+  /admin/products/{id}:
+    patch:
+      tags: [Admin]
+      summary: Update product
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductUpdateInput"
+      responses:
+        "200":
+          description: Product updated
+    delete:
+      tags: [Admin]
+      summary: Delete product
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Product deleted
+
+  /admin/images:
+    get:
+      tags: [Admin]
+      summary: List product images
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: query
+          name: productId
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Images list
+    post:
+      tags: [Admin]
+      summary: Create product image
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImageCreateInput"
+      responses:
+        "201":
+          description: Image created
+
+  /admin/images/{id}:
+    delete:
+      tags: [Admin]
+      summary: Delete product image
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Image deleted
+
+  /admin/inventory:
+    get:
+      tags: [Admin]
+      summary: List inventory
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Inventory list
+    post:
+      tags: [Admin]
+      summary: Create inventory record
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InventoryCreateInput"
+      responses:
+        "201":
+          description: Inventory created
+
+  /admin/inventory/{id}:
+    patch:
+      tags: [Admin]
+      summary: Update inventory record
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InventoryUpdateInput"
+      responses:
+        "200":
+          description: Inventory updated
+
+  /admin/orders:
+    get:
+      tags: [Admin]
+      summary: List orders
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
+      responses:
+        "200":
+          description: Orders list
+
+  /admin/orders/{id}:
+    get:
+      tags: [Admin]
+      summary: Get order
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Order detail
+
+  /admin/orders/{id}/status:
+    patch:
+      tags: [Admin]
+      summary: Update order status
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderStatusUpdateInput"
+      responses:
+        "200":
+          description: Order updated
+
+  /admin/payments:
+    get:
+      tags: [Admin]
+      summary: List payments
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Payments list
+
+  /admin/payments/{id}/status:
+    patch:
+      tags: [Admin]
+      summary: Update payment status
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentStatusUpdateInput"
+      responses:
+        "200":
+          description: Payment updated
+
+  /admin/shipments:
+    get:
+      tags: [Admin]
+      summary: List shipments
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Shipments list
+    post:
+      tags: [Admin]
+      summary: Create shipment
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShipmentCreateInput"
+      responses:
+        "201":
+          description: Shipment created
+
+  /admin/shipments/{id}:
+    patch:
+      tags: [Admin]
+      summary: Update shipment
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShipmentUpdateInput"
+      responses:
+        "200":
+          description: Shipment updated
+    delete:
+      tags: [Admin]
+      summary: Delete shipment
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Shipment deleted
+
+  /admin/coupons:
+    get:
+      tags: [Admin]
+      summary: List coupons
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Coupons list
+    post:
+      tags: [Admin]
+      summary: Create coupon
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CouponCreateInput"
+      responses:
+        "201":
+          description: Coupon created
+
+  /admin/coupons/{id}:
+    patch:
+      tags: [Admin]
+      summary: Update coupon
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CouponUpdateInput"
+      responses:
+        "200":
+          description: Coupon updated
+    delete:
+      tags: [Admin]
+      summary: Delete coupon
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Coupon deleted
+
+  /admin/reviews:
+    get:
+      tags: [Admin]
+      summary: List reviews
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Reviews list
+
+  /admin/reviews/{id}:
+    delete:
+      tags: [Admin]
+      summary: Delete review
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Review deleted
+
+  /public/categories:
+    get:
+      tags: [Public]
+      summary: List public categories
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
+      responses:
+        "200":
+          description: Categories list
+
+  /public/categories/{id}:
+    get:
+      tags: [Public]
+      summary: Get category
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Category detail
+
+  /public/products:
+    get:
+      tags: [Public]
+      summary: List public products
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
+        - $ref: "#/components/parameters/QParam"
+        - in: query
+          name: activeOnly
+          schema:
+            type: string
+            enum: [true, false]
+      responses:
+        "200":
+          description: Products list
+
+  /public/products/{id}:
+    get:
+      tags: [Public]
+      summary: Get product
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Product detail
+
+  /public/cart:
+    get:
+      tags: [Public]
+      summary: Get active cart
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Active cart
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /public/cart/items:
+    post:
+      tags: [Public]
+      summary: Add item to cart
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartAddItemInput"
+      responses:
+        "201":
+          description: Cart item created
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /public/cart/items/{id}:
+    patch:
+      tags: [Public]
+      summary: Update cart item
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartUpdateItemInput"
+      responses:
+        "200":
+          description: Cart item updated
+    delete:
+      tags: [Public]
+      summary: Delete cart item
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Cart item deleted
+
+  /public/addresses:
+    get:
+      tags: [Public]
+      summary: List my addresses
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Addresses list
+    post:
+      tags: [Public]
+      summary: Create address
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddressCreateInput"
+      responses:
+        "201":
+          description: Address created
+
+  /public/addresses/{id}:
+    patch:
+      tags: [Public]
+      summary: Update address
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddressUpdateInput"
+      responses:
+        "200":
+          description: Address updated
+    delete:
+      tags: [Public]
+      summary: Delete address
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Address deleted
+
+  /public/orders:
+    get:
+      tags: [Public]
+      summary: List my orders
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
+      responses:
+        "200":
+          description: Orders list
+    post:
+      tags: [Public]
+      summary: Create order from active cart
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderCreateInput"
+      responses:
+        "201":
+          description: Order created
+
+  /public/orders/{id}:
+    get:
+      tags: [Public]
+      summary: Get my order
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Order detail
+
+  /public/payments:
+    get:
+      tags: [Public]
+      summary: List my payments
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Payments list
+    post:
+      tags: [Public]
+      summary: Create payment for my order
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentCreateInput"
+      responses:
+        "201":
+          description: Payment created
+
+  /public/coupons/validate:
+    get:
+      tags: [Public]
+      summary: Validate coupon
+      parameters:
+        - in: query
+          name: code
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: orderTotalCents
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Coupon validation result
+        "400":
+          $ref: "#/components/responses/ValidationError"
+
+  /public/reviews:
+    get:
+      tags: [Public]
+      summary: List reviews
+      parameters:
+        - in: query
+          name: productId
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reviews list
+    post:
+      tags: [Public]
+      summary: Create review (must be authenticated and have purchased product)
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewCreateInput"
+      responses:
+        "201":
+          description: Review created
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+  /public/reviews/{id}:
+    patch:
+      tags: [Public]
+      summary: Update my review
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewUpdateInput"
+      responses:
+        "200":
+          description: Review updated
+    delete:
+      tags: [Public]
+      summary: Delete my review
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Review deleted
+
+  /public/inventory:
+    get:
+      tags: [Public]
+      summary: List inventory
+      responses:
+        "200":
+          description: Inventory list
+
+  /public/shipments:
+    get:
+      tags: [Public]
+      summary: List my shipments
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Shipments list
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /swagger.json:
     get:

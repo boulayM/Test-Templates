@@ -3,11 +3,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import helmet from "helmet";
 
-import authRoutes from "./routes/auth.routes.js";
-import csrfRoutes from "./routes/csrf.routes.js";
+import apiRoutes from "./routes/index.js";
 import errorHandler from "./middlewares/errorHandler.js";
-import auditLogRoutes from "./routes/auditLog.routes.js";
-import userRoutes from "./routes/user.routes.js";
 
 import swaggerDoc from "./swagger.js";
 import swaggerUiDist from "swagger-ui-dist";
@@ -74,10 +71,7 @@ app.get("/api/swagger.json", (req, res) => {
 app.use("/swagger-ui", express.static(swaggerUiPath));
 app.use("/swagger", express.static(path.join(__dirname, "public/swagger")));
 
-app.use("/api/csrf", csrfRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/audit-logs", auditLogRoutes);
-app.use("/api/users", userRoutes);
+app.use("/api", apiRoutes);
 
 app.use(errorHandler);
 

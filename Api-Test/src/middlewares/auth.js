@@ -1,15 +1,31 @@
 import jwt from "jsonwebtoken";
+import prisma from "../config/prisma.js";
 
-export function authRequired(req, res, next) {
+export async function authRequired(req, res, next) {
   const token = req.cookies.accessToken;
 
   if (!token) return res.status(401).json({ message: "Non authentifie" });
 
+  let payload;
   try {
-    req.user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    next();
+    payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
   } catch {
     return res.status(403).json({ message: "Token invalide" });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: payload.id },
+      select: { id: true, role: true, isActive: true }
+    });
+
+    if (!user) return res.status(401).json({ message: "Non authentifie" });
+    if (!user.isActive) return res.status(403).json({ message: "Compte desactive" });
+
+    req.user = { ...payload, role: user.role };
+    next();
+  } catch (err) {
+    next(err);
   }
 }
 

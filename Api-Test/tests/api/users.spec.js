@@ -49,6 +49,21 @@ describe("users", () => {
     const mod = await import("../../src/app.js");
     app = mod.default;
 
+    await prisma.orderCoupon.deleteMany();
+    await prisma.shipment.deleteMany();
+    await prisma.payment.deleteMany();
+    await prisma.orderItem.deleteMany();
+    await prisma.order.deleteMany();
+    await prisma.cartItem.deleteMany();
+    await prisma.cart.deleteMany();
+    await prisma.review.deleteMany();
+    await prisma.inventory.deleteMany();
+    await prisma.productImage.deleteMany();
+    await prisma.productCategory.deleteMany();
+    await prisma.product.deleteMany();
+    await prisma.category.deleteMany();
+    await prisma.address.deleteMany();
+    await prisma.coupon.deleteMany();
     await prisma.refreshToken.deleteMany();
     await prisma.verificationToken.deleteMany();
     await prisma.user.deleteMany();
@@ -60,7 +75,7 @@ describe("users", () => {
   });
 
   it("lists users", async () => {
-    const { agent, csrfToken } = await loginAdmin();
+    const { agent } = await loginAdmin();
     const res = await agent.get("/api/users");
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.data)).toBe(true);
@@ -118,7 +133,7 @@ describe("users", () => {
   });
 
   it("rejects update without csrf", async () => {
-    const { agent, csrfToken } = await loginAdmin();
+    const { agent } = await loginAdmin();
     const hash = await bcrypt.hash("User123!", 10);
     const user = await prisma.user.create({
       data: {
@@ -132,9 +147,7 @@ describe("users", () => {
       }
     });
 
-    const res = await agent
-      .patch("/api/users/" + user.id)
-      .send({ firstName: "Blocked" });
+    const res = await agent.patch("/api/users/" + user.id).send({ firstName: "Blocked" });
 
     expect(res.status).toBe(403);
   });
@@ -154,18 +167,24 @@ describe("users", () => {
       }
     });
 
-    const res = await agent
-      .delete("/api/users/" + user.id)
-      .set("x-csrf-token", csrfToken);
+    const res = await agent.delete("/api/users/" + user.id).set("x-csrf-token", csrfToken);
 
     expect(res.status).toBe(200);
   });
 
   it("exports users csv", async () => {
-    const { agent, csrfToken } = await loginAdmin();
+    const { agent } = await loginAdmin();
     const res = await agent.get("/api/users/export");
     expect(res.status).toBe(200);
     expect(res.headers["content-type"]).toContain("text/csv");
     expect(res.text).toContain("id,firstName,lastName,email,role,emailVerified,isActive,createdAt");
+  });
+
+  it("returns current profile on /api/users/me", async () => {
+    const { agent } = await loginAdmin();
+    const res = await agent.get("/api/users/me");
+    expect(res.status).toBe(200);
+    expect(res.body.user).toBeDefined();
+    expect(res.body.user.email).toBe(adminEmail);
   });
 });

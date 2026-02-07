@@ -285,4 +285,29 @@ describe("public api", () => {
     const foreignDetail = await user1.get("/api/public/orders/" + order2Id);
     expect(foreignDetail.status).toBe(404);
   });
+
+  test("can abandon active cart and get a new active cart", async () => {
+    const { agent } = await loginUserByEmail(userEmail);
+    const product = await prisma.product.findFirst({ select: { id: true } });
+    expect(product).toBeTruthy();
+
+    const add = await agent.post("/api/public/cart/items").send({
+      productId: product.id,
+      quantity: 1
+    });
+    expect(add.status).toBe(201);
+
+    const cartBeforeRes = await agent.get("/api/public/cart");
+    expect(cartBeforeRes.status).toBe(200);
+    const previousCartId = cartBeforeRes.body.cart.id;
+
+    const abandon = await agent.post("/api/public/cart/abandon");
+    expect(abandon.status).toBe(200);
+    expect(abandon.body.abandonedCartId).toBe(previousCartId);
+    expect(abandon.body.cart.status).toBe("ACTIVE");
+    expect(abandon.body.cart.id).not.toBe(previousCartId);
+
+    const abandoned = await prisma.cart.findUnique({ where: { id: previousCartId } });
+    expect(abandoned.status).toBe("ABANDONED");
+  });
 });

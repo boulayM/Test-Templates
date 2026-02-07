@@ -91,3 +91,32 @@ export async function deleteCartItem(req, res, next) {
     next(err);
   }
 }
+
+export async function abandonCart(req, res, next) {
+  try {
+    const userId = req.user.id;
+    const activeCart = await prisma.cart.findFirst({
+      where: { userId, status: "ACTIVE" },
+      orderBy: { id: "desc" }
+    });
+
+    if (!activeCart) {
+      const cart = await prisma.cart.create({ data: { userId, status: "ACTIVE" } });
+      return res.json({ cart, abandonedCartId: null });
+    }
+
+    const [, cart] = await prisma.$transaction([
+      prisma.cart.update({
+        where: { id: activeCart.id },
+        data: { status: "ABANDONED" }
+      }),
+      prisma.cart.create({
+        data: { userId, status: "ACTIVE" }
+      })
+    ]);
+
+    return res.json({ cart, abandonedCartId: activeCart.id });
+  } catch (err) {
+    next(err);
+  }
+}

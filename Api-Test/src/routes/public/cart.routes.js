@@ -5,7 +5,8 @@ import {
   getCart,
   addCartItem,
   updateCartItem,
-  deleteCartItem
+  deleteCartItem,
+  abandonCart
 } from "../../controllers/cartController.js";
 import { cartAddItemSchema, cartUpdateItemSchema, idParamSchema } from "../../schemas/ecommerce.schema.js";
 
@@ -21,5 +22,6 @@ router.patch(
   updateCartItem
 );
 router.delete("/items/:id", authRequired, validateParams(idParamSchema), deleteCartItem);
+router.post("/abandon", authRequired, abandonCart);
 
 export default router;

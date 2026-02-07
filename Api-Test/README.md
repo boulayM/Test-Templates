@@ -83,7 +83,7 @@ npm run dev
   - `GET /api/public/inventory`
   - `GET /api/public/reviews`
   - `GET|POST|PATCH|DELETE /api/public/addresses`
-  - `GET /api/public/cart`, `POST /api/public/cart/items`, `PATCH|DELETE /api/public/cart/items/:id`
+  - `GET /api/public/cart`, `POST /api/public/cart/items`, `PATCH|DELETE /api/public/cart/items/:id`, `POST /api/public/cart/abandon`
   - `GET|POST /api/public/orders`, `GET /api/public/orders/:id`
   - `GET|POST /api/public/payments`
   - `GET /api/public/shipments`

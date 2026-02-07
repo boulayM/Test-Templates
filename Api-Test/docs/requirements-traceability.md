@@ -48,7 +48,7 @@ Légende statut:
 |---|---|---|---|
 | Panier actif unique, ajout/modif/suppression lignes | `/api/public/cart`, `/api/public/cart/items`, `/api/public/cart/items/{id}` | `tests/api/public.spec.js`, `tests/api/validation.spec.js`, `tests/api/e2e-client-flow.spec.js` | COUVERT |
 | Statuts panier `ACTIVE` / `CONVERTED` | cycle panier lors de `POST /api/public/orders` | `tests/api/business-rules.spec.js` | COUVERT |
-| Statut panier `ABANDONED` | logique presente en base, pas d endpoint metier dedie | couverture explicite absente | PARTIEL |
+| Statut panier `ABANDONED` | `POST /api/public/cart/abandon` | `tests/api/public.spec.js` | COUVERT |
 | Stock insuffisant bloque la commande et rollback réservations | `POST /api/public/orders` | `tests/api/business-rules.spec.js` | COUVERT |
 
 ## 5) Commandes
@@ -117,6 +117,3 @@ Légende statut:
 
 1. Finaliser la couverture environnement observabilité:
 - conserver les tests audit sur un environnement où MongoDB est disponible pour valider la persistance réelle.
-
-2. Surveiller la stabilité de la couverture traçabilité:
-- maintenir les validations explicites `createdAt/updatedAt` si de nouvelles ressources critiques sont ajoutées.

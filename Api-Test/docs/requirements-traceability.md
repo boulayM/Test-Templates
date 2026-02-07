@@ -47,7 +47,8 @@ Légende statut:
 | Besoin | Endpoints | Tests | Statut |
 |---|---|---|---|
 | Panier actif unique, ajout/modif/suppression lignes | `/api/public/cart`, `/api/public/cart/items`, `/api/public/cart/items/{id}` | `tests/api/public.spec.js`, `tests/api/validation.spec.js`, `tests/api/e2e-client-flow.spec.js` | COUVERT |
-| Statuts panier ACTIVE/CONVERTED/ABANDONED | logique create order -> CONVERTED implémentée | couverture indirecte | PARTIEL |
+| Statuts panier `ACTIVE` / `CONVERTED` | cycle panier lors de `POST /api/public/orders` | `tests/api/business-rules.spec.js` | COUVERT |
+| Statut panier `ABANDONED` | logique presente en base, pas d endpoint metier dedie | couverture explicite absente | PARTIEL |
 | Stock insuffisant bloque la commande et rollback réservations | `POST /api/public/orders` | `tests/api/business-rules.spec.js` | COUVERT |
 
 ## 5) Commandes

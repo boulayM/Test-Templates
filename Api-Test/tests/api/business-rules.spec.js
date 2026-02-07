@@ -431,4 +431,34 @@ describe("business rules", () => {
     const items = await prisma.orderItem.findMany({ where: { orderId: order.id } });
     expect(items).toHaveLength(2);
   });
+
+  test("cart lifecycle: active cart is converted and a new active cart is created after order", async () => {
+    const user = await prisma.user.findUnique({ where: { email: userEmail } });
+    await resetUserCarts(user.id);
+    const { product, address } = await seedProductForUser(user.id);
+
+    const { agent: userAgent } = await login(userEmail, userPassword);
+    await addToCart(userAgent, product.id, 1);
+
+    const activeBefore = await prisma.cart.findFirst({
+      where: { userId: user.id, status: "ACTIVE" },
+      orderBy: { id: "desc" }
+    });
+    expect(activeBefore).toBeTruthy();
+
+    const orderRes = await userAgent.post("/api/public/orders").send({
+      shippingAddressId: address.id,
+      billingAddressId: address.id
+    });
+    expect(orderRes.status).toBe(201);
+
+    const convertedCart = await prisma.cart.findUnique({ where: { id: activeBefore.id } });
+    expect(convertedCart.status).toBe("CONVERTED");
+
+    const activeCartsAfter = await prisma.cart.findMany({
+      where: { userId: user.id, status: "ACTIVE" }
+    });
+    expect(activeCartsAfter).toHaveLength(1);
+    expect(activeCartsAfter[0].id).not.toBe(activeBefore.id);
+  });
 });

@@ -692,6 +692,25 @@ paths:
               schema:
                 type: string
 
+  /admin/users/me:
+    get:
+      tags: [Admin]
+      summary: Get current authenticated user (admin namespace)
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
   /admin/audit-logs:
     get:
       tags: [Admin]

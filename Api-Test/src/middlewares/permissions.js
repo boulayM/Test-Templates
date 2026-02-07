@@ -2,39 +2,55 @@ import { createAuditLog } from "../services/auditLogService.js";
 
 const PERMISSIONS = {
   ADMIN: ["*"],
-  MANAGER: [
-    "products.read",
-    "products.create",
-    "products.update",
-    "products.delete",
-    "products.export",
-    "products.batch",
+
+  LOGISTIQUE: [
     "orders.read",
+    "orders.prepare",
+    "orders.ship",
+    "orders.deliver",
     "orders.updateStatus",
-    "orders.delete",
-    "orders.export",
-    "orders.batch",
-    "audit-logs.read",
-    "audit-logs.export",
-    "metrics.read"
+    "shipments.read",
+    "shipments.create",
+    "shipments.update",
+    "inventory.read",
+    "inventory.update",
+    "audit-logs.read"
   ],
-  SUPPORT: ["orders.read", "orders.export", "audit-logs.read", "audit-logs.export", "metrics.read"],
-  READONLY: [
-    "users.read",
-    "users.export",
-    "products.read",
-    "products.export",
+
+  COMPTABILITE: [
+    "payments.read",
+    "payments.validate",
+    "payments.refund",
     "orders.read",
-    "orders.export",
-    "audit-logs.read",
-    "audit-logs.export",
-    "metrics.read"
+    "coupons.read",
+    "reports.finance.read",
+    "audit-logs.read"
   ],
-  USER: ["products.read", "orders.read", "orders.delete"]
+
+  USER: [
+    "profile.read",
+    "profile.update",
+    "addresses.read",
+    "addresses.create",
+    "addresses.update",
+    "addresses.delete",
+    "cart.read",
+    "cart.update",
+    "orders.own.read",
+    "orders.own.create",
+    "payments.own.create",
+    "shipments.own.read",
+    "reviews.own.create",
+    "reviews.own.update",
+    "reviews.own.delete",
+    "coupons.validate",
+    "products.read",
+    "categories.read"
+  ]
 };
 
 function hasPermission(role, permission) {
-  if (!role) return false;
+  if (!role || !permission) return false;
   const allowed = PERMISSIONS[role] || [];
   if (allowed.includes("*")) return true;
   return allowed.includes(permission);
@@ -43,6 +59,7 @@ function hasPermission(role, permission) {
 export function requirePermission(permission) {
   return async (req, res, next) => {
     const role = req.user?.role;
+
     if (!hasPermission(role, permission)) {
       await createAuditLog({
         userId: req.user?.id ?? null,
@@ -51,10 +68,16 @@ export function requirePermission(permission) {
         resourceId: permission,
         status: "DENIED",
         req,
-        metadata: { permission }
+        metadata: { permission, role: role || null }
       });
+
       return res.status(403).json({ message: "Acces refuse" });
     }
+
     next();
   };
+}
+
+export function getPermissionsForRole(role) {
+  return PERMISSIONS[role] || [];
 }

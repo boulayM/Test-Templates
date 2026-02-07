@@ -45,6 +45,9 @@ export async function createReview(req, res, next) {
     });
     res.status(201).json({ review });
   } catch (err) {
+    if (err?.code === "P2002") {
+      return res.status(409).json({ message: "Review already exists for this product" });
+    }
     next(err);
   }
 }

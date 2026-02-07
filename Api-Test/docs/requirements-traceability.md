@@ -91,7 +91,7 @@ Légende statut:
 | Lister avis | `GET /api/public/reviews`, `GET /api/admin/reviews` | `tests/api/public.spec.js`, `tests/api/admin.spec.js` | PARTIEL |
 | Créer/modifier/supprimer avis client | `/api/public/reviews*` | `tests/api/public.spec.js` | PARTIEL |
 | Modération admin (delete) | `DELETE /api/admin/reviews/{id}` | `tests/api/admin.spec.js` | PARTIEL |
-| "Un avis par produit acheté" | règle backend implémentée | pas de test explicite dédié | GAP |
+| "Un avis par produit acheté" | règle backend implémentée | `tests/api/reviews-rules.spec.js` | COUVERT |
 
 ## 10) Audit logs
 
@@ -113,7 +113,6 @@ Légende statut:
 ## 12) Gaps prioritaires recommandés
 
 1. Ajouter tests explicites sur:
-- règle "avis seulement si produit acheté".
 - usage coupon dans commande (cas valide + invalide + limite usage).
 
 2. Renforcer tests CRUD complets par domaine admin:

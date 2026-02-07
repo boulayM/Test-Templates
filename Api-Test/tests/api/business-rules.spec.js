@@ -106,17 +106,20 @@ async function seedProductForUser(userId) {
   return { product, address };
 }
 
-async function createOrderFlow(userAgent, productId, addressId) {
+async function createOrderFlow(userAgent, productId, addressId, couponCode = null) {
   const add = await userAgent.post("/api/public/cart/items").send({
     productId,
     quantity: 2
   });
   expect(add.status).toBe(201);
 
-  const orderRes = await userAgent.post("/api/public/orders").send({
+  const payload = {
     shippingAddressId: addressId,
     billingAddressId: addressId
-  });
+  };
+  if (couponCode) payload.couponCode = couponCode;
+
+  const orderRes = await userAgent.post("/api/public/orders").send(payload);
   expect(orderRes.status).toBe(201);
   return orderRes.body.order;
 }
@@ -221,5 +224,92 @@ describe("business rules", () => {
       .patch("/api/admin/payments/" + p2.body.payment.id + "/status")
       .send({ status: "REFUNDED" });
     expect(refund2.status).toBe(400);
+  });
+
+  test("valid coupon is applied on order and increments usedCount", async () => {
+    const user = await prisma.user.findUnique({ where: { email: userEmail } });
+    const { product, address } = await seedProductForUser(user.id);
+    const code = "VALID-" + Date.now();
+    await prisma.coupon.create({
+      data: {
+        code,
+        type: "PERCENT",
+        value: 10,
+        isActive: true,
+        usageLimit: 10
+      }
+    });
+
+    const { agent: userAgent } = await login(userEmail, userPassword);
+    const order = await createOrderFlow(userAgent, product.id, address.id, code);
+
+    expect(order.subtotalCents).toBe(3000);
+    expect(order.discountCents).toBe(300);
+    expect(order.totalCents).toBe(2700);
+
+    const coupon = await prisma.coupon.findUnique({ where: { code } });
+    expect(coupon.usedCount).toBe(1);
+  });
+
+  test("expired coupon is rejected during order creation", async () => {
+    const user = await prisma.user.findUnique({ where: { email: userEmail } });
+    const { product, address } = await seedProductForUser(user.id);
+    const code = "EXPIRED-" + Date.now();
+    await prisma.coupon.create({
+      data: {
+        code,
+        type: "FIXED",
+        value: 500,
+        isActive: true,
+        startsAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+        endsAt: new Date(Date.now() - 60 * 1000)
+      }
+    });
+
+    const { agent: userAgent } = await login(userEmail, userPassword);
+    const add = await userAgent.post("/api/public/cart/items").send({
+      productId: product.id,
+      quantity: 2
+    });
+    expect(add.status).toBe(201);
+
+    const res = await userAgent.post("/api/public/orders").send({
+      shippingAddressId: address.id,
+      billingAddressId: address.id,
+      couponCode: code
+    });
+
+    expect(res.status).toBe(400);
+  });
+
+  test("coupon usage limit is enforced in order creation", async () => {
+    const user = await prisma.user.findUnique({ where: { email: userEmail } });
+    const { product, address } = await seedProductForUser(user.id);
+    const code = "LIMIT-" + Date.now();
+    await prisma.coupon.create({
+      data: {
+        code,
+        type: "FIXED",
+        value: 200,
+        isActive: true,
+        usageLimit: 1,
+        usedCount: 1
+      }
+    });
+
+    const { agent: userAgent } = await login(userEmail, userPassword);
+    const add = await userAgent.post("/api/public/cart/items").send({
+      productId: product.id,
+      quantity: 2
+    });
+    expect(add.status).toBe(201);
+
+    const res = await userAgent.post("/api/public/orders").send({
+      shippingAddressId: address.id,
+      billingAddressId: address.id,
+      couponCode: code
+    });
+
+    expect(res.status).toBe(400);
   });
 });

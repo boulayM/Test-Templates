@@ -82,7 +82,7 @@ Légende statut:
 |---|---|---|---|
 | CRUD coupons admin | `/api/admin/coupons*` | `tests/api/admin.spec.js`, `tests/api/rbac-roles.spec.js` | PARTIEL |
 | Validation coupon public | `GET /api/public/coupons/validate` | `tests/api/public.spec.js`, `tests/api/validation.spec.js` | COUVERT |
-| Usage coupon en commande | `POST /api/public/orders` (couponCode) | couverture indirecte | PARTIEL |
+| Usage coupon en commande | `POST /api/public/orders` (couponCode) | `tests/api/business-rules.spec.js` | COUVERT |
 
 ## 9) Avis produits
 
@@ -112,11 +112,8 @@ Légende statut:
 
 ## 12) Gaps prioritaires recommandés
 
-1. Ajouter tests explicites sur:
-- usage coupon dans commande (cas valide + invalide + limite usage).
-
-2. Renforcer tests CRUD complets par domaine admin:
+1. Renforcer tests CRUD complets par domaine admin:
 - catégories, produits, coupons, images, inventory, shipments.
 
-3. Ajouter assertions métier chiffrées:
+2. Ajouter assertions métier chiffrées:
 - cohérence `subtotal + shipping - discount = total` sur création commande.

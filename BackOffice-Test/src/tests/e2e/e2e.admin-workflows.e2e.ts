@@ -58,22 +58,100 @@ function nextOrderStatus(current: string): string | null {
   return candidates.length > 0 ? candidates[0] : null;
 }
 
+async function fetchList(page: import('@playwright/test').Page, endpoint: string): Promise<unknown[]> {
+  const res = await page.request.get(`${apiUrl}${endpoint}`);
+  if (!res.ok()) return [];
+  const body = (await res.json()) as Record<string, unknown>;
+  return Array.isArray(body.data) ? (body.data as unknown[]) : [];
+}
+
+async function getCsrfToken(page: import('@playwright/test').Page): Promise<string | null> {
+  const csrfRes = await page.request.get(`${apiUrl}/csrf`);
+  if (!csrfRes.ok()) return null;
+  const payload = (await csrfRes.json()) as Record<string, unknown>;
+  return typeof payload.csrfToken === 'string' ? payload.csrfToken : null;
+}
+
+async function createTransitionableOrder(page: import('@playwright/test').Page): Promise<number | null> {
+  const csrfToken = await getCsrfToken(page);
+  if (!csrfToken) return null;
+
+  const loginRes = await page.request.post(`${apiUrl}/auth/login`, {
+    data: { email: 'alice@test.local', password: 'User123!' },
+    headers: { 'x-csrf-token': csrfToken },
+  });
+  if (!loginRes.ok()) return null;
+
+  const csrfAfterLogin = (await getCsrfToken(page)) || csrfToken;
+
+  const productsRes = await page.request.get(`${apiUrl}/public/products?limit=1&_ts=${Date.now()}`);
+  if (!productsRes.ok()) return null;
+  const productsBody = (await productsRes.json()) as Record<string, unknown>;
+  const products = Array.isArray(productsBody.data) ? (productsBody.data as Record<string, unknown>[]) : [];
+  const firstProductId = products.find((p) => typeof p.id === 'number')?.id as number | undefined;
+  if (!firstProductId) return null;
+
+  const addressesRes = await page.request.get(`${apiUrl}/public/addresses?limit=10&_ts=${Date.now()}`);
+  if (!addressesRes.ok()) return null;
+  const addressesBody = (await addressesRes.json()) as Record<string, unknown>;
+  const addresses = Array.isArray(addressesBody.data) ? (addressesBody.data as Record<string, unknown>[]) : [];
+  const firstAddressId = addresses.find((a) => typeof a.id === 'number')?.id as number | undefined;
+  if (!firstAddressId) return null;
+
+  const addCartRes = await page.request.post(`${apiUrl}/public/cart/items`, {
+    data: { productId: firstProductId, quantity: 1 },
+    headers: { 'x-csrf-token': csrfAfterLogin },
+  });
+  if (!addCartRes.ok()) return null;
+
+  const orderRes = await page.request.post(`${apiUrl}/public/orders`, {
+    data: {
+      shippingAddressId: firstAddressId,
+      billingAddressId: firstAddressId,
+    },
+    headers: { 'x-csrf-token': csrfAfterLogin },
+  });
+  if (![200, 201].includes(orderRes.status())) return null;
+
+  const orderBody = (await orderRes.json()) as Record<string, unknown>;
+  const order = (orderBody.order && typeof orderBody.order === 'object'
+    ? (orderBody.order as Record<string, unknown>)
+    : null);
+  return order && typeof order.id === 'number' ? order.id : null;
+}
+
 test.describe.serial('Admin workflows', () => {
   test('update order status', async ({ page }) => {
     await ensureAuth(page, '/orders');
     await expect(page.locator('h1', { hasText: 'Orders' })).toBeVisible();
 
-    const firstRow = page.locator('tbody tr').first();
-    if ((await firstRow.count()) === 0) {
-      test.skip(true, 'No order row found');
+    let rows = await fetchList(page, '/admin/orders?limit=50&_ts=' + Date.now());
+    let candidate = rows
+      .map((r) => (r && typeof r === 'object' ? (r as Record<string, unknown>) : null))
+      .find((r) => !!r && typeof r.id === 'number' && typeof r.status === 'string' && nextOrderStatus(r.status));
+
+    if (!candidate) {
+      const newOrderId = await createTransitionableOrder(page);
+      if (newOrderId) {
+        rows = await fetchList(page, '/admin/orders?limit=50&_ts=' + Date.now());
+        candidate = rows
+          .map((r) => (r && typeof r === 'object' ? (r as Record<string, unknown>) : null))
+          .find((r) => !!r && r.id === newOrderId && typeof r.status === 'string' && nextOrderStatus(r.status));
+      }
     }
 
-    const orderId = Number((await firstRow.locator('td').nth(0).textContent()) || '0');
-    const currentStatus = await firstRow.locator('select').inputValue();
+    const orderId = candidate?.id as number;
+    const currentStatus = candidate?.status as string;
     const targetStatus = nextOrderStatus(currentStatus);
     if (!orderId || !targetStatus) {
       test.skip(true, `No valid transition from ${currentStatus}`);
     }
+
+    await page.locator('.actions input').fill(String(orderId));
+    await page.getByRole('button', { name: 'Refresh' }).click();
+
+    const targetRow = page.locator('tbody tr', { hasText: String(orderId) }).first();
+    await expect(targetRow).toBeVisible({ timeout: 10000 });
 
     const waitUpdate = page.waitForResponse(
       (res) =>
@@ -82,8 +160,8 @@ test.describe.serial('Admin workflows', () => {
       { timeout: 15000 },
     );
 
-    await firstRow.locator('select').selectOption(targetStatus as string);
-    await firstRow.getByRole('button', { name: 'Update' }).click();
+    await targetRow.locator('select').selectOption(targetStatus as string);
+    await targetRow.getByRole('button', { name: 'Update' }).click();
 
     const updateRes = await waitUpdate;
     expect(updateRes.status()).toBe(200);
@@ -93,17 +171,27 @@ test.describe.serial('Admin workflows', () => {
     await ensureAuth(page, '/payments');
     await expect(page.locator('h1', { hasText: 'Payments' })).toBeVisible();
 
-    const firstRow = page.locator('tbody tr').first();
-    if ((await firstRow.count()) === 0) {
+    const rows = await fetchList(page, '/admin/payments?limit=50&_ts=' + Date.now());
+    const candidate = rows
+      .map((r) => (r && typeof r === 'object' ? (r as Record<string, unknown>) : null))
+      .find((r) => !!r && typeof r.id === 'number' && typeof r.status === 'string');
+
+    if (!candidate) {
       test.skip(true, 'No payment row found');
     }
 
-    const paymentId = Number((await firstRow.locator('td').nth(0).textContent()) || '0');
-    const currentStatus = await firstRow.locator('select').inputValue();
+    const paymentId = candidate?.id as number;
+    const currentStatus = candidate?.status as string;
     const targetStatus = currentStatus === 'CAPTURED' ? 'AUTHORIZED' : 'CAPTURED';
     if (!paymentId) {
       test.skip(true, 'No payment id');
     }
+
+    await page.locator('.actions input').fill(String(paymentId));
+    await page.getByRole('button', { name: 'Refresh' }).click();
+
+    const targetRow = page.locator('tbody tr', { hasText: String(paymentId) }).first();
+    await expect(targetRow).toBeVisible({ timeout: 10000 });
 
     const waitUpdate = page.waitForResponse(
       (res) =>
@@ -112,8 +200,8 @@ test.describe.serial('Admin workflows', () => {
       { timeout: 15000 },
     );
 
-    await firstRow.locator('select').selectOption(targetStatus);
-    await firstRow.getByRole('button', { name: 'Update' }).click();
+    await targetRow.locator('select').selectOption(targetStatus);
+    await targetRow.getByRole('button', { name: 'Update' }).click();
 
     const updateRes = await waitUpdate;
     expect(updateRes.status()).toBe(200);
@@ -123,13 +211,17 @@ test.describe.serial('Admin workflows', () => {
     await ensureAuth(page, '/shipments');
     await expect(page.locator('h1', { hasText: 'Shipments' })).toBeVisible();
 
-    const firstRow = page.locator('tbody tr').first();
-    if ((await firstRow.count()) === 0) {
+    const rows = await fetchList(page, '/admin/shipments?limit=50&_ts=' + Date.now());
+    const candidate = rows
+      .map((r) => (r && typeof r === 'object' ? (r as Record<string, unknown>) : null))
+      .find((r) => !!r && typeof r.id === 'number' && typeof r.status === 'string');
+
+    if (!candidate) {
       test.skip(true, 'No shipment row found');
     }
 
-    const shipmentId = Number((await firstRow.locator('td').nth(0).textContent()) || '0');
-    const currentStatus = await firstRow.locator('select').inputValue();
+    const shipmentId = candidate?.id as number;
+    const currentStatus = candidate?.status as string;
     const nextMap: Record<string, string> = {
       CREATED: 'IN_TRANSIT',
       IN_TRANSIT: 'DELIVERED',
@@ -141,6 +233,12 @@ test.describe.serial('Admin workflows', () => {
       test.skip(true, 'No shipment id');
     }
 
+    await page.locator('.actions input').fill(String(shipmentId));
+    await page.getByRole('button', { name: 'Refresh' }).click();
+
+    const targetRow = page.locator('tbody tr', { hasText: String(shipmentId) }).first();
+    await expect(targetRow).toBeVisible({ timeout: 10000 });
+
     const waitUpdate = page.waitForResponse(
       (res) =>
         res.url().includes(`/api/admin/shipments/${shipmentId}`) &&
@@ -148,8 +246,8 @@ test.describe.serial('Admin workflows', () => {
       { timeout: 15000 },
     );
 
-    await firstRow.locator('select').selectOption(targetStatus);
-    await firstRow.getByRole('button', { name: 'Update' }).click();
+    await targetRow.locator('select').selectOption(targetStatus);
+    await targetRow.getByRole('button', { name: 'Update' }).click();
 
     const updateRes = await waitUpdate;
     expect(updateRes.status()).toBe(200);
@@ -182,17 +280,27 @@ test.describe.serial('Admin workflows', () => {
     await ensureAuth(page, '/inventory');
     await expect(page.locator('h1', { hasText: 'Inventory' })).toBeVisible();
 
-    const firstRow = page.locator('tbody tr').first();
-    if ((await firstRow.count()) === 0) {
+    const rows = await fetchList(page, '/admin/inventory?limit=50&_ts=' + Date.now());
+    const candidate = rows
+      .map((r) => (r && typeof r === 'object' ? (r as Record<string, unknown>) : null))
+      .find((r) => !!r && typeof r.id === 'number');
+
+    if (!candidate) {
       test.skip(true, 'No inventory row found');
     }
 
-    const inventoryId = Number((await firstRow.locator('td').nth(0).textContent()) || '0');
+    const inventoryId = candidate?.id as number;
     if (!inventoryId) {
       test.skip(true, 'No inventory id');
     }
 
-    const qtyInput = firstRow.locator('input[type="number"]').nth(0);
+    await page.locator('.actions input').fill(String(inventoryId));
+    await page.getByRole('button', { name: 'Refresh' }).click();
+
+    const targetRow = page.locator('tbody tr', { hasText: String(inventoryId) }).first();
+    await expect(targetRow).toBeVisible({ timeout: 10000 });
+
+    const qtyInput = targetRow.locator('input[type="number"]').nth(0);
     const currentQtyText = await qtyInput.inputValue();
     const currentQty = Number(currentQtyText || '0');
     const nextQty = Number.isNaN(currentQty) ? 1 : currentQty + 1;
@@ -205,10 +313,9 @@ test.describe.serial('Admin workflows', () => {
       { timeout: 15000 },
     );
 
-    await firstRow.getByRole('button', { name: 'Update' }).click();
+    await targetRow.getByRole('button', { name: 'Update' }).click();
 
     const updateRes = await waitUpdate;
     expect(updateRes.status()).toBe(200);
   });
 });
-

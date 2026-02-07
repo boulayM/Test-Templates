@@ -1,6 +1,7 @@
 export const AuthMessages = {
   userOnly: 'Acces reserve aux clients',
   adminOnly: 'Acces reserve aux administrateurs',
+  backOfficeOnly: 'Acces reserve a l equipe back-office',
   loginInvalid: 'Identifiants invalides',
   loginLimitReached: 'Limite de tentatives atteinte. Réessayez dans 15 minutes !',
   loginRemaining: (remaining: number, total: number) =>

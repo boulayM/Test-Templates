@@ -59,10 +59,14 @@ export class LoginComponent {
       return;
     }
 
-    if (result.user.role !== 'ADMIN') {
+    const role = result.user.role;
+    const isBackOfficeRole =
+      role === 'ADMIN' || role === 'LOGISTIQUE' || role === 'COMPTABILITE';
+
+    if (!isBackOfficeRole) {
       await this.auth.initCsrfAfterLogin();
       await this.auth.logout();
-      this.error = AuthMessages.adminOnly;
+      this.error = AuthMessages.backOfficeOnly;
       this.cdr.detectChanges();
       return;
     }

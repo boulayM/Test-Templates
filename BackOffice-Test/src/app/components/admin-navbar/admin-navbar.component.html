@@ -2,10 +2,11 @@
   <div class="ds-container nav-inner">
     <div class="nav-left">
       <a class="navbar-brand" routerLink="/dashboard">Dashboard</a>
-      <a class="nav-link" routerLink="/users">Users</a>
-      <a class="nav-link" routerLink="/audit-logs">Audit Logs</a>
+      <a *ngIf="canSeeUsers()" class="nav-link" routerLink="/users">Users</a>
+      <a *ngIf="canSeeAuditLogs()" class="nav-link" routerLink="/audit-logs">Audit Logs</a>
     </div>
     <div class="nav-right">
+      <span class="nav-email" *ngIf="isLoggedIn() && role()">{{ role() }}</span>
       <span class="nav-email" *ngIf="isLoggedIn()">{{ user()?.email }}</span>
       <button *ngIf="isLoggedIn()" class="btn-ui btn-outline-light btn-sm" (click)="handleLogout()">
         Logout

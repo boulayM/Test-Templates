@@ -13,6 +13,12 @@ import { AuthService } from '../../core/services/auth.service';
 export class AdminNavbarComponent {
   user = computed(() => this.auth.user);
   isLoggedIn = computed(() => !!this.auth.user);
+  role = computed(() => this.auth.user?.role ?? null);
+  canSeeUsers = computed(() => this.role() === 'ADMIN');
+  canSeeAuditLogs = computed(() => {
+    const role = this.role();
+    return role === 'ADMIN' || role === 'LOGISTIQUE' || role === 'COMPTABILITE';
+  });
 
   constructor(
     private auth: AuthService,

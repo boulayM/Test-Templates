@@ -75,7 +75,7 @@ describe("users", () => {
   });
 
   it("lists users", async () => {
-    const { agent, csrfToken } = await loginAdmin();
+    const { agent } = await loginAdmin();
     const res = await agent.get("/api/users");
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.data)).toBe(true);
@@ -133,7 +133,7 @@ describe("users", () => {
   });
 
   it("rejects update without csrf", async () => {
-    const { agent, csrfToken } = await loginAdmin();
+    const { agent } = await loginAdmin();
     const hash = await bcrypt.hash("User123!", 10);
     const user = await prisma.user.create({
       data: {
@@ -147,9 +147,7 @@ describe("users", () => {
       }
     });
 
-    const res = await agent
-      .patch("/api/users/" + user.id)
-      .send({ firstName: "Blocked" });
+    const res = await agent.patch("/api/users/" + user.id).send({ firstName: "Blocked" });
 
     expect(res.status).toBe(403);
   });
@@ -169,15 +167,13 @@ describe("users", () => {
       }
     });
 
-    const res = await agent
-      .delete("/api/users/" + user.id)
-      .set("x-csrf-token", csrfToken);
+    const res = await agent.delete("/api/users/" + user.id).set("x-csrf-token", csrfToken);
 
     expect(res.status).toBe(200);
   });
 
   it("exports users csv", async () => {
-    const { agent, csrfToken } = await loginAdmin();
+    const { agent } = await loginAdmin();
     const res = await agent.get("/api/users/export");
     expect(res.status).toBe(200);
     expect(res.headers["content-type"]).toContain("text/csv");

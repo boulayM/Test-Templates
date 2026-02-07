@@ -26,7 +26,7 @@ async function main() {
   const adminPasswordHash = await bcrypt.hash("Admin123!", 10);
   const userPasswordHash = await bcrypt.hash("User123!", 10);
 
-  const users = await prisma.user.createMany({
+  await prisma.user.createMany({
     data: [
       {
         firstName: "Admin",

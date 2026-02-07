@@ -88,9 +88,9 @@ Légende statut:
 
 | Besoin | Endpoints | Tests | Statut |
 |---|---|---|---|
-| Lister avis | `GET /api/public/reviews`, `GET /api/admin/reviews` | `tests/api/public.spec.js`, `tests/api/admin.spec.js` | PARTIEL |
-| Créer/modifier/supprimer avis client | `/api/public/reviews*` | `tests/api/public.spec.js` | PARTIEL |
-| Modération admin (delete) | `DELETE /api/admin/reviews/{id}` | `tests/api/admin.spec.js` | PARTIEL |
+| Lister avis | `GET /api/public/reviews`, `GET /api/admin/reviews` | `tests/api/public.spec.js`, `tests/api/admin.spec.js` | COUVERT |
+| Créer/modifier/supprimer avis client | `/api/public/reviews*` | `tests/api/public.spec.js`, `tests/api/reviews-rules.spec.js` | COUVERT |
+| Modération admin (delete) | `DELETE /api/admin/reviews/{id}` | `tests/api/admin.spec.js`, `tests/api/reviews-rules.spec.js` | COUVERT |
 | "Un avis par produit acheté" | règle backend implémentée | `tests/api/reviews-rules.spec.js` | COUVERT |
 
 ## 10) Audit logs
@@ -112,5 +112,5 @@ Légende statut:
 
 ## 12) Gaps prioritaires recommandés
 
-1. Étendre couverture avis:
-- update/delete côté client, modération admin avec assertions de contenu.
+1. Améliorer la couverture des contraintes de stock:
+- tests additionnels sur bornes de stock/réservations et cas limites multi-lignes panier.

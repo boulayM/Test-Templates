@@ -29,7 +29,7 @@ Légende statut:
 | Produits CRUD admin | `/api/admin/products`, `/api/admin/products/{id}` | `tests/api/admin.spec.js`, `tests/api/validation.spec.js`, `tests/api/e2e-client-flow.spec.js` | COUVERT |
 | Images produits admin | `/api/admin/images`, `/api/admin/images/{id}` | `tests/api/admin.spec.js` | COUVERT |
 | Listing public produits/catégories | `/api/public/products*`, `/api/public/categories*` | `tests/api/public.spec.js`, `tests/api/e2e-client-flow.spec.js` | COUVERT |
-| Slugs uniques SEO | contraintes Prisma (`@unique`) | tests indirects | PARTIEL |
+| Slugs uniques SEO | contraintes Prisma (`@unique`) | `tests/api/validation.spec.js` | COUVERT |
 
 ## 3) Comptes et adresses
 

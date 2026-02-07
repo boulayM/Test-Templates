@@ -126,4 +126,59 @@ describe("zod validation", () => {
     expect(res.status).toBe(400);
     expect(res.body.code).toBe("BAD_REQUEST");
   });
+
+  test("rejects duplicate category slug", async () => {
+    const admin = await login(adminEmail, adminPassword);
+    const slug = "dup-category-" + Date.now();
+
+    const first = await admin.post("/api/admin/categories").send({
+      name: "Category A",
+      slug
+    });
+    expect(first.status).toBe(201);
+
+    const duplicate = await admin.post("/api/admin/categories").send({
+      name: "Category B",
+      slug
+    });
+    expect(duplicate.status).toBe(409);
+    expect(duplicate.body.code).toBe("CONFLICT");
+  });
+
+  test("rejects duplicate product slug", async () => {
+    const admin = await login(adminEmail, adminPassword);
+    const catSlug = "slug-test-cat-" + Date.now();
+    const catRes = await admin.post("/api/admin/categories").send({
+      name: "Slug Test Cat",
+      slug: catSlug
+    });
+    expect(catRes.status).toBe(201);
+    const categoryId = catRes.body.category.id;
+    const productSlug = "dup-product-" + Date.now();
+
+    const first = await admin.post("/api/admin/products").send({
+      name: "Product A",
+      slug: productSlug,
+      description: "desc",
+      priceCents: 1000,
+      currency: "EUR",
+      sku: "SKU-A-" + Date.now(),
+      isActive: true,
+      categoryIds: [categoryId]
+    });
+    expect(first.status).toBe(201);
+
+    const duplicate = await admin.post("/api/admin/products").send({
+      name: "Product B",
+      slug: productSlug,
+      description: "desc",
+      priceCents: 1000,
+      currency: "EUR",
+      sku: "SKU-B-" + Date.now(),
+      isActive: true,
+      categoryIds: [categoryId]
+    });
+    expect(duplicate.status).toBe(409);
+    expect(duplicate.body.code).toBe("CONFLICT");
+  });
 });

@@ -109,12 +109,12 @@ Légende statut:
 | Rotation refresh token + revoke | auth refresh/logout-all | `tests/api/security.spec.js` | COUVERT |
 | Validation Zod | middlewares validation | `tests/api/validation.spec.js` | COUVERT |
 | Montants en centimes (pas float) | schéma Prisma + controllers | `tests/api/workflow.spec.js`, `tests/api/business-rules.spec.js`, `tests/api/e2e-client-flow.spec.js` | COUVERT |
-| Traçabilité timestamps | champs `createdAt/updatedAt` | couverture indirecte | PARTIEL |
+| Traçabilité timestamps | champs `createdAt/updatedAt` | `tests/api/timestamps.spec.js` | COUVERT |
 
 ## 12) Gaps prioritaires recommandés
 
 1. Renforcer la couverture observabilité:
 - assertions dédiées sur audit logs (actions métier clés) selon environnement Mongo.
 
-2. Renforcer la couverture traçabilité:
-- validations explicites sur `createdAt/updatedAt` dans les ressources critiques.
+2. Surveiller la stabilité de la couverture traçabilité:
+- maintenir les validations explicites `createdAt/updatedAt` si de nouvelles ressources critiques sont ajoutées.

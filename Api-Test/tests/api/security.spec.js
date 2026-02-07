@@ -43,6 +43,21 @@ describe("security L2", () => {
     const mod = await import("../../src/app.js");
     app = mod.default;
 
+    await prisma.orderCoupon.deleteMany();
+    await prisma.shipment.deleteMany();
+    await prisma.payment.deleteMany();
+    await prisma.orderItem.deleteMany();
+    await prisma.order.deleteMany();
+    await prisma.cartItem.deleteMany();
+    await prisma.cart.deleteMany();
+    await prisma.review.deleteMany();
+    await prisma.inventory.deleteMany();
+    await prisma.productImage.deleteMany();
+    await prisma.productCategory.deleteMany();
+    await prisma.product.deleteMany();
+    await prisma.category.deleteMany();
+    await prisma.address.deleteMany();
+    await prisma.coupon.deleteMany();
     await prisma.refreshToken.deleteMany();
     await prisma.verificationToken.deleteMany();
     await prisma.user.deleteMany();

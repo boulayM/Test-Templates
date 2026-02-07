@@ -55,10 +55,38 @@ export async function updatePaymentStatus(req, res, next) {
     const status = String(req.body.status || "").trim().toUpperCase();
     if (Number.isNaN(id) || !status) return res.status(400).json({ message: "Invalid payload" });
 
-    const payment = await prisma.payment.update({
-      where: { id },
-      data: { status }
-    });
+    const current = await prisma.payment.findUnique({ where: { id } });
+    if (!current) return res.status(404).json({ message: "Payment not found" });
+
+    if (status === "REFUNDED") {
+      const [capturedAgg, refundedAgg] = await Promise.all([
+        prisma.payment.aggregate({
+          where: { orderId: current.orderId, status: "CAPTURED" },
+          _sum: { amountCents: true }
+        }),
+        prisma.payment.aggregate({
+          where: {
+            orderId: current.orderId,
+            status: "REFUNDED",
+            id: { not: current.id }
+          },
+          _sum: { amountCents: true }
+        })
+      ]);
+
+      const capturedTotal = capturedAgg._sum.amountCents || 0;
+      const alreadyRefunded = refundedAgg._sum.amountCents || 0;
+      const afterRefund = alreadyRefunded + current.amountCents;
+
+      if (capturedTotal <= 0) {
+        return res.status(400).json({ message: "Cannot refund without captured payment" });
+      }
+      if (afterRefund > capturedTotal) {
+        return res.status(400).json({ message: "Refund exceeds captured amount" });
+      }
+    }
+
+    const payment = await prisma.payment.update({ where: { id }, data: { status } });
 
     if (status === "CAPTURED") {
       await prisma.order.updateMany({

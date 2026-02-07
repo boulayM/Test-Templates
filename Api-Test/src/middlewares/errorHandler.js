@@ -1,7 +1,12 @@
 export default function errorHandler(err, req, res, _next) {
-  console.error(err);
   const prismaConflict = err?.code === "P2002";
   const status = err?.status || err?.statusCode || (prismaConflict ? 409 : 500);
+  const isServerError = status >= 500;
+
+  // Keep error logs for real server failures; 4xx business errors are expected and should stay quiet.
+  if (isServerError) {
+    console.error(err);
+  }
 
   const code =
     status === 400

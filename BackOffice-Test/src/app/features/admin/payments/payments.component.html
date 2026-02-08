@@ -12,24 +12,41 @@
     <table class="table-ui" *ngIf="rows.length; else emptyState">
       <thead>
         <tr>
-      <th>id</th>
-      <th>orderId</th>
-      <th>provider</th>
-      <th>status</th>
-      <th>amountCents</th>
-      <th>currency</th>
-      <th>createdAt</th>
+          <th>id</th>
+          <th>orderId</th>
+          <th>provider</th>
+          <th>status</th>
+          <th>amountCents</th>
+          <th>currency</th>
+          <th>createdAt</th>
+          <th>action</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let row of rows">
-      <td>{{ row['id'] }}</td>
-      <td>{{ row['orderId'] }}</td>
-      <td>{{ row['provider'] }}</td>
-      <td>{{ row['status'] }}</td>
-      <td>{{ row['amountCents'] }}</td>
-      <td>{{ row['currency'] }}</td>
-      <td>{{ row['createdAt'] }}</td>
+          <td>{{ rowId(row) }}</td>
+          <td>{{ row['orderId'] }}</td>
+          <td>{{ row['provider'] }}</td>
+          <td>{{ row['status'] }}</td>
+          <td>{{ row['amountCents'] }}</td>
+          <td>{{ row['currency'] }}</td>
+          <td>{{ row['createdAt'] }}</td>
+          <td>
+            <select
+              [attr.data-testid]="'payment-status-' + rowId(row)"
+              [(ngModel)]="statusDrafts[+rowId(row)]"
+            >
+              <option *ngFor="let s of statuses" [ngValue]="s">{{ s }}</option>
+            </select>
+            <button
+              type="button"
+              class="btn-ui btn-sm"
+              [attr.data-testid]="'payment-update-' + rowId(row)"
+              (click)="updateStatus(row)"
+            >
+              Update
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>

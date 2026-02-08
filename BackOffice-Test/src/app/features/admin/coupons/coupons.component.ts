@@ -1,17 +1,22 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AdminCouponsService } from '../../../core/services/admin-coupons.service';
 import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-coupons',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './coupons.component.html',
   styleUrl: './coupons.component.scss',
 })
 export class CouponsComponent implements OnInit {
   rows: Record<string, unknown>[] = [];
   loading = false;
+
+  newCode = '';
+  newType = 'PERCENT';
+  newValue = 10;
 
   constructor(
     private service: AdminCouponsService,
@@ -56,5 +61,33 @@ export class CouponsComponent implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  createCoupon(): void {
+    const code = this.newCode.trim();
+    if (!code) {
+      this.toast.error('Coupon code is required');
+      return;
+    }
+
+    this.service
+      .create({
+        code,
+        type: this.newType,
+        value: Number(this.newValue),
+        isActive: true,
+      })
+      .subscribe({
+        next: () => {
+          this.toast.success('Coupon created');
+          this.newCode = '';
+          this.newType = 'PERCENT';
+          this.newValue = 10;
+          this.load();
+        },
+        error: (err: unknown) => {
+          this.toast.error(this.extractErrorMessage(err));
+        },
+      });
   }
 }

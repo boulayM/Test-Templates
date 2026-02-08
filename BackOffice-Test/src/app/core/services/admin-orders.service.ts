@@ -8,4 +8,8 @@ export class AdminOrdersService {
   list(params?: Record<string, string | number | boolean | null | undefined>) {
     return this.api.get('/admin/orders', params, true);
   }
+
+  updateStatus(id: number, status: string) {
+    return this.api.patch('/admin/orders/' + id + '/status', { status });
+  }
 }

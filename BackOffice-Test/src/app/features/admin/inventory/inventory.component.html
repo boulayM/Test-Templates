@@ -12,20 +12,37 @@
     <table class="table-ui" *ngIf="rows.length; else emptyState">
       <thead>
         <tr>
-      <th>id</th>
-      <th>productId</th>
-      <th>quantity</th>
-      <th>reserved</th>
-      <th>updatedAt</th>
+          <th>id</th>
+          <th>productId</th>
+          <th>quantity</th>
+          <th>reserved</th>
+          <th>updatedAt</th>
+          <th>action</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let row of rows">
-      <td>{{ row['id'] }}</td>
-      <td>{{ row['productId'] }}</td>
-      <td>{{ row['quantity'] }}</td>
-      <td>{{ row['reserved'] }}</td>
-      <td>{{ row['updatedAt'] }}</td>
+          <td>{{ rowId(row) }}</td>
+          <td>{{ row['productId'] }}</td>
+          <td>{{ row['quantity'] }}</td>
+          <td>{{ row['reserved'] }}</td>
+          <td>{{ row['updatedAt'] }}</td>
+          <td>
+            <input
+              [attr.data-testid]="'inventory-quantity-' + rowId(row)"
+              type="number"
+              min="0"
+              [(ngModel)]="quantityDrafts[+rowId(row)]"
+            />
+            <button
+              type="button"
+              class="btn-ui btn-sm"
+              [attr.data-testid]="'inventory-update-' + rowId(row)"
+              (click)="updateQuantity(row)"
+            >
+              Update
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>

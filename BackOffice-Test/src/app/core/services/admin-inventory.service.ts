@@ -8,4 +8,8 @@ export class AdminInventoryService {
   list(params?: Record<string, string | number | boolean | null | undefined>) {
     return this.api.get('/admin/inventory', params, true);
   }
+
+  update(id: number, body: Record<string, unknown>) {
+    return this.api.patch('/admin/inventory/' + id, body);
+  }
 }

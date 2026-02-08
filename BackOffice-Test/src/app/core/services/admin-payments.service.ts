@@ -8,4 +8,8 @@ export class AdminPaymentsService {
   list(params?: Record<string, string | number | boolean | null | undefined>) {
     return this.api.get('/admin/payments', params, true);
   }
+
+  updateStatus(id: number, status: string) {
+    return this.api.patch('/admin/payments/' + id + '/status', { status });
+  }
 }

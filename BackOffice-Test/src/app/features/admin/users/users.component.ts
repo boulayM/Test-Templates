@@ -42,7 +42,8 @@ export class UsersComponent implements OnInit {
   activeFilter = '';
   verifiedFilter = '';
 
-  roles: UserRole[] = ['ADMIN', 'USER', 'LOGISTIQUE', 'COMPTABILITE'];
+  // This API currently accepts USER/ADMIN only on users filters/create/update payloads.
+  roles: UserRole[] = ['ADMIN', 'USER'];
   createAlert: FormAlertState | null = null;
   updateAlert: FormAlertState | null = null;
   createFieldErrors: Record<string, string> = {};

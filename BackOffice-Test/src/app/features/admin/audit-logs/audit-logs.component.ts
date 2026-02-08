@@ -64,6 +64,25 @@ export class AuditLogsComponent implements OnInit {
   targetType = '';
 
   selected: AuditLogItem | null = null;
+  readonly actionOptions: string[] = [
+    '',
+    'LOGIN',
+    'LOGOUT',
+    'ACCESS_DENIED',
+    'USER_CREATE',
+    'USER_UPDATE',
+    'USER_DELETE',
+    'REGISTER',
+    'REGISTER_RESEND',
+    'VERIFY_EMAIL',
+    'ORDER_CREATE',
+    'ORDER_UPDATE_STATUS',
+    'PAYMENT_CREATE',
+    'PAYMENT_UPDATE_STATUS',
+    'SHIPMENT_CREATE',
+    'SHIPMENT_UPDATE'
+  ];
+  readonly targetTypeOptions: string[] = ['', 'User', 'Order', 'Payment', 'Shipment', 'Permission'];
 
   constructor(
     private auditLogsService: AuditLogsService,
@@ -163,6 +182,12 @@ export class AuditLogsComponent implements OnInit {
 
   selectLog(log: AuditLogItem): void {
     this.selected = log;
+    setTimeout(() => {
+      const el = document.getElementById('audit-details');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 0);
   }
 
   prevPage(): void {
@@ -203,7 +228,7 @@ export class AuditLogsComponent implements OnInit {
         URL.revokeObjectURL(url);
       },
       error: (err: unknown) => {
-        this.toast.show(this.extractErrorMessage(err));
+        this.toast.error(this.extractErrorMessage(err));
       }
     });
   }

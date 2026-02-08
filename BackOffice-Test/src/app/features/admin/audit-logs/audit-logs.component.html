@@ -1,7 +1,6 @@
 <section class="ds-container">
   <div class="card-ui">
     <h1>Audit Logs</h1>
-<div class="mt-1">Debug count: {{ logs.length }}</div>
 
     <div class="mt-2 grid grid-md-2 grid-lg-4">
       <div>
@@ -15,12 +14,11 @@
       </div>
       <div>
         <label class="form-label mr-space-2">Action</label>
-        <input
-          id="auditAction"
-          class="form-control"
-          [(ngModel)]="actionFilter"
-          (keyup.enter)="applyFilters()"
-        />
+        <select id="auditAction" class="form-control" [(ngModel)]="actionFilter" (change)="applyFilters()">
+          <option *ngFor="let action of actionOptions" [value]="action">
+            {{ action || 'All' }}
+          </option>
+        </select>
       </div>
       <div>
         <label class="form-label mr-space-2">Status</label>
@@ -33,12 +31,11 @@
       </div>
       <div>
         <label class="form-label mr-space-2">Target type</label>
-        <input
-          id="auditTargetType"
-          class="form-control"
-          [(ngModel)]="targetType"
-          (keyup.enter)="applyFilters()"
-        />
+        <select id="auditTargetType" class="form-control" [(ngModel)]="targetType" (change)="applyFilters()">
+          <option *ngFor="let type of targetTypeOptions" [value]="type">
+            {{ type || 'All' }}
+          </option>
+        </select>
       </div>
     </div>
 

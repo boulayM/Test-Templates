@@ -72,8 +72,7 @@ test.describe.serial('Audit logs critical', () => {
       { timeout: 10000 },
     );
 
-    await page.locator('#auditAction').fill('LOGIN');
-    await page.keyboard.press('Enter');
+    await page.locator('#auditAction').selectOption('LOGIN');
 
     const listRes = await waitList;
     if (listRes.status() !== 200) {

@@ -3,10 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminProductsService } from '../../../core/services/admin-products.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { FormAlertComponent } from '../../../shared/components/form-alert/form-alert.component';
+import { ValidationMessages } from '../../../shared/messages/validation-messages';
+import { FormAlertState, mapBackendError } from '../../../shared/utils/backend-error-mapper';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormAlertComponent],
   templateUrl: './products.component.html',
   styleUrl: './products.component.scss',
 })
@@ -18,6 +21,7 @@ export class ProductsComponent implements OnInit {
   limit = 10;
   q = '';
   loading = false;
+  formAlert: FormAlertState | null = null;
   form = {
     name: '',
     slug: '',
@@ -50,16 +54,21 @@ export class ProductsComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.toast.show('Unable to load products');
+        this.toast.error('Unable to load products');
       },
     });
   }
 
   createProduct(): void {
     if (!this.form.name.trim() || !this.form.slug.trim() || !this.form.sku.trim()) {
-      this.toast.show('Name, slug and sku are required');
+      this.formAlert = {
+        title: 'Validation error',
+        message: ValidationMessages.genericSubmit,
+        items: ['Name, slug and sku are required'],
+      };
       return;
     }
+    this.formAlert = null;
     this.service
       .create({
         name: this.form.name,
@@ -72,7 +81,7 @@ export class ProductsComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.toast.show('Product created');
+          this.toast.success('Product created');
           this.form = {
             name: '',
             slug: '',
@@ -84,17 +93,19 @@ export class ProductsComponent implements OnInit {
           };
           this.load();
         },
-        error: () => this.toast.show('Unable to create product'),
+        error: (err: unknown) => {
+          this.formAlert = mapBackendError(err, 'Unable to create product').alert;
+        },
       });
   }
 
   toggleActive(item: ProductItem): void {
     this.service.update(item.id, { isActive: !item.isActive }).subscribe({
       next: () => {
-        this.toast.show('Product updated');
+        this.toast.success('Product updated');
         this.load();
       },
-      error: () => this.toast.show('Unable to update product'),
+      error: () => this.toast.error('Unable to update product'),
     });
   }
 
@@ -102,10 +113,10 @@ export class ProductsComponent implements OnInit {
     if (!confirm('Delete this product?')) return;
     this.service.delete(item.id).subscribe({
       next: () => {
-        this.toast.show('Product deleted');
+        this.toast.success('Product deleted');
         this.load();
       },
-      error: () => this.toast.show('Unable to delete product'),
+      error: () => this.toast.error('Unable to delete product'),
     });
   }
 

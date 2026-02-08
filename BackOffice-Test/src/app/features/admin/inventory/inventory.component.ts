@@ -3,10 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminInventoryService } from '../../../core/services/admin-inventory.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { FormAlertComponent } from '../../../shared/components/form-alert/form-alert.component';
+import { ValidationMessages } from '../../../shared/messages/validation-messages';
+import { FormAlertState, mapBackendError } from '../../../shared/utils/backend-error-mapper';
 
 @Component({
   selector: 'app-inventory',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormAlertComponent],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.scss',
 })
@@ -18,6 +21,7 @@ export class InventoryComponent implements OnInit {
   limit = 10;
   q = '';
   loading = false;
+  formAlert: FormAlertState | null = null;
   draft: Record<number, { quantity: number; reserved: number }> = {};
   form = { productId: '', quantity: '0', reserved: '0' };
 
@@ -48,7 +52,7 @@ export class InventoryComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.toast.show('Unable to load inventory');
+        this.toast.error('Unable to load inventory');
       },
     });
   }
@@ -56,9 +60,14 @@ export class InventoryComponent implements OnInit {
   createInventory(): void {
     const productId = Number(this.form.productId);
     if (!productId) {
-      this.toast.show('Product id is required');
+      this.formAlert = {
+        title: 'Validation error',
+        message: ValidationMessages.genericSubmit,
+        items: ['Product id is required'],
+      };
       return;
     }
+    this.formAlert = null;
     this.service
       .create({
         productId,
@@ -67,11 +76,13 @@ export class InventoryComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.toast.show('Inventory row created');
+          this.toast.success('Inventory row created');
           this.form = { productId: '', quantity: '0', reserved: '0' };
           this.load();
         },
-        error: () => this.toast.show('Unable to create inventory row'),
+        error: (err: unknown) => {
+          this.formAlert = mapBackendError(err, 'Unable to create inventory row').alert;
+        },
       });
   }
 
@@ -80,10 +91,10 @@ export class InventoryComponent implements OnInit {
     if (!payload) return;
     this.service.update(item.id, payload).subscribe({
       next: () => {
-        this.toast.show('Inventory updated');
+        this.toast.success('Inventory updated');
         this.load();
       },
-      error: () => this.toast.show('Unable to update inventory'),
+      error: () => this.toast.error('Unable to update inventory'),
     });
   }
 

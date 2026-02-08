@@ -3,10 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminCategoriesService } from '../../../core/services/admin-categories.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { FormAlertComponent } from '../../../shared/components/form-alert/form-alert.component';
+import { ValidationMessages } from '../../../shared/messages/validation-messages';
+import { FormAlertState, mapBackendError } from '../../../shared/utils/backend-error-mapper';
 
 @Component({
   selector: 'app-categories',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormAlertComponent],
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.scss',
 })
@@ -19,6 +22,7 @@ export class CategoriesComponent implements OnInit {
   q = '';
   loading = false;
   form = { name: '', slug: '', parentId: '' };
+  formAlert: FormAlertState | null = null;
 
   constructor(
     private service: AdminCategoriesService,
@@ -42,16 +46,21 @@ export class CategoriesComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.toast.show('Unable to load categories');
+        this.toast.error('Unable to load categories');
       },
     });
   }
 
   createCategory(): void {
     if (!this.form.name.trim() || !this.form.slug.trim()) {
-      this.toast.show('Name and slug are required');
+      this.formAlert = {
+        title: 'Validation error',
+        message: ValidationMessages.genericSubmit,
+        items: ['Name and slug are required'],
+      };
       return;
     }
+    this.formAlert = null;
     this.service
       .create({
         name: this.form.name,
@@ -60,11 +69,13 @@ export class CategoriesComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.toast.show('Category created');
+          this.toast.success('Category created');
           this.form = { name: '', slug: '', parentId: '' };
           this.load();
         },
-        error: () => this.toast.show('Unable to create category'),
+        error: (err: unknown) => {
+          this.formAlert = mapBackendError(err, 'Unable to create category').alert;
+        },
       });
   }
 
@@ -72,10 +83,10 @@ export class CategoriesComponent implements OnInit {
     if (!confirm('Delete this category?')) return;
     this.service.delete(item.id).subscribe({
       next: () => {
-        this.toast.show('Category deleted');
+        this.toast.success('Category deleted');
         this.load();
       },
-      error: () => this.toast.show('Unable to delete category'),
+      error: () => this.toast.error('Unable to delete category'),
     });
   }
 

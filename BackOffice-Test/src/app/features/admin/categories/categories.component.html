@@ -8,6 +8,13 @@
       </div>
     </div>
 
+    <app-form-alert
+      [visible]="!!formAlert"
+      [title]="formAlert?.title || 'Validation error'"
+      [message]="formAlert?.message || ''"
+      [items]="formAlert?.items || []"
+    ></app-form-alert>
+
     <div class="create-row">
       <input [(ngModel)]="form.name" placeholder="Name" />
       <input [(ngModel)]="form.slug" placeholder="Slug" />

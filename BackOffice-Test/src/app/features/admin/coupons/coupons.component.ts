@@ -3,10 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminCouponsService } from '../../../core/services/admin-coupons.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { FormAlertComponent } from '../../../shared/components/form-alert/form-alert.component';
+import { ValidationMessages } from '../../../shared/messages/validation-messages';
+import { FormAlertState, mapBackendError } from '../../../shared/utils/backend-error-mapper';
 
 @Component({
   selector: 'app-coupons',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormAlertComponent],
   templateUrl: './coupons.component.html',
   styleUrl: './coupons.component.scss',
 })
@@ -18,6 +21,7 @@ export class CouponsComponent implements OnInit {
   limit = 10;
   q = '';
   loading = false;
+  formAlert: FormAlertState | null = null;
   editId: number | null = null;
   edit = { value: '', isActive: false };
   form = {
@@ -51,16 +55,21 @@ export class CouponsComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.toast.show('Unable to load coupons');
+        this.toast.error('Unable to load coupons');
       },
     });
   }
 
   createCoupon(): void {
     if (!this.form.code.trim()) {
-      this.toast.show('Code is required');
+      this.formAlert = {
+        title: 'Validation error',
+        message: ValidationMessages.genericSubmit,
+        items: ['Code is required'],
+      };
       return;
     }
+    this.formAlert = null;
     this.service
       .create({
         code: this.form.code,
@@ -72,7 +81,7 @@ export class CouponsComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.toast.show('Coupon created');
+          this.toast.success('Coupon created');
           this.form = {
             code: '',
             type: 'PERCENT',
@@ -83,7 +92,9 @@ export class CouponsComponent implements OnInit {
           };
           this.load();
         },
-        error: () => this.toast.show('Unable to create coupon'),
+        error: (err: unknown) => {
+          this.formAlert = mapBackendError(err, 'Unable to create coupon').alert;
+        },
       });
   }
 
@@ -102,11 +113,13 @@ export class CouponsComponent implements OnInit {
       .update(item.id, { value: Number(this.edit.value || 0), isActive: this.edit.isActive })
       .subscribe({
         next: () => {
-          this.toast.show('Coupon updated');
+          this.toast.success('Coupon updated');
           this.editId = null;
           this.load();
         },
-        error: () => this.toast.show('Unable to update coupon'),
+        error: (err: unknown) => {
+          this.formAlert = mapBackendError(err, 'Unable to update coupon').alert;
+        },
       });
   }
 
@@ -114,10 +127,10 @@ export class CouponsComponent implements OnInit {
     if (!confirm('Delete this coupon?')) return;
     this.service.delete(item.id).subscribe({
       next: () => {
-        this.toast.show('Coupon deleted');
+        this.toast.success('Coupon deleted');
         this.load();
       },
-      error: () => this.toast.show('Unable to delete coupon'),
+      error: () => this.toast.error('Unable to delete coupon'),
     });
   }
 

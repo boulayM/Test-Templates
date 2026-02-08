@@ -24,10 +24,10 @@ export default function errorHandler(err, req, res, _next) {
   const isProd = process.env.NODE_ENV === "production";
   const message = isProd
     ? status === 409
-      ? "Conflit de donnees"
+      ? "Conflit de données"
       : "Erreur interne"
     : status === 409
-      ? "Conflit d unicite"
+      ? "Conflit d'unicité"
       : err?.message || "Erreur interne";
   const details = isProd ? undefined : err?.stack;
 

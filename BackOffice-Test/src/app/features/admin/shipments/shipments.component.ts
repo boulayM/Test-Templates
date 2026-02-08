@@ -3,10 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminShipmentsService } from '../../../core/services/admin-shipments.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { FormAlertComponent } from '../../../shared/components/form-alert/form-alert.component';
+import { ValidationMessages } from '../../../shared/messages/validation-messages';
+import { FormAlertState, mapBackendError } from '../../../shared/utils/backend-error-mapper';
 
 @Component({
   selector: 'app-shipments',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormAlertComponent],
   templateUrl: './shipments.component.html',
   styleUrl: './shipments.component.scss',
 })
@@ -18,6 +21,7 @@ export class ShipmentsComponent implements OnInit {
   limit = 10;
   q = '';
   loading = false;
+  formAlert: FormAlertState | null = null;
   statusDraft: Record<number, string> = {};
 
   form = {
@@ -56,7 +60,7 @@ export class ShipmentsComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.toast.show('Unable to load shipments');
+        this.toast.error('Unable to load shipments');
       },
     });
   }
@@ -64,9 +68,14 @@ export class ShipmentsComponent implements OnInit {
   createShipment(): void {
     const orderId = Number(this.form.orderId);
     if (!orderId) {
-      this.toast.show('Order id is required');
+      this.formAlert = {
+        title: 'Validation error',
+        message: ValidationMessages.genericSubmit,
+        items: ['Order id is required'],
+      };
       return;
     }
+    this.formAlert = null;
     this.service
       .create({
         orderId,
@@ -76,11 +85,13 @@ export class ShipmentsComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.toast.show('Shipment created');
+          this.toast.success('Shipment created');
           this.form = { orderId: '', carrier: '', trackingNumber: '', status: 'CREATED' };
           this.load();
         },
-        error: () => this.toast.show('Unable to create shipment'),
+        error: (err: unknown) => {
+          this.formAlert = mapBackendError(err, 'Unable to create shipment').alert;
+        },
       });
   }
 
@@ -89,10 +100,10 @@ export class ShipmentsComponent implements OnInit {
     if (!nextStatus || nextStatus === item.status) return;
     this.service.update(item.id, { status: nextStatus }).subscribe({
       next: () => {
-        this.toast.show('Shipment status updated');
+        this.toast.success('Shipment status updated');
         this.load();
       },
-      error: () => this.toast.show('Unable to update shipment'),
+      error: () => this.toast.error('Unable to update shipment'),
     });
   }
 
@@ -100,10 +111,10 @@ export class ShipmentsComponent implements OnInit {
     if (!confirm('Delete this shipment?')) return;
     this.service.delete(item.id).subscribe({
       next: () => {
-        this.toast.show('Shipment deleted');
+        this.toast.success('Shipment deleted');
         this.load();
       },
-      error: () => this.toast.show('Unable to delete shipment'),
+      error: () => this.toast.error('Unable to delete shipment'),
     });
   }
 

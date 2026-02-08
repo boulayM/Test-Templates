@@ -6,6 +6,14 @@ import { AdminLayoutComponent } from './layout/admin-layout/admin-layout.compone
 import { DashboardComponent } from './features/admin/dashboard/dashboard.component';
 import { UsersComponent } from './features/admin/users/users.component';
 import { AuditLogsComponent } from './features/admin/audit-logs/audit-logs.component';
+import { CategoriesComponent } from './features/admin/categories/categories.component';
+import { ProductsComponent } from './features/admin/products/products.component';
+import { InventoryComponent } from './features/admin/inventory/inventory.component';
+import { OrdersComponent } from './features/admin/orders/orders.component';
+import { PaymentsComponent } from './features/admin/payments/payments.component';
+import { ShipmentsComponent } from './features/admin/shipments/shipments.component';
+import { CouponsComponent } from './features/admin/coupons/coupons.component';
+import { ReviewsComponent } from './features/admin/reviews/reviews.component';
 
 import { LoginComponent } from './features/auth/login/login.component';
 import { LogoutComponent } from './features/auth/logout/logout.component';

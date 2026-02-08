@@ -2,7 +2,35 @@
   padding-top: 1rem;
 }
 
-.page-shell-header p {
-  margin: 0;
+.page-shell-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.page-shell-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table-ui {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-ui th,
+.table-ui td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.5rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.muted {
   color: #6b7280;
 }

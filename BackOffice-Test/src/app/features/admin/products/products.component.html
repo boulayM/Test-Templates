@@ -1,6 +1,40 @@
 <section class="container-ui page-shell">
   <header class="page-shell-header">
     <h1>Products</h1>
-    <p>Gestion des produits (catalogue, activation, categories, prix, SKU) sera branchee a l API a l etape suivante.</p>
+    <div class="page-shell-actions">
+      <button type="button" class="btn-ui" (click)="load()">Refresh</button>
+    </div>
   </header>
+
+  <p *ngIf="loading" class="muted">Loading...</p>
+
+  <div *ngIf="!loading" class="table-responsive">
+    <table class="table-ui" *ngIf="rows.length; else emptyState">
+      <thead>
+        <tr>
+      <th>id</th>
+      <th>name</th>
+      <th>slug</th>
+      <th>sku</th>
+      <th>priceCents</th>
+      <th>currency</th>
+      <th>isActive</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rows">
+      <td>{{ row['id'] }}</td>
+      <td>{{ row['name'] }}</td>
+      <td>{{ row['slug'] }}</td>
+      <td>{{ row['sku'] }}</td>
+      <td>{{ row['priceCents'] }}</td>
+      <td>{{ row['currency'] }}</td>
+      <td>{{ row['isActive'] }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #emptyState>
+      <p class="muted">No data.</p>
+    </ng-template>
+  </div>
 </section>

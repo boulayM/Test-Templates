@@ -42,11 +42,17 @@ async function ensureAuth(page: import('@playwright/test').Page, path: string) {
 
 test.describe.serial('Admin workflows', () => {
   test('update order status', async ({ page }) => {
+    const waitList = page.waitForResponse(
+      (res) => res.url().includes('/api/admin/orders') && res.request().method() === 'GET',
+      { timeout: 15000 },
+    );
     await ensureAuth(page, '/orders');
+    const listRes = await waitList;
 
     const updates = page.locator('[data-testid^="order-update-"]');
+    await updates.first().waitFor({ state: 'visible', timeout: 4000 }).catch(() => undefined);
     const count = await updates.count();
-    test.skip(count === 0, 'No order row visible');
+    test.skip(count === 0, `No order row visible (list status ${listRes.status()})`);
 
     const firstUpdate = updates.first();
     await expect(firstUpdate).toBeVisible();
@@ -65,9 +71,15 @@ test.describe.serial('Admin workflows', () => {
   });
 
   test('update payment status', async ({ page }) => {
+    const waitList = page.waitForResponse(
+      (res) => res.url().includes('/api/admin/payments') && res.request().method() === 'GET',
+      { timeout: 15000 },
+    );
     await ensureAuth(page, '/payments');
+    await waitList;
 
     const updates = page.locator('[data-testid^="payment-update-"]');
+    await updates.first().waitFor({ state: 'visible', timeout: 4000 }).catch(() => undefined);
     const count = await updates.count();
     test.skip(count === 0, 'No payment row visible');
 
@@ -88,9 +100,15 @@ test.describe.serial('Admin workflows', () => {
   });
 
   test('update shipment status', async ({ page }) => {
+    const waitList = page.waitForResponse(
+      (res) => res.url().includes('/api/admin/shipments') && res.request().method() === 'GET',
+      { timeout: 15000 },
+    );
     await ensureAuth(page, '/shipments');
+    await waitList;
 
     const updates = page.locator('[data-testid^="shipment-update-"]');
+    await updates.first().waitFor({ state: 'visible', timeout: 4000 }).catch(() => undefined);
     const count = await updates.count();
     test.skip(count === 0, 'No shipment row visible');
 
@@ -129,9 +147,15 @@ test.describe.serial('Admin workflows', () => {
   });
 
   test('update inventory quantity', async ({ page }) => {
+    const waitList = page.waitForResponse(
+      (res) => res.url().includes('/api/admin/inventory') && res.request().method() === 'GET',
+      { timeout: 15000 },
+    );
     await ensureAuth(page, '/inventory');
+    await waitList;
 
     const updates = page.locator('[data-testid^="inventory-update-"]');
+    await updates.first().waitFor({ state: 'visible', timeout: 4000 }).catch(() => undefined);
     const count = await updates.count();
     test.skip(count === 0, 'No inventory row visible');
 

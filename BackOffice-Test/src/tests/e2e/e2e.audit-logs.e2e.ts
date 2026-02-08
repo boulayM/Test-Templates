@@ -81,7 +81,12 @@ test.describe.serial('Audit logs critical', () => {
   });
 
   test('open details if row exists', async ({ page }) => {
+    const waitList = page.waitForResponse(
+      (res) => res.url().includes('/api/audit-logs') && res.request().method() === 'GET',
+      { timeout: 10000 },
+    );
     await ensureAuth(page, '/audit-logs');
+    await waitList;
     const rows = page.locator('tbody tr');
     if ((await rows.count()) === 0) {
       test.skip(true, 'No logs');

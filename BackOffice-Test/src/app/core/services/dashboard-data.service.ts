@@ -26,7 +26,7 @@ export class DashboardDataService {
 
   getAdminMetrics(): Observable<unknown> {
     return this.api
-      .get<unknown>('/admin/orders', { page: 1, limit: 100, sort: 'createdAt', order: 'desc' }, true)
+      .get<unknown>('/admin/orders', { page: 1, limit: 100 })
       .pipe(
         map((res) => {
           const rec = this.asRecord(res);
@@ -102,7 +102,7 @@ export class DashboardDataService {
 
   getOrdersMetrics(): Observable<unknown> {
     return this.api
-      .get<unknown>('/admin/orders', { page: 1, limit: 100, sort: 'createdAt', order: 'desc' }, true)
+      .get<unknown>('/admin/orders', { page: 1, limit: 100 })
       .pipe(
         map((res) => {
           const rec = this.asRecord(res);
@@ -133,7 +133,7 @@ export class DashboardDataService {
   }
 
   getRecentOrders(): Observable<unknown> {
-    return this.api.get<unknown>('/admin/orders', { page: 1, limit: 5, sort: 'createdAt', order: 'desc' }, true);
+    return this.api.get<unknown>('/admin/orders', { page: 1, limit: 5 });
   }
 
   getRecentUsers(): Observable<unknown> {

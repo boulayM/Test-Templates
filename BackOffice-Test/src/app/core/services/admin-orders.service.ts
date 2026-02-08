@@ -6,7 +6,7 @@ export class AdminOrdersService {
   constructor(private api: ApiService) {}
 
   list(params?: Record<string, string | number | boolean | null | undefined>) {
-    return this.api.get('/admin/orders', params, true);
+    return this.api.get('/admin/orders', params);
   }
 
   updateStatus(id: number, status: string) {

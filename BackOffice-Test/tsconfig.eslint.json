@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "experimentalDecorators": true
-  },
-  "include": ["src/**/*.ts", "src/tests/**/*.ts", "playwright.config.ts"],
-  "exclude": ["node_modules", "dist", ".angular", "coverage", "playwright-report", "test-results"]
-}

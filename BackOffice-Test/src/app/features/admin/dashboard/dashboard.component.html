@@ -1,0 +1,149 @@
+<section class="ds-container">
+  <div class="dashboard-card">
+    <h1 class="dashboard-title">Dashboard</h1>
+    <p class="dashboard-subtitle">Overview of BackOffice data.</p>
+
+    <div class="mt-3 grid grid-md-2 grid-lg-4">
+      <div class="card-ui kpi-card">
+        <h2>Users</h2>
+        <p class="kpi-value">{{ metrics.users }}</p>
+      </div>
+      <div class="card-ui kpi-card">
+        <h2>Orders</h2>
+        <p class="kpi-value">{{ metrics.orders }}</p>
+      </div>
+      <div class="card-ui kpi-card">
+        <h2>Revenue</h2>
+        <p class="kpi-value">{{ centsToEuros(metrics.revenueCents) }} EUR</p>
+      </div>
+      <div class="card-ui kpi-card">
+        <h2>Products</h2>
+        <p class="kpi-value">{{ metrics.products }}</p>
+      </div>
+    </div>
+
+    <div class="mt-3 grid grid-md-2">
+      <div class="card-ui">
+        <h2>Users status</h2>
+        <div class="metric-line">
+          Verified: <strong>{{ usersMetrics.verified }}</strong>
+        </div>
+        <div class="metric-line">
+          Unverified: <strong>{{ usersMetrics.unverified }}</strong>
+        </div>
+      </div>
+      <div class="card-ui">
+        <h2>Products status</h2>
+        <div class="metric-line">
+          Active: <strong>{{ productsMetrics.active }}</strong>
+        </div>
+        <div class="metric-line">
+          Inactive: <strong>{{ productsMetrics.inactive }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3 grid grid-md-2">
+      <div class="card-ui">
+        <h2>Orders by status</h2>
+        <table class="table-ui">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let s of statusList">
+              <td>{{ s.status }}</td>
+              <td>{{ s.count }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-ui">
+        <h2>Audit logs</h2>
+        <div class="metric-line">
+          Total: <strong>{{ auditMetrics.total }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3 card-ui">
+      <h2>Alerts</h2>
+      <ul class="alerts" *ngIf="alerts.length">
+        <li *ngFor="let a of alerts">{{ a }}</li>
+      </ul>
+      <p *ngIf="!alerts.length" class="muted">No alerts.</p>
+    </div>
+
+    <div class="mt-3 card-ui">
+      <h2>Quick actions</h2>
+      <div class="mt-2 grid grid-md-2 grid-lg-4">
+        <a class="btn-ui" routerLink="/users">Manage users</a>
+        <a class="btn-ui" routerLink="/products">Manage products</a>
+        <a class="btn-ui" routerLink="/orders">Manage orders</a>
+        <a class="btn-ui" routerLink="/audit-logs">View audit logs</a>
+      </div>
+    </div>
+
+    <div class="mt-3 grid grid-md-2">
+      <div class="card-ui">
+        <h2>Recent orders</h2>
+        <table class="table-ui">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Status</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let o of recentOrders">
+              <td>{{ o.id }}</td>
+              <td>{{ o.status }}</td>
+              <td>{{ centsToEuros(o.totalCents) }} EUR</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-ui">
+        <h2>Recent users</h2>
+        <table class="table-ui">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of recentUsers">
+              <td>{{ u.email }}</td>
+              <td>{{ u.role }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mt-3 card-ui">
+      <h2>Recent audit logs</h2>
+      <table class="table-ui">
+        <thead>
+          <tr>
+            <th>Action</th>
+            <th>User</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let l of recentLogs">
+            <td>{{ l.action }}</td>
+            <td>{{ l.userEmail || l.userId }}</td>
+            <td>{{ formatDate(l.createdAt) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

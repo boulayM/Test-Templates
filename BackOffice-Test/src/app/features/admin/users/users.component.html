@@ -1,0 +1,260 @@
+<section class="ds-container">
+  <div class="card-ui">
+    <h1>Users</h1>
+
+    <div class="mt-2 grid grid-md-2 grid-lg-3">
+      <div>
+        <label class="form-label mr-space-2" for="usersSearch">Search</label>
+        <input
+          id="usersSearch"
+          class="form-control"
+          [(ngModel)]="q"
+          (keyup.enter)="applyFilters()"
+        />
+      </div>
+      <div>
+        <label class="form-label mr-space-2" for="usersRoleFilter">Role</label>
+        <select
+          id="usersRoleFilter"
+          class="form-control"
+          [(ngModel)]="roleFilter"
+          (change)="applyFilters()"
+        >
+          <option value="">All</option>
+          <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label mr-space-2" for="usersActiveFilter">Active</label>
+        <select
+          id="usersActiveFilter"
+          class="form-control"
+          [(ngModel)]="activeFilter"
+          (change)="applyFilters()"
+        >
+          <option value="">All</option>
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mt-2 grid grid-md-2">
+      <div>
+        <label class="form-label mr-space-2" for="usersVerifiedFilter">Verified</label>
+        <select
+          id="usersVerifiedFilter"
+          class="form-control"
+          [(ngModel)]="verifiedFilter"
+          (change)="applyFilters()"
+        >
+          <option value="">All</option>
+          <option value="true">Verified</option>
+          <option value="false">Unverified</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mt-3 grid grid-md-2">
+      <div>
+        <label class="form-label">Create user</label>
+        <app-form-alert
+          [visible]="!!createAlert"
+          [title]="createAlert?.title || 'Validation error'"
+          [message]="createAlert?.message || ''"
+          [items]="createAlert?.items || []"
+        ></app-form-alert>
+        <form class="form-ui" (ngSubmit)="createUser()" autocomplete="off">
+          <div class="form-row">
+            <label class="form-label" for="userFirstName">First name</label>
+            <input
+              id="userFirstName"
+              class="form-control"
+              [(ngModel)]="form.firstName"
+              name="firstName"
+              required
+            />
+            <div class="field-error" *ngIf="createFieldErrors['firstName']">
+              {{ createFieldErrors['firstName'] }}
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="userLastName">Last name</label>
+            <input
+              id="userLastName"
+              class="form-control"
+              [(ngModel)]="form.lastName"
+              name="lastName"
+              required
+            />
+            <div class="field-error" *ngIf="createFieldErrors['lastName']">
+              {{ createFieldErrors['lastName'] }}
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="userEmail">Email</label>
+            <input
+              id="userEmail" autocomplete="off"
+              class="form-control"
+              type="email"
+              [(ngModel)]="form.email"
+              name="email"
+              required
+            />
+            <div class="field-error" *ngIf="createFieldErrors['email']">
+              {{ createFieldErrors['email'] }}
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="userPassword">Password</label>
+            <input
+              id="userPassword" autocomplete="new-password"
+              class="form-control"
+              type="password"
+              [(ngModel)]="form.password"
+              name="password"
+              required
+            />
+            <div class="field-error" *ngIf="createFieldErrors['password']">
+              {{ createFieldErrors['password'] }}
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="userRole">Role</label>
+            <select id="userRole" class="form-control" [(ngModel)]="form.role" name="role">
+              <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="userVerified">Email verified</label>
+            <input
+              id="userVerified"
+              type="checkbox"
+              [(ngModel)]="form.emailVerified"
+              name="emailVerified"
+            />
+          </div>
+          <div class="actions">
+            <button class="btn-ui btn-primary" type="submit">Create</button>
+          </div>
+        </form>
+      </div>
+
+      <div *ngIf="editing" class="card-ui bg-gray-100">
+        <label class="form-label">Edit</label>
+        <app-form-alert
+          [visible]="!!updateAlert"
+          [title]="updateAlert?.title || 'Validation error'"
+          [message]="updateAlert?.message || ''"
+          [items]="updateAlert?.items || []"
+        ></app-form-alert>
+        <form class="form-ui" (ngSubmit)="updateUser()">
+          <div class="form-row">
+            <label class="form-label" for="editFirstName">First name</label>
+            <input
+              id="editFirstName"
+              class="form-control"
+              [(ngModel)]="edit.firstName"
+              name="editFirstName"
+            />
+            <div class="field-error" *ngIf="updateFieldErrors['editFirstName']">
+              {{ updateFieldErrors['editFirstName'] }}
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="editLastName">Last name</label>
+            <input
+              id="editLastName"
+              class="form-control"
+              [(ngModel)]="edit.lastName"
+              name="editLastName"
+            />
+            <div class="field-error" *ngIf="updateFieldErrors['editLastName']">
+              {{ updateFieldErrors['editLastName'] }}
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="editEmail">Email</label>
+            <input
+              id="editEmail"
+              class="form-control"
+              type="email"
+              [(ngModel)]="edit.email"
+              name="editEmail"
+            />
+            <div class="field-error" *ngIf="updateFieldErrors['editEmail']">
+              {{ updateFieldErrors['editEmail'] }}
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="editRole">Role</label>
+            <select id="editRole" class="form-control" [(ngModel)]="edit.role" name="editRole">
+              <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="editVerified">Email verified</label>
+            <input
+              id="editVerified"
+              type="checkbox"
+              [(ngModel)]="edit.emailVerified"
+              name="editVerified"
+            />
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="editActive">Active</label>
+            <input id="editActive" type="checkbox" [(ngModel)]="edit.isActive" name="editActive" />
+          </div>
+          <div class="actions">
+            <button class="btn-ui btn-primary" type="submit">Save</button>
+            <button class="btn-ui" type="button" (click)="cancelEdit()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="mt-3 card-ui">
+      <div class="grid grid-md-2">
+        <div>
+          <button class="btn-ui" (click)="exportCsv()">Export CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3">
+      <table class="table-ui">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Verified</th>
+            <th>Active</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of users">
+            <td>{{ u.email }}</td>
+            <td>{{ u.firstName }} {{ u.lastName }}</td>
+            <td>{{ u.role }}</td>
+            <td>{{ u.emailVerified ? 'Yes' : 'No' }}</td>
+            <td>{{ u.isActive ? 'Yes' : 'No' }}</td>
+            <td>
+              <button class="btn-ui" (click)="editUser(u)">Edit</button>
+              <button class="btn-ui" (click)="deleteUser(u)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="mt-2 grid grid-md-2">
+        <div>Page {{ page }} / {{ totalPages }}</div>
+        <div class="text-right">
+          <button class="btn-ui" [disabled]="page <= 1" (click)="prevPage()">Prev</button>
+          <button class="btn-ui" [disabled]="page >= totalPages" (click)="nextPage()">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,30 @@
+.inline-select {
+  width: auto;
+  display: inline-block;
+  margin-right: 8px;
+}
+.form-ui {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.form-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.field-error {
+  grid-column: 2;
+  color: #b91c1c;
+  font-size: 12px;
+  margin-top: -4px;
+}
+
+.actions {
+  margin-top: 16px;
+  text-align: center;
+}

@@ -6,11 +6,11 @@
     <div class="mt-3 grid grid-md-2 grid-lg-4">
       <div class="card-ui kpi-card">
         <h2>Users</h2>
-        <p class="kpi-value">{{ metrics.users }}</p>
+        <p class="kpi-value">{{ usersMetrics.total || metrics.users }}</p>
       </div>
       <div class="card-ui kpi-card">
         <h2>Orders</h2>
-        <p class="kpi-value">{{ metrics.orders }}</p>
+        <p class="kpi-value">{{ ordersMetrics.total || metrics.orders }}</p>
       </div>
       <div class="card-ui kpi-card">
         <h2>Revenue</h2>
@@ -18,7 +18,7 @@
       </div>
       <div class="card-ui kpi-card">
         <h2>Products</h2>
-        <p class="kpi-value">{{ metrics.products }}</p>
+        <p class="kpi-value">{{ productsMetrics.total || metrics.products }}</p>
       </div>
     </div>
 

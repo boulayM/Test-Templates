@@ -24,9 +24,9 @@ export class ApiService {
         }
       }
     }
-    if (noCache) {
-      url.searchParams.set('_ts', String(Date.now()));
-    }
+    // Keep compatibility with strict query validation on the API side:
+    // do not append technical params (like _ts) that are not part of route schemas.
+    void noCache;
     return url.toString();
   }
 

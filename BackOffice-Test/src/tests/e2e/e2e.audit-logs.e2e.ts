@@ -83,18 +83,18 @@ test.describe.serial('Audit logs critical', () => {
 
   test('open details if row exists', async ({ page }) => {
     await ensureAuth(page, '/audit-logs');
+    const listRes = await page.waitForResponse(
+      (res) => res.url().includes('/api/audit-logs') && res.request().method() === 'GET',
+      { timeout: 10000 },
+    );
+    expect(listRes.status()).toBe(200);
+
     const rows = page.locator('tbody tr');
-    if ((await rows.count()) === 0) {
-      test.skip(true, 'No logs');
-    }
+    await expect(rows.first()).toBeVisible({ timeout: 10000 });
+
     await rows.first().getByRole('button', { name: 'Details' }).click();
     const details = page.locator('#audit-details');
-    try {
-      await details.waitFor({ state: 'visible', timeout: 5000 });
-    } catch {
-      test.skip(true, 'Details not available');
-    }
-    await expect(details).toBeVisible();
+    await expect(details).toBeVisible({ timeout: 10000 });
   });
 
   test('export CSV', async ({ page }) => {

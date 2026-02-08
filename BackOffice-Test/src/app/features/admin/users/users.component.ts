@@ -1,10 +1,13 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UsersService } from '../../../core/services/users.service';
+import { AdminUsersService } from '../../../core/services/admin-users.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { FormAlertComponent } from '../../../shared/components/form-alert/form-alert.component';
+import { ValidationMessages } from '../../../shared/messages/validation-messages';
+import { FormAlertState, mapBackendError } from '../../../shared/utils/backend-error-mapper';
 
-type UserRole = 'ADMIN' | 'USER';
+type UserRole = 'ADMIN' | 'USER' | 'LOGISTIQUE' | 'COMPTABILITE';
 
 interface UserItem {
   id: number;
@@ -23,9 +26,9 @@ interface UsersListResponse {
 
 @Component({
   selector: 'app-users',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormAlertComponent],
   templateUrl: './users.component.html',
-  styleUrls: ['./users.component.css']
+  styleUrls: ['./users.component.css'],
 })
 export class UsersComponent implements OnInit {
   users: UserItem[] = [];
@@ -39,24 +42,37 @@ export class UsersComponent implements OnInit {
   activeFilter = '';
   verifiedFilter = '';
 
-  roles = ['ADMIN', 'USER'];
+  filterRoles: UserRole[] = ['ADMIN', 'USER', 'LOGISTIQUE', 'COMPTABILITE'];
+  assignableRoles: Array<'ADMIN' | 'USER'> = ['ADMIN', 'USER'];
 
   form = {
     firstName: '',
     lastName: '',
     email: '',
     password: '',
-    role: 'USER',
-    emailVerified: false
+    role: 'USER' as 'ADMIN' | 'USER',
+    emailVerified: false,
   };
 
   editing = false;
-  edit: UserItem = { id: 0, firstName: '', lastName: '', email: '', role: 'USER', emailVerified: false, isActive: true };
+  createAlert: FormAlertState | null = null;
+  updateAlert: FormAlertState | null = null;
+  createFieldErrors: Record<string, string> = {};
+  updateFieldErrors: Record<string, string> = {};
+  edit: UserItem = {
+    id: 0,
+    firstName: '',
+    lastName: '',
+    email: '',
+    role: 'USER',
+    emailVerified: false,
+    isActive: true,
+  };
 
   constructor(
-    private usersService: UsersService,
+    private usersService: AdminUsersService,
     private cdr: ChangeDetectorRef,
-    private toast: ToastService
+    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -71,8 +87,10 @@ export class UsersComponent implements OnInit {
       email: '',
       password: '',
       role: 'USER',
-      emailVerified: false
+      emailVerified: false,
     };
+    this.createAlert = null;
+    this.createFieldErrors = {};
   }
 
   applyFilters(): void {
@@ -81,10 +99,12 @@ export class UsersComponent implements OnInit {
   }
 
   private buildFiltersParam(): string | undefined {
-    const obj: Record<string, string> = {};
-    if (this.roleFilter) obj['role'] = this.roleFilter;
-    if (this.activeFilter !== '') obj['isActive'] = this.activeFilter;
-    if (this.verifiedFilter !== '') obj['emailVerified'] = this.verifiedFilter;
+    const obj: Record<string, string | boolean> = {};
+    if (this.roleFilter) {
+      obj['role'] = this.roleFilter;
+    }
+    if (this.activeFilter !== '') obj['isActive'] = this.activeFilter === 'true';
+    if (this.verifiedFilter !== '') obj['emailVerified'] = this.verifiedFilter === 'true';
     return Object.keys(obj).length > 0 ? JSON.stringify(obj) : undefined;
   }
 
@@ -126,60 +146,152 @@ export class UsersComponent implements OnInit {
 
   private extractErrorMessage(err: unknown): string {
     if (!err || typeof err !== 'object') return 'Operation failed';
-    const e = err as { error?: { message?: string; details?: string }; message?: string };
-    return e.error?.message || e.error?.details || e.message || 'Operation failed';
+    const e = err as {
+      error?: { message?: string; details?: string | Array<{ message?: string }> };
+      message?: string;
+    };
+    if (Array.isArray(e.error?.details) && e.error?.details[0]?.message) {
+      return e.error.details[0].message as string;
+    }
+    return e.error?.message || (typeof e.error?.details === 'string' ? e.error.details : '') || e.message || 'Operation failed';
+  }
+
+  private isEmailValid(value: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
+  private isStrongPassword(value: string): boolean {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(value);
+  }
+
+  private validateCreateForm(): boolean {
+    const errors: Record<string, string> = {};
+    if (!this.form.firstName.trim()) errors['firstName'] = ValidationMessages.required;
+    if (!this.form.lastName.trim()) errors['lastName'] = ValidationMessages.required;
+    if (!this.form.email.trim()) {
+      errors['email'] = ValidationMessages.required;
+    } else if (!this.isEmailValid(this.form.email)) {
+      errors['email'] = ValidationMessages.email;
+    }
+    if (!this.form.password) {
+      errors['password'] = ValidationMessages.required;
+    } else if (!this.isStrongPassword(this.form.password)) {
+      errors['password'] = ValidationMessages.passwordWeak;
+    }
+    this.createFieldErrors = errors;
+    if (Object.keys(errors).length > 0) {
+      this.createAlert = {
+        title: 'Validation error',
+        message: ValidationMessages.genericSubmit,
+        items: Object.values(errors),
+      };
+      return false;
+    }
+    this.createAlert = null;
+    return true;
+  }
+
+  private validateEditForm(): boolean {
+    const errors: Record<string, string> = {};
+    if (!this.edit.firstName.trim()) errors['editFirstName'] = ValidationMessages.required;
+    if (!this.edit.lastName.trim()) errors['editLastName'] = ValidationMessages.required;
+    if (!this.edit.email.trim()) {
+      errors['editEmail'] = ValidationMessages.required;
+    } else if (!this.isEmailValid(this.edit.email)) {
+      errors['editEmail'] = ValidationMessages.email;
+    }
+    this.updateFieldErrors = errors;
+    if (Object.keys(errors).length > 0) {
+      this.updateAlert = {
+        title: 'Validation error',
+        message: ValidationMessages.genericSubmit,
+        items: Object.values(errors),
+      };
+      return false;
+    }
+    this.updateAlert = null;
+    return true;
+  }
+
+  private applyClientRoleFilter(list: UserItem[]): UserItem[] {
+    if (!this.roleFilter) return list;
+    return list.filter((u) => u.role === this.roleFilter);
   }
 
   load(): void {
+    const roleNeedsClientFilter = this.roleFilter === 'LOGISTIQUE' || this.roleFilter === 'COMPTABILITE';
     const filtersParam = this.buildFiltersParam();
     const params: Record<string, string | number | boolean | null | undefined> = {
-      page: this.page,
-      limit: this.limit,
+      page: roleNeedsClientFilter ? 1 : this.page,
+      limit: roleNeedsClientFilter ? 100 : this.limit,
       q: this.q,
       sort: 'createdAt',
-      order: 'desc'
+      order: 'desc',
     };
     if (filtersParam) params['filters'] = filtersParam;
 
     this.usersService.list(params).subscribe({
       next: (res: UsersListResponse | { body?: UsersListResponse } | unknown) => {
         const body = this.unwrapBody(res);
-        const list = this.extractList(body).filter((u) => u.role !== 'ADMIN');
-        this.users = list;
-        this.total = this.extractTotal(body);
+        const raw = this.extractList(body);
+        const filtered = this.applyClientRoleFilter(raw);
+        this.users = filtered;
+
+        this.total = roleNeedsClientFilter ? filtered.length : this.extractTotal(body);
         this.totalPages = Math.max(1, Math.ceil(this.total / this.limit));
         this.cdr.detectChanges();
       },
       error: (err: unknown) => {
-        this.toast.show(this.extractErrorMessage(err));
-      }
+        this.toast.error(this.extractErrorMessage(err));
+      },
     });
   }
 
   createUser(): void {
+    if (!this.validateCreateForm()) return;
+    this.createAlert = null;
+    this.createFieldErrors = {};
     this.usersService.create(this.form).subscribe({
       next: () => {
         this.clearCreateForm();
+        this.toast.success('User created');
         this.load();
       },
       error: (err: unknown) => {
-        this.toast.show(this.extractErrorMessage(err));
-      }
+        const mapped = mapBackendError(err, this.extractErrorMessage(err));
+        this.createAlert = mapped.alert;
+        this.createFieldErrors = mapped.fieldErrors;
+      },
     });
   }
 
   editUser(user: UserItem): void {
     this.editing = true;
     this.edit = { ...user };
+    this.updateAlert = null;
+    this.updateFieldErrors = {};
   }
 
   cancelEdit(): void {
     this.editing = false;
-    this.edit = { id: 0, firstName: '', lastName: '', email: '', role: 'USER', emailVerified: false, isActive: true };
+    this.updateAlert = null;
+    this.updateFieldErrors = {};
+    this.edit = {
+      id: 0,
+      firstName: '',
+      lastName: '',
+      email: '',
+      role: 'USER',
+      emailVerified: false,
+      isActive: true,
+    };
   }
 
   updateUser(): void {
     if (!this.edit.id) return;
+    if (!this.validateEditForm()) return;
+    this.updateAlert = null;
+    this.updateFieldErrors = {};
 
     const payload: Record<string, unknown> = {
       firstName: this.edit.firstName,
@@ -187,18 +299,29 @@ export class UsersComponent implements OnInit {
       email: this.edit.email,
       role: this.edit.role,
       emailVerified: this.edit.emailVerified,
-      isActive: this.edit.isActive
+      isActive: this.edit.isActive,
     };
 
     this.usersService.update(this.edit.id, payload).subscribe({
       next: () => {
         this.editing = false;
-        this.edit = { id: 0, firstName: '', lastName: '', email: '', role: 'USER', emailVerified: false, isActive: true };
+        this.toast.success('User updated');
+        this.edit = {
+          id: 0,
+          firstName: '',
+          lastName: '',
+          email: '',
+          role: 'USER',
+          emailVerified: false,
+          isActive: true,
+        };
         this.load();
       },
       error: (err: unknown) => {
-        this.toast.show(this.extractErrorMessage(err));
-      }
+        const mapped = mapBackendError(err, this.extractErrorMessage(err));
+        this.updateAlert = mapped.alert;
+        this.updateFieldErrors = mapped.fieldErrors;
+      },
     });
   }
 
@@ -206,10 +329,13 @@ export class UsersComponent implements OnInit {
     if (!user?.id) return;
     if (!confirm('Delete this user?')) return;
     this.usersService.delete(user.id).subscribe({
-      next: () => this.load(),
+      next: () => {
+        this.toast.success('User deleted');
+        this.load();
+      },
       error: (err: unknown) => {
-        this.toast.show(this.extractErrorMessage(err));
-      }
+        this.toast.error(this.extractErrorMessage(err));
+      },
     });
   }
 
@@ -226,7 +352,14 @@ export class UsersComponent implements OnInit {
   }
 
   exportCsv(): void {
-    this.usersService.exportCsv().subscribe({
+    this.usersService
+      .exportCsv({
+        q: this.q,
+        filters: this.buildFiltersParam(),
+        sort: 'createdAt',
+        order: 'desc',
+      })
+      .subscribe({
       next: (blob: Blob) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -234,10 +367,11 @@ export class UsersComponent implements OnInit {
         a.download = 'users.csv';
         a.click();
         URL.revokeObjectURL(url);
+        this.toast.success('CSV exported');
       },
       error: (err: unknown) => {
-        this.toast.show(this.extractErrorMessage(err));
-      }
+        this.toast.error(this.extractErrorMessage(err));
+      },
     });
   }
 }

@@ -177,7 +177,7 @@ export const login = async (req, res, next) => {
 export const register = async (req, res, next) => {
   try {
     if (!isRegistrationEnabled) {
-      return res.status(403).json({ message: "Inscription fermee" });
+      return res.status(403).json({ message: "Inscription fermée" });
     }
 
     const payload = parseBody(authRegisterSchema, req, res);

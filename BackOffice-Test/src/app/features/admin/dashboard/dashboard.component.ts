@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 import { DashboardDataService } from '../../../core/services/dashboard-data.service';
 
 interface User {
@@ -216,11 +216,11 @@ export class DashboardComponent implements OnInit {
 
   loadMetrics() {
     forkJoin([
-      this.dataService.getAdminMetrics(),
-      this.dataService.getUsersMetrics(),
-      this.dataService.getProductsMetrics(),
-      this.dataService.getOrdersMetrics(),
-      this.dataService.getAuditMetrics(),
+      this.dataService.getAdminMetrics().pipe(catchError(() => of({}))),
+      this.dataService.getUsersMetrics().pipe(catchError(() => of({ total: 0, verified: 0, unverified: 0 }))),
+      this.dataService.getProductsMetrics().pipe(catchError(() => of({ total: 0, active: 0, inactive: 0 }))),
+      this.dataService.getOrdersMetrics().pipe(catchError(() => of({ total: 0, byStatus: {} }))),
+      this.dataService.getAuditMetrics().pipe(catchError(() => of({ total: 0 }))),
     ]).subscribe(([adminRes, usersRes, productsRes, ordersRes, auditRes]: unknown[]) => {
       const admin = this.unwrapRecord(adminRes);
       this.metrics.orders = this.toNumber(admin['orders']);
@@ -238,7 +238,10 @@ export class DashboardComponent implements OnInit {
   }
 
   loadRecent() {
-    forkJoin([this.dataService.getRecentOrders(), this.dataService.getRecentUsers()]).subscribe(
+    forkJoin([
+      this.dataService.getRecentOrders().pipe(catchError(() => of({ data: [] }))),
+      this.dataService.getRecentUsers().pipe(catchError(() => of({ data: [] }))),
+    ]).subscribe(
       ([ordersRes, usersRes]: unknown[]) => {
         this.recentOrders = this.unwrapList(ordersRes) as Order[];
         this.recentUsers = this.unwrapList(usersRes) as User[];
@@ -248,7 +251,10 @@ export class DashboardComponent implements OnInit {
   }
 
   loadLogs() {
-    this.dataService.getRecentLogs().subscribe((res: unknown) => {
+    this.dataService
+      .getRecentLogs()
+      .pipe(catchError(() => of({ data: [] })))
+      .subscribe((res: unknown) => {
       this.recentLogs = this.unwrapList(res) as AuditLog[];
       this.cdr.detectChanges();
     });

@@ -10,7 +10,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 export interface UserDto {
   id: number;
   email: string;
-  role: string;
+  role: 'ADMIN' | 'LOGISTIQUE' | 'COMPTABILITE' | 'USER';
   firstName?: string;
   lastName?: string;
 }
@@ -118,5 +118,10 @@ export class AuthService {
 
   get isAdmin(): boolean {
     return this.currentUserSubject.value?.role === 'ADMIN';
+  }
+
+  get isBackOfficeRole(): boolean {
+    const role = this.currentUserSubject.value?.role;
+    return role === 'ADMIN' || role === 'LOGISTIQUE' || role === 'COMPTABILITE';
   }
 }

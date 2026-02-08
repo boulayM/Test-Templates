@@ -13,6 +13,34 @@ import { AuthService } from '../../core/services/auth.service';
 export class AdminNavbarComponent {
   user = computed(() => this.auth.user);
   isLoggedIn = computed(() => !!this.auth.user);
+  role = computed(() => this.auth.user?.role ?? null);
+  canSeeUsers = computed(() => this.role() === 'ADMIN');
+  canSeeAuditLogs = computed(() => {
+    const role = this.role();
+    return role === 'ADMIN' || role === 'LOGISTIQUE' || role === 'COMPTABILITE';
+  });
+  canSeeCatalog = computed(() => this.role() === 'ADMIN');
+  canSeeInventory = computed(() => {
+    const role = this.role();
+    return role === 'ADMIN' || role === 'LOGISTIQUE';
+  });
+  canSeeOrders = computed(() => {
+    const role = this.role();
+    return role === 'ADMIN' || role === 'LOGISTIQUE';
+  });
+  canSeePayments = computed(() => {
+    const role = this.role();
+    return role === 'ADMIN' || role === 'COMPTABILITE';
+  });
+  canSeeShipments = computed(() => {
+    const role = this.role();
+    return role === 'ADMIN' || role === 'LOGISTIQUE';
+  });
+  canSeeCoupons = computed(() => {
+    const role = this.role();
+    return role === 'ADMIN' || role === 'COMPTABILITE';
+  });
+  canSeeReviews = computed(() => this.role() === 'ADMIN');
 
   constructor(
     private auth: AuthService,

@@ -1,8 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuditLogsService } from '../../../core/services/audit-logs.service';
+import { AdminAuditLogsService } from '../../../core/services/admin-audit-logs.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface AuditActor {
   id?: number;
@@ -48,7 +49,7 @@ interface AuditLogsListResponse {
   selector: 'app-audit-logs',
   imports: [CommonModule, FormsModule],
   templateUrl: './audit-logs.component.html',
-  styleUrls: ['./audit-logs.component.css']
+  styleUrls: ['./audit-logs.component.css'],
 })
 export class AuditLogsComponent implements OnInit {
   logs: AuditLogItem[] = [];
@@ -65,14 +66,40 @@ export class AuditLogsComponent implements OnInit {
 
   selected: AuditLogItem | null = null;
 
+  readonly actions = [
+    'LOGIN',
+    'LOGOUT',
+    'LOGIN_FAIL',
+    'LOGIN_BLOCKED',
+    'ACCESS_DENIED',
+    'USER_CREATE',
+    'USER_UPDATE',
+    'USER_DELETE',
+    'ORDER_CREATE',
+    'ORDER_UPDATE',
+    'PAYMENT_CREATE',
+    'PAYMENT_UPDATE',
+    'SHIPMENT_CREATE',
+    'SHIPMENT_UPDATE',
+    'VERIFY_EMAIL',
+    'REGISTER',
+  ];
+
+  readonly statuses = ['DENIED', 'FAILED', 'SUCCESS'];
+
   constructor(
-    private auditLogsService: AuditLogsService,
+    private auditLogsService: AdminAuditLogsService,
     private cdr: ChangeDetectorRef,
-    private toast: ToastService
+    private toast: ToastService,
+    private auth: AuthService,
   ) {}
 
   ngOnInit(): void {
     this.load();
+  }
+
+  get canExport(): boolean {
+    return this.auth.isAdmin;
   }
 
   applyFilters(): void {
@@ -84,12 +111,14 @@ export class AuditLogsComponent implements OnInit {
     const obj: Record<string, string> = {};
     if (this.actionFilter) obj['action'] = this.actionFilter;
     if (this.statusFilter) obj['status'] = this.statusFilter;
-    if (this.actorEmail) obj['actorEmail'] = this.actorEmail;
-    if (this.targetType) obj['targetType'] = this.targetType;
+    if (this.actorEmail.trim()) obj['actorEmail'] = this.actorEmail.trim();
+    if (this.targetType.trim()) obj['targetType'] = this.targetType.trim();
     return Object.keys(obj).length > 0 ? JSON.stringify(obj) : undefined;
   }
 
-  private unwrapBody(res: AuditLogsListResponse | { body?: AuditLogsListResponse } | unknown): AuditLogsListResponse | unknown {
+  private unwrapBody(
+    res: AuditLogsListResponse | { body?: AuditLogsListResponse } | unknown,
+  ): AuditLogsListResponse | unknown {
     if (res && typeof res === 'object' && 'body' in res) {
       const r = res as { body?: AuditLogsListResponse };
       if (r.body) return r.body;
@@ -132,16 +161,21 @@ export class AuditLogsComponent implements OnInit {
     return e.error?.message || e.error?.details || e.message || 'Operation failed';
   }
 
-  load(): void {
+  private buildListParams(): Record<string, string | number | boolean | null | undefined> {
     const filtersParam = this.buildFiltersParam();
     const params: Record<string, string | number | boolean | null | undefined> = {
       page: this.page,
       limit: this.limit,
-      q: this.q,
+      q: this.q.trim(),
       sort: 'createdAt',
-      order: 'desc'
+      order: 'desc',
     };
     if (filtersParam) params['filters'] = filtersParam;
+    return params;
+  }
+
+  load(): void {
+    const params = this.buildListParams();
 
     this.auditLogsService.list(params).subscribe({
       next: (res: AuditLogsListResponse | { body?: AuditLogsListResponse } | unknown) => {
@@ -156,13 +190,17 @@ export class AuditLogsComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err: unknown) => {
-        this.toast.show(this.extractErrorMessage(err));
-      }
+        this.toast.error(this.extractErrorMessage(err));
+      },
     });
   }
 
   selectLog(log: AuditLogItem): void {
     this.selected = log;
+    setTimeout(() => {
+      const target = document.getElementById('audit-details');
+      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
   }
 
   prevPage(): void {
@@ -184,6 +222,25 @@ export class AuditLogsComponent implements OnInit {
     return d.toLocaleString();
   }
 
+  getStatus(log: AuditLogItem): string {
+    if (log.status) return log.status;
+    const metadataStatus = this.extractMetadataField(log.metadata, 'status');
+    return metadataStatus || '-';
+  }
+
+  getRequestId(log: AuditLogItem): string {
+    if (log.requestId) return log.requestId;
+    const metadataRequestId = this.extractMetadataField(log.metadata, 'requestId');
+    return metadataRequestId || '-';
+  }
+
+  private extractMetadataField(metadata: unknown, field: string): string {
+    if (!metadata || typeof metadata !== 'object') return '';
+    const obj = metadata as Record<string, unknown>;
+    const value = obj[field];
+    return typeof value === 'string' ? value : '';
+  }
+
   pretty(value: unknown): string {
     try {
       return JSON.stringify(value, null, 2) || '';
@@ -193,7 +250,12 @@ export class AuditLogsComponent implements OnInit {
   }
 
   exportCsv(): void {
-    this.auditLogsService.exportCsv().subscribe({
+    if (!this.canExport) {
+      this.toast.error('Export CSV is allowed for ADMIN only');
+      return;
+    }
+
+    this.auditLogsService.exportCsv(this.buildListParams()).subscribe({
       next: (blob: Blob) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -201,10 +263,11 @@ export class AuditLogsComponent implements OnInit {
         a.download = 'audit-logs.csv';
         a.click();
         URL.revokeObjectURL(url);
+        this.toast.success('CSV exported');
       },
       error: (err: unknown) => {
-        this.toast.show(this.extractErrorMessage(err));
-      }
+        this.toast.error(this.extractErrorMessage(err));
+      },
     });
   }
 }

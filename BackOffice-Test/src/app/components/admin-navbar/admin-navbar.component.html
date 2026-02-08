@@ -2,10 +2,20 @@
   <div class="ds-container nav-inner">
     <div class="nav-left">
       <a class="navbar-brand" routerLink="/dashboard">Dashboard</a>
-      <a class="nav-link" routerLink="/users">Users</a>
-      <a class="nav-link" routerLink="/audit-logs">Audit Logs</a>
+      <a *ngIf="canSeeUsers()" class="nav-link" routerLink="/users">Users</a>
+      <a *ngIf="canSeeAuditLogs()" class="nav-link" routerLink="/audit-logs">Audit Logs</a>
+      <a *ngIf="canSeeCatalog()" class="nav-link" routerLink="/categories">Categories</a>
+      <a *ngIf="canSeeCatalog()" class="nav-link" routerLink="/products">Products</a>
+      <a *ngIf="canSeeCatalog()" class="nav-link" routerLink="/images">Images</a>
+      <a *ngIf="canSeeInventory()" class="nav-link" routerLink="/inventory">Inventory</a>
+      <a *ngIf="canSeeOrders()" class="nav-link" routerLink="/orders">Orders</a>
+      <a *ngIf="canSeePayments()" class="nav-link" routerLink="/payments">Payments</a>
+      <a *ngIf="canSeeShipments()" class="nav-link" routerLink="/shipments">Shipments</a>
+      <a *ngIf="canSeeCoupons()" class="nav-link" routerLink="/coupons">Coupons</a>
+      <a *ngIf="canSeeReviews()" class="nav-link" routerLink="/reviews">Reviews</a>
     </div>
     <div class="nav-right">
+      <span class="nav-email" *ngIf="isLoggedIn() && role()">{{ role() }}</span>
       <span class="nav-email" *ngIf="isLoggedIn()">{{ user()?.email }}</span>
       <button *ngIf="isLoggedIn()" class="btn-ui btn-outline-light btn-sm" (click)="handleLogout()">
         Logout

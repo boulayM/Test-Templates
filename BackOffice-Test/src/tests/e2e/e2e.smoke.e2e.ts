@@ -73,4 +73,49 @@ test.describe.serial('BackOffice smoke', () => {
     await ensureAuth(page, '/audit-logs');
     await expect(page.locator('h1', { hasText: 'Audit Logs' })).toBeVisible();
   });
+
+  test('categories loads', async ({ page }) => {
+    await ensureAuth(page, '/categories');
+    await expect(page.locator('h1', { hasText: 'Categories' })).toBeVisible();
+  });
+
+  test('products loads', async ({ page }) => {
+    await ensureAuth(page, '/products');
+    await expect(page.locator('h1', { hasText: 'Products' })).toBeVisible();
+  });
+
+  test('images loads', async ({ page }) => {
+    await ensureAuth(page, '/images');
+    await expect(page.locator('h1', { hasText: 'Images' })).toBeVisible();
+  });
+
+  test('inventory loads', async ({ page }) => {
+    await ensureAuth(page, '/inventory');
+    await expect(page.locator('h1', { hasText: 'Inventory' })).toBeVisible();
+  });
+
+  test('orders loads', async ({ page }) => {
+    await ensureAuth(page, '/orders');
+    await expect(page.locator('h1', { hasText: 'Orders' })).toBeVisible();
+  });
+
+  test('payments loads', async ({ page }) => {
+    await ensureAuth(page, '/payments');
+    await expect(page.locator('h1', { hasText: 'Payments' })).toBeVisible();
+  });
+
+  test('shipments loads', async ({ page }) => {
+    await ensureAuth(page, '/shipments');
+    await expect(page.locator('h1', { hasText: 'Shipments' })).toBeVisible();
+  });
+
+  test('coupons loads', async ({ page }) => {
+    await ensureAuth(page, '/coupons');
+    await expect(page.locator('h1', { hasText: 'Coupons' })).toBeVisible();
+  });
+
+  test('reviews loads', async ({ page }) => {
+    await ensureAuth(page, '/reviews');
+    await expect(page.locator('h1', { hasText: 'Reviews' })).toBeVisible();
+  });
 });

@@ -2,16 +2,16 @@
   <div class="ds-container nav-inner">
     <div class="nav-left">
       <a class="navbar-brand" [routerLink]="dashboardPath()" *ngIf="can('dashboard.view')">Dashboard</a>
-      <a class="nav-link" routerLink="/users" *ngIf="can('users.read')">Users</a>
-      <a class="nav-link" routerLink="/audit-logs" *ngIf="can('auditLogs.read')">Audit Logs</a>
-      <a class="nav-link" routerLink="/categories" *ngIf="can('categories.read')">Categories</a>
-      <a class="nav-link" routerLink="/products" *ngIf="can('products.read')">Products</a>
-      <a class="nav-link" routerLink="/inventory" *ngIf="can('inventory.read')">Inventory</a>
-      <a class="nav-link" routerLink="/orders" *ngIf="can('orders.read')">Orders</a>
-      <a class="nav-link" routerLink="/payments" *ngIf="can('payments.read')">Payments</a>
-      <a class="nav-link" routerLink="/shipments" *ngIf="can('shipments.read')">Shipments</a>
-      <a class="nav-link" routerLink="/coupons" *ngIf="can('coupons.read')">Coupons</a>
-      <a class="nav-link" routerLink="/reviews" *ngIf="can('reviews.read')">Reviews</a>
+      <a class="nav-link" [routerLink]="pathFor('users.read')" *ngIf="can('users.read')">Users</a>
+      <a class="nav-link" [routerLink]="pathFor('auditLogs.read')" *ngIf="can('auditLogs.read')">Audit Logs</a>
+      <a class="nav-link" [routerLink]="pathFor('categories.read')" *ngIf="can('categories.read')">Categories</a>
+      <a class="nav-link" [routerLink]="pathFor('products.read')" *ngIf="can('products.read')">Products</a>
+      <a class="nav-link" [routerLink]="pathFor('inventory.read')" *ngIf="can('inventory.read')">Inventory</a>
+      <a class="nav-link" [routerLink]="pathFor('orders.read')" *ngIf="can('orders.read')">Orders</a>
+      <a class="nav-link" [routerLink]="pathFor('payments.read')" *ngIf="can('payments.read')">Payments</a>
+      <a class="nav-link" [routerLink]="pathFor('shipments.read')" *ngIf="can('shipments.read')">Shipments</a>
+      <a class="nav-link" [routerLink]="pathFor('coupons.read')" *ngIf="can('coupons.read')">Coupons</a>
+      <a class="nav-link" [routerLink]="pathFor('reviews.read')" *ngIf="can('reviews.read')">Reviews</a>
     </div>
     <div class="nav-right">
       <span class="nav-email" *ngIf="isLoggedIn()">{{ user()?.email }}</span>

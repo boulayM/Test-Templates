@@ -31,6 +31,35 @@ export class AdminNavbarComponent {
     return hasPermission(this.auth.user?.role, permission);
   }
 
+  pathFor(permission: AppPermission): string {
+    const role = this.auth.user?.role;
+    if (permission === 'users.read') return '/admin/users';
+    if (permission === 'auditLogs.read') return '/admin/audit-logs';
+    if (permission === 'categories.read') return '/admin/categories';
+    if (permission === 'products.read') return '/admin/products';
+    if (permission === 'reviews.read') return '/admin/reviews';
+
+    if (permission === 'inventory.read') {
+      return role === 'LOGISTIQUE' ? '/logistique/inventory' : '/admin/inventory';
+    }
+    if (permission === 'shipments.read') {
+      return role === 'LOGISTIQUE' ? '/logistique/shipments' : '/admin/shipments';
+    }
+    if (permission === 'payments.read') {
+      return role === 'COMPTABILITE' ? '/comptabilite/payments' : '/admin/payments';
+    }
+    if (permission === 'coupons.read') {
+      return role === 'COMPTABILITE' ? '/comptabilite/coupons' : '/admin/coupons';
+    }
+    if (permission === 'orders.read') {
+      if (role === 'LOGISTIQUE') return '/logistique/orders';
+      if (role === 'COMPTABILITE') return '/comptabilite/orders';
+      return '/admin/orders';
+    }
+
+    return '/dashboard';
+  }
+
   async handleLogout(): Promise<void> {
     await this.auth.logout();
     this.router.navigate(['/login']);

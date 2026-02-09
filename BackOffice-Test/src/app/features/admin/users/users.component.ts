@@ -245,6 +245,7 @@ export class UsersComponent implements OnInit {
         const mapped = mapBackendError(err, this.extractErrorMessage(err));
         this.createAlert = mapped.alert;
         this.createFieldErrors = mapped.fieldErrors;
+        this.cdr.detectChanges();
       }
     });
   }

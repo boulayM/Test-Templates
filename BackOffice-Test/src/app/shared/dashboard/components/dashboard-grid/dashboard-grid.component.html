@@ -1,0 +1,9 @@
+<section class="ds-container">
+  <div class="dashboard-card">
+    <h1 class="dashboard-title">{{ title }}</h1>
+    @if (subtitle) {
+      <p class="dashboard-subtitle">{{ subtitle }}</p>
+    }
+    <ng-content></ng-content>
+  </div>
+</section>

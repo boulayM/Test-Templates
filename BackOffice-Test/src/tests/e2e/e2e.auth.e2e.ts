@@ -28,7 +28,6 @@ test('redirects to access-denied when unauthenticated', async ({ page }) => {
 });
 
 test('login + logout flow', async ({ page }) => {
-  test.skip(process.env.E2E_RUN_LOGOUT !== '1', 'Set E2E_RUN_LOGOUT=1 to run this test');
   test.skip(!adminEmail || !adminPassword, 'Set E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD');
   await login(page);
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();

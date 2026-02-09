@@ -83,58 +83,25 @@ test.describe.serial('Users errors', () => {
     await expect(page.locator('#userPassword + .field-error')).toContainText(/password/i);
   });
 
-  test('create duplicate email shows backend error alert', async ({ page }) => {
-    test.skip(true, 'Duplicate-email feedback is non-deterministic with current backend policy');
+  test('create duplicate email is rejected by backend', async ({ page }) => {
     await ensureAuth(page, '/users');
-    const dupEmail = `dup_${Date.now()}@test.local`;
+    const dupEmail = adminEmail || 'admin@example.com';
 
     await page.locator('#userFirstName').fill('Dup');
     await page.locator('#userLastName').fill('User');
     await page.locator('#userEmail').fill(dupEmail);
     await page.locator('#userPassword').fill('Password123!');
     await page.locator('#userRole').selectOption('USER');
-    await page.getByRole('button', { name: 'Create' }).click();
-
-    // Second submit with the exact same email must trigger duplicate backend error.
-    const duplicateResponse = page.waitForResponse(
+    // Creating with an already existing email must fail with backend error.
+    const duplicateResponsePromise = page.waitForResponse(
       (res) => res.url().includes('/api/users/register') && res.request().method() === 'POST',
       { timeout: 15000 },
     );
-    await page.locator('#userFirstName').fill('Dup');
-    await page.locator('#userLastName').fill('User');
-    await page.locator('#userEmail').fill(dupEmail);
-    await page.locator('#userPassword').fill('Password123!');
-    await page.locator('#userRole').selectOption('USER');
     await page.getByRole('button', { name: 'Create' }).click();
-    const secondCreateRes = await duplicateResponse;
+    const duplicateResponse = await duplicateResponsePromise;
+    expect(duplicateResponse.status()).toBeGreaterThanOrEqual(400);
 
-    if (secondCreateRes.status() < 400) {
-      test.skip(true, `Backend duplicate policy is non-blocking (status ${secondCreateRes.status()})`);
-    }
-
-    const alert = page.locator('.form-alert');
-    const errorToast = page.locator('.ds-toast.ds-toast-error');
-
-    const alertVisible = await alert
-      .first()
-      .isVisible()
-      .catch(() => false);
-    const toastVisible = await errorToast
-      .first()
-      .isVisible()
-      .catch(() => false);
-
-    if (!alertVisible && !toastVisible) {
-      throw new Error('Expected a backend error feedback (form alert or error toast).');
-    }
-
-    if (alertVisible) {
-      await expect(alert.first()).toContainText(/email|validation|used|utilise/i);
-    }
-
-    if (toastVisible) {
-      await expect(errorToast.first()).toContainText(/error|invalid|utilise|already|failed/i);
-    }
+    await expect(page.locator('#userEmail')).toHaveValue(dupEmail);
   });
 
   test('edit shows invalid email validation error', async ({ page }) => {

@@ -12,6 +12,7 @@ import { AuthMessages } from '../../../shared/messages/auth-messages';
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {
+  private readonly allowedRoles = new Set(['ADMIN', 'LOGISTIQUE', 'COMPTABILITE']);
   email = '';
   password = '';
   loading = false;
@@ -59,7 +60,7 @@ export class LoginComponent {
       return;
     }
 
-    if (result.user.role !== 'ADMIN') {
+    if (!this.allowedRoles.has(result.user.role)) {
       await this.auth.initCsrfAfterLogin();
       await this.auth.logout();
       this.error = AuthMessages.adminOnly;
@@ -68,6 +69,12 @@ export class LoginComponent {
     }
 
     await this.auth.initCsrfAfterLogin();
-    this.router.navigate(['/dashboard']);
+    const roleHome =
+      result.user.role === 'ADMIN'
+        ? '/admin/dashboard'
+        : result.user.role === 'LOGISTIQUE'
+          ? '/logistique/dashboard'
+          : '/comptabilite/dashboard';
+    this.router.navigate([roleHome]);
   }
 }

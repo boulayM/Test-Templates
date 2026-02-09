@@ -38,9 +38,9 @@ export class ComptabiliteDashboardComponent implements OnInit {
 
       this.ordersTotal = a.orders || 0;
       this.revenueCents = a.revenueCents || 0;
-      this.paymentsCaptured = p.byStatus?.CAPTURED || 0;
-      this.paymentsFailed = p.byStatus?.FAILED || 0;
-      this.paymentsRefunded = p.byStatus?.REFUNDED || 0;
+      this.paymentsCaptured = p.byStatus?.['CAPTURED'] || 0;
+      this.paymentsFailed = p.byStatus?.['FAILED'] || 0;
+      this.paymentsRefunded = p.byStatus?.['REFUNDED'] || 0;
       this.couponsUsed = c.usedCount || 0;
       this.cdr.detectChanges();
     });

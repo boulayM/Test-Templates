@@ -40,7 +40,7 @@ export class LogistiqueDashboardComponent implements OnInit {
       const r = recent as { data?: Array<{ id: number; status: string; totalCents?: number }> };
 
       this.ordersTotal = o.total || 0;
-      this.pendingPrep = o.byStatus?.PAID || 0;
+      this.pendingPrep = o.byStatus?.['PAID'] || 0;
       this.shipmentsTotal = s.total || 0;
       this.inventoryOut = i.outOfStock || 0;
       this.inventoryLow = i.lowStock || 0;

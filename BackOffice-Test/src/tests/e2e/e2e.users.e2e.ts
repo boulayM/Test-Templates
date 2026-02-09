@@ -58,13 +58,20 @@ async function ensureAuth(page: import('@playwright/test').Page, path: string) {
   }
 }
 
+async function goToUsersPage(page: import('@playwright/test').Page) {
+  await ensureAuth(page, '/dashboard');
+  await page.goto('/dashboard');
+  await page.getByRole('link', { name: 'Users', exact: true }).click();
+  await expect(page).toHaveURL(/\/admin\/users/);
+  await expect(page.locator('#usersSearch')).toBeVisible();
+}
+
 test.describe.serial('Users critical', () => {
   const ts = Date.now();
   const email = `e2e_user_${ts}@example.com`;
 
   test('create user', async ({ page }) => {
-    await ensureAuth(page, '/users');
-    await expect(page.locator('h1', { hasText: 'Users' })).toBeVisible();
+    await goToUsersPage(page);
 
     const waitCreate = page.waitForResponse(
       (res) => res.url().includes('/api/users/register') && res.request().method() === 'POST',
@@ -83,7 +90,7 @@ test.describe.serial('Users critical', () => {
       throw new Error(`Create failed with status ${createRes.status()}`);
     }
 
-    await page.getByLabel('Search').fill(email);
+    await page.locator('#usersSearch').fill(email);
     await page.keyboard.press('Enter');
 
     const waitList = page.waitForResponse(
@@ -97,7 +104,7 @@ test.describe.serial('Users critical', () => {
   });
 
   test('edit user name', async ({ page }) => {
-    await ensureAuth(page, '/users');
+    await goToUsersPage(page);
     const row = page.locator('tr', { hasText: email });
     await expect(row).toBeVisible();
 
@@ -117,17 +124,13 @@ test.describe.serial('Users critical', () => {
     }
 
     await page.waitForTimeout(500);
-    await page.reload();
-    await page.getByLabel('Search').fill(email);
-    await page.keyboard.press('Enter');
-
     const updatedRow = page.locator('tr', { hasText: email });
     await expect(updatedRow).toContainText('E2E-Edited', { timeout: 10000 });
     await expect(updatedRow).toContainText('User-Edited', { timeout: 10000 });
   });
 
   test('filter by role', async ({ page }) => {
-    await ensureAuth(page, '/users');
+    await goToUsersPage(page);
     await page.locator('#usersRoleFilter').selectOption('USER');
 
     const row = page.locator('tr', { hasText: email });
@@ -140,7 +143,7 @@ test.describe.serial('Users critical', () => {
   });
 
   test('export CSV', async ({ page }) => {
-    await ensureAuth(page, '/users');
+    await goToUsersPage(page);
     const downloadPromise = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Export CSV' }).click();
     const download = await downloadPromise;
@@ -148,7 +151,7 @@ test.describe.serial('Users critical', () => {
   });
 
   test('delete user', async ({ page }) => {
-    await ensureAuth(page, '/users');
+    await goToUsersPage(page);
     await page.locator('#usersSearch').fill(email);
     await page.keyboard.press('Enter');
     const row = page.locator('tr', { hasText: email });

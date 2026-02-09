@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
+import { roleMatchGuard } from './core/guards/role-match.guard';
 import { permissionGuard } from './core/guards/permission.guard';
 
 import { AdminLayoutComponent } from './layout/admin-layout/admin-layout.component';
@@ -47,44 +48,96 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN', 'LOGISTIQUE', 'COMPTABILITE'] },
     children: [
+      {
+        path: 'admin',
+        canMatch: [roleMatchGuard],
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN'] },
+        children: [
+          {
+            path: 'dashboard',
+            component: DashboardComponent,
+            canActivate: [permissionGuard],
+            data: { permission: 'dashboard.view' },
+          },
+          { path: 'users', component: UsersComponent, canActivate: [permissionGuard], data: { permission: 'users.read' } },
+          { path: 'audit-logs', component: AuditLogsComponent, canActivate: [permissionGuard], data: { permission: 'auditLogs.read' } },
+          { path: 'categories', component: CategoriesComponent, canActivate: [permissionGuard], data: { permission: 'categories.read' } },
+          { path: 'products', component: ProductsComponent, canActivate: [permissionGuard], data: { permission: 'products.read' } },
+          { path: 'inventory', component: InventoryComponent, canActivate: [permissionGuard], data: { permission: 'inventory.read' } },
+          { path: 'orders', component: OrdersComponent, canActivate: [permissionGuard], data: { permission: 'orders.read' } },
+          { path: 'payments', component: PaymentsComponent, canActivate: [permissionGuard], data: { permission: 'payments.read' } },
+          { path: 'shipments', component: ShipmentsComponent, canActivate: [permissionGuard], data: { permission: 'shipments.read' } },
+          { path: 'coupons', component: CouponsComponent, canActivate: [permissionGuard], data: { permission: 'coupons.read' } },
+          { path: 'reviews', component: ReviewsComponent, canActivate: [permissionGuard], data: { permission: 'reviews.read' } },
+        ],
+      },
+      {
+        path: 'logistique',
+        canMatch: [roleMatchGuard],
+        canActivate: [roleGuard],
+        data: { roles: ['LOGISTIQUE'] },
+        children: [
+          {
+            path: 'dashboard',
+            component: LogistiqueDashboardComponent,
+            canActivate: [permissionGuard],
+            data: { permission: 'dashboard.view' },
+          },
+          {
+            path: 'inventory',
+            component: LogistiqueInventoryComponent,
+            canActivate: [permissionGuard],
+            data: { permission: 'inventory.read' },
+          },
+          {
+            path: 'orders',
+            component: LogistiqueOrdersComponent,
+            canActivate: [permissionGuard],
+            data: { permission: 'orders.read' },
+          },
+          {
+            path: 'shipments',
+            component: LogistiqueShipmentsComponent,
+            canActivate: [permissionGuard],
+            data: { permission: 'shipments.read' },
+          },
+        ],
+      },
+      {
+        path: 'comptabilite',
+        canMatch: [roleMatchGuard],
+        canActivate: [roleGuard],
+        data: { roles: ['COMPTABILITE'] },
+        children: [
+          {
+            path: 'dashboard',
+            component: ComptabiliteDashboardComponent,
+            canActivate: [permissionGuard],
+            data: { permission: 'dashboard.view' },
+          },
+          {
+            path: 'orders',
+            component: ComptabiliteOrdersComponent,
+            canActivate: [permissionGuard],
+            data: { permission: 'orders.read' },
+          },
+          {
+            path: 'payments',
+            component: ComptabilitePaymentsComponent,
+            canActivate: [permissionGuard],
+            data: { permission: 'payments.read' },
+          },
+          {
+            path: 'coupons',
+            component: ComptabiliteCouponsComponent,
+            canActivate: [permissionGuard],
+            data: { permission: 'coupons.read' },
+          },
+        ],
+      },
+
       { path: 'dashboard', component: RoleDashboardRedirectComponent, canActivate: [permissionGuard], data: { permission: 'dashboard.view' } },
-      {
-        path: 'admin/dashboard',
-        component: DashboardComponent,
-        canActivate: [roleGuard, permissionGuard],
-        data: { roles: ['ADMIN'], permission: 'dashboard.view' },
-      },
-      {
-        path: 'logistique/dashboard',
-        component: LogistiqueDashboardComponent,
-        canActivate: [roleGuard, permissionGuard],
-        data: { roles: ['LOGISTIQUE'], permission: 'dashboard.view' },
-      },
-      {
-        path: 'comptabilite/dashboard',
-        component: ComptabiliteDashboardComponent,
-        canActivate: [roleGuard, permissionGuard],
-        data: { roles: ['COMPTABILITE'], permission: 'dashboard.view' },
-      },
-      { path: 'admin/users', component: UsersComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['ADMIN'], permission: 'users.read' } },
-      { path: 'admin/audit-logs', component: AuditLogsComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['ADMIN'], permission: 'auditLogs.read' } },
-      { path: 'admin/categories', component: CategoriesComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['ADMIN'], permission: 'categories.read' } },
-      { path: 'admin/products', component: ProductsComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['ADMIN'], permission: 'products.read' } },
-      { path: 'admin/inventory', component: InventoryComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['ADMIN'], permission: 'inventory.read' } },
-      { path: 'admin/orders', component: OrdersComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['ADMIN'], permission: 'orders.read' } },
-      { path: 'admin/payments', component: PaymentsComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['ADMIN'], permission: 'payments.read' } },
-      { path: 'admin/shipments', component: ShipmentsComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['ADMIN'], permission: 'shipments.read' } },
-      { path: 'admin/coupons', component: CouponsComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['ADMIN'], permission: 'coupons.read' } },
-      { path: 'admin/reviews', component: ReviewsComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['ADMIN'], permission: 'reviews.read' } },
-
-      { path: 'logistique/inventory', component: LogistiqueInventoryComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['LOGISTIQUE'], permission: 'inventory.read' } },
-      { path: 'logistique/orders', component: LogistiqueOrdersComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['LOGISTIQUE'], permission: 'orders.read' } },
-      { path: 'logistique/shipments', component: LogistiqueShipmentsComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['LOGISTIQUE'], permission: 'shipments.read' } },
-
-      { path: 'comptabilite/orders', component: ComptabiliteOrdersComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['COMPTABILITE'], permission: 'orders.read' } },
-      { path: 'comptabilite/payments', component: ComptabilitePaymentsComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['COMPTABILITE'], permission: 'payments.read' } },
-      { path: 'comptabilite/coupons', component: ComptabiliteCouponsComponent, canActivate: [roleGuard, permissionGuard], data: { roles: ['COMPTABILITE'], permission: 'coupons.read' } },
-
       { path: 'users', component: RoleFeatureRedirectComponent, canActivate: [permissionGuard], data: { permission: 'users.read', feature: 'users' } },
       { path: 'audit-logs', component: RoleFeatureRedirectComponent, canActivate: [permissionGuard], data: { permission: 'auditLogs.read', feature: 'audit-logs' } },
       { path: 'categories', component: RoleFeatureRedirectComponent, canActivate: [permissionGuard], data: { permission: 'categories.read', feature: 'categories' } },
@@ -95,6 +148,7 @@ export const routes: Routes = [
       { path: 'shipments', component: RoleFeatureRedirectComponent, canActivate: [permissionGuard], data: { permission: 'shipments.read', feature: 'shipments' } },
       { path: 'coupons', component: RoleFeatureRedirectComponent, canActivate: [permissionGuard], data: { permission: 'coupons.read', feature: 'coupons' } },
       { path: 'reviews', component: RoleFeatureRedirectComponent, canActivate: [permissionGuard], data: { permission: 'reviews.read', feature: 'reviews' } },
+      { path: '**', component: ErrorPageComponent, data: { reason: 'not-found' } },
     ],
   },
   { path: '**', component: ErrorPageComponent, data: { reason: 'not-found' } },

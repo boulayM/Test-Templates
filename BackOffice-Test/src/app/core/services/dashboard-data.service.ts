@@ -79,7 +79,7 @@ export class DashboardDataService {
 
   getProductsMetrics(): Observable<unknown> {
     return this.api
-      .get<unknown>('/admin/products', { page: 1, limit: 100, sort: 'id', order: 'desc' }, true)
+      .get<unknown>('/admin/products', { page: 1, limit: 100 })
       .pipe(
         map((res) => {
           const rec = this.asRecord(res);
@@ -130,6 +130,97 @@ export class DashboardDataService {
           return { total: this.toNumber(rec['total']) };
         }),
       );
+  }
+
+  getPaymentsMetrics(): Observable<unknown> {
+    return this.api.get<unknown>('/admin/payments', { page: 1, limit: 100 }).pipe(
+      map((res) => {
+        const rec = this.asRecord(res);
+        const data = this.asArray(rec['data']);
+        const byStatus: Record<string, number> = {};
+        for (const row of data) {
+          const r = this.asRecord(row);
+          const status = typeof r['status'] === 'string' ? r['status'] : 'UNKNOWN';
+          byStatus[status] = (byStatus[status] || 0) + 1;
+        }
+        return { total: this.toNumber(rec['total']) || data.length, byStatus };
+      }),
+    );
+  }
+
+  getShipmentsMetrics(): Observable<unknown> {
+    return this.api.get<unknown>('/admin/shipments', { page: 1, limit: 100 }).pipe(
+      map((res) => {
+        const rec = this.asRecord(res);
+        const data = this.asArray(rec['data']);
+        const byStatus: Record<string, number> = {};
+        for (const row of data) {
+          const r = this.asRecord(row);
+          const status = typeof r['status'] === 'string' ? r['status'] : 'UNKNOWN';
+          byStatus[status] = (byStatus[status] || 0) + 1;
+        }
+        return { total: this.toNumber(rec['total']) || data.length, byStatus };
+      }),
+    );
+  }
+
+  getInventoryMetrics(): Observable<unknown> {
+    return this.api.get<unknown>('/admin/inventory', { page: 1, limit: 200 }).pipe(
+      map((res) => {
+        const rec = this.asRecord(res);
+        const data = this.asArray(rec['data']);
+        let outOfStock = 0;
+        let lowStock = 0;
+        for (const row of data) {
+          const r = this.asRecord(row);
+          const quantity = this.toNumber(r['quantity']);
+          const reserved = this.toNumber(r['reserved']);
+          const available = quantity - reserved;
+          if (available <= 0) outOfStock += 1;
+          else if (available < 5) lowStock += 1;
+        }
+        return { total: this.toNumber(rec['total']) || data.length, outOfStock, lowStock };
+      }),
+    );
+  }
+
+  getCouponsMetrics(): Observable<unknown> {
+    return this.api.get<unknown>('/admin/coupons', { page: 1, limit: 100 }).pipe(
+      map((res) => {
+        const rec = this.asRecord(res);
+        const data = this.asArray(rec['data']);
+        let active = 0;
+        let inactive = 0;
+        let usedCount = 0;
+        for (const row of data) {
+          const r = this.asRecord(row);
+          if (r['isActive'] === true) active += 1;
+          else inactive += 1;
+          usedCount += this.toNumber(r['usedCount']);
+        }
+        return { total: this.toNumber(rec['total']) || data.length, active, inactive, usedCount };
+      }),
+    );
+  }
+
+  getReviewsMetrics(): Observable<unknown> {
+    return this.api.get<unknown>('/admin/reviews').pipe(
+      map((res) => {
+        const rec = this.asRecord(res);
+        const data = this.asArray(rec['data']);
+        let sum = 0;
+        let lowRatings = 0;
+        for (const row of data) {
+          const r = this.asRecord(row);
+          const rating = this.toNumber(r['rating']);
+          sum += rating;
+          if (rating > 0 && rating <= 2) lowRatings += 1;
+        }
+        const total = this.toNumber(rec['total']) || data.length;
+        const avgRating = total > 0 ? sum / total : 0;
+        return { total, avgRating, lowRatings };
+      }),
+    );
   }
 
   getRecentOrders(): Observable<unknown> {

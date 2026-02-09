@@ -69,6 +69,74 @@
       </div>
     </div>
 
+    <div class="mt-3 grid grid-md-2">
+      <div class="card-ui">
+        <h2>Payments</h2>
+        <div class="metric-line">
+          Total: <strong>{{ paymentsMetrics.total }}</strong>
+        </div>
+        <div class="metric-line">
+          Captured: <strong>{{ paymentsMetrics.byStatus['CAPTURED'] || 0 }}</strong>
+        </div>
+        <div class="metric-line">
+          Failed: <strong>{{ paymentsMetrics.byStatus['FAILED'] || 0 }}</strong>
+        </div>
+        <div class="metric-line">
+          Refunded: <strong>{{ paymentsMetrics.byStatus['REFUNDED'] || 0 }}</strong>
+        </div>
+      </div>
+      <div class="card-ui">
+        <h2>Shipments</h2>
+        <div class="metric-line">
+          Total: <strong>{{ shipmentsMetrics.total }}</strong>
+        </div>
+        <div class="metric-line">
+          Created: <strong>{{ shipmentsMetrics.byStatus['CREATED'] || 0 }}</strong>
+        </div>
+        <div class="metric-line">
+          In transit: <strong>{{ shipmentsMetrics.byStatus['IN_TRANSIT'] || 0 }}</strong>
+        </div>
+        <div class="metric-line">
+          Delivered: <strong>{{ shipmentsMetrics.byStatus['DELIVERED'] || 0 }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3 grid grid-md-2">
+      <div class="card-ui">
+        <h2>Inventory risk</h2>
+        <div class="metric-line">
+          Total rows: <strong>{{ inventoryMetrics.total }}</strong>
+        </div>
+        <div class="metric-line">
+          Out of stock: <strong>{{ inventoryMetrics.outOfStock }}</strong>
+        </div>
+        <div class="metric-line">
+          Low stock: <strong>{{ inventoryMetrics.lowStock }}</strong>
+        </div>
+      </div>
+      <div class="card-ui">
+        <h2>Coupons & reviews</h2>
+        <div class="metric-line">
+          Coupons active/inactive:
+          <strong>{{ couponsMetrics.active }}</strong> /
+          <strong>{{ couponsMetrics.inactive }}</strong>
+        </div>
+        <div class="metric-line">
+          Coupon usage total: <strong>{{ couponsMetrics.usedCount }}</strong>
+        </div>
+        <div class="metric-line">
+          Reviews total: <strong>{{ reviewsMetrics.total }}</strong>
+        </div>
+        <div class="metric-line">
+          Avg rating: <strong>{{ reviewsMetrics.avgRating.toFixed(2) }}</strong>
+        </div>
+        <div class="metric-line">
+          Low ratings (1-2): <strong>{{ reviewsMetrics.lowRatings }}</strong>
+        </div>
+      </div>
+    </div>
+
     <div class="mt-3 card-ui">
       <h2>Alerts</h2>
       <ul class="alerts" *ngIf="alerts.length">

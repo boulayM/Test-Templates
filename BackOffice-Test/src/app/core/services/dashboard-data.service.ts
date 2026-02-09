@@ -56,7 +56,7 @@ export class DashboardDataService {
 
   getUsersMetrics(): Observable<unknown> {
     return this.api
-      .get<unknown>('/users', { page: 1, limit: 100, sort: 'createdAt', order: 'desc' }, true)
+      .get<unknown>('/admin/users', { page: 1, limit: 100, sort: 'createdAt', order: 'desc' }, true)
       .pipe(
         map((res) => {
           const rec = this.asRecord(res);
@@ -123,7 +123,7 @@ export class DashboardDataService {
 
   getAuditMetrics(): Observable<unknown> {
     return this.api
-      .get<unknown>('/audit-logs', { page: 1, limit: 1, sort: 'createdAt', order: 'desc' }, true)
+      .get<unknown>('/admin/audit-logs', { page: 1, limit: 1, sort: 'createdAt', order: 'desc' }, true)
       .pipe(
         map((res) => {
           const rec = this.asRecord(res);
@@ -228,10 +228,10 @@ export class DashboardDataService {
   }
 
   getRecentUsers(): Observable<unknown> {
-    return this.api.get<unknown>('/users', { page: 1, limit: 5, sort: 'createdAt', order: 'desc' }, true);
+    return this.api.get<unknown>('/admin/users', { page: 1, limit: 5, sort: 'createdAt', order: 'desc' }, true);
   }
 
   getRecentLogs(): Observable<unknown> {
-    return this.api.get<unknown>('/audit-logs', { page: 1, limit: 5, sort: 'createdAt', order: 'desc' }, true);
+    return this.api.get<unknown>('/admin/audit-logs', { page: 1, limit: 5, sort: 'createdAt', order: 'desc' }, true);
   }
 }

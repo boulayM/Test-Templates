@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 import { DashboardDataService } from '../../../core/services/dashboard-data.service';
 
 interface User {
@@ -64,6 +64,35 @@ interface AuditMetrics {
   total: number;
 }
 
+interface PaymentsMetrics {
+  total: number;
+  byStatus: Record<string, number>;
+}
+
+interface ShipmentsMetrics {
+  total: number;
+  byStatus: Record<string, number>;
+}
+
+interface InventoryMetrics {
+  total: number;
+  outOfStock: number;
+  lowStock: number;
+}
+
+interface CouponsMetrics {
+  total: number;
+  active: number;
+  inactive: number;
+  usedCount: number;
+}
+
+interface ReviewsMetrics {
+  total: number;
+  avgRating: number;
+  lowRatings: number;
+}
+
 @Component({
   selector: 'app-dashboard',
   imports: [CommonModule, RouterLink],
@@ -76,6 +105,11 @@ export class DashboardComponent implements OnInit {
   productsMetrics: ProductsMetrics = { total: 0, active: 0, inactive: 0 };
   ordersMetrics: OrdersMetrics = { total: 0, byStatus: {} };
   auditMetrics: AuditMetrics = { total: 0 };
+  paymentsMetrics: PaymentsMetrics = { total: 0, byStatus: {} };
+  shipmentsMetrics: ShipmentsMetrics = { total: 0, byStatus: {} };
+  inventoryMetrics: InventoryMetrics = { total: 0, outOfStock: 0, lowStock: 0 };
+  couponsMetrics: CouponsMetrics = { total: 0, active: 0, inactive: 0, usedCount: 0 };
+  reviewsMetrics: ReviewsMetrics = { total: 0, avgRating: 0, lowRatings: 0 };
 
   recentOrders: Order[] = [];
   recentUsers: User[] = [];
@@ -181,6 +215,50 @@ export class DashboardComponent implements OnInit {
     return { total: this.toNumber(obj['total']) };
   }
 
+  private toPaymentsMetrics(res: unknown): PaymentsMetrics {
+    const obj = this.unwrapRecord(res);
+    return {
+      total: this.toNumber(obj['total']),
+      byStatus: this.toRecordNumber(obj['byStatus']),
+    };
+  }
+
+  private toShipmentsMetrics(res: unknown): ShipmentsMetrics {
+    const obj = this.unwrapRecord(res);
+    return {
+      total: this.toNumber(obj['total']),
+      byStatus: this.toRecordNumber(obj['byStatus']),
+    };
+  }
+
+  private toInventoryMetrics(res: unknown): InventoryMetrics {
+    const obj = this.unwrapRecord(res);
+    return {
+      total: this.toNumber(obj['total']),
+      outOfStock: this.toNumber(obj['outOfStock']),
+      lowStock: this.toNumber(obj['lowStock']),
+    };
+  }
+
+  private toCouponsMetrics(res: unknown): CouponsMetrics {
+    const obj = this.unwrapRecord(res);
+    return {
+      total: this.toNumber(obj['total']),
+      active: this.toNumber(obj['active']),
+      inactive: this.toNumber(obj['inactive']),
+      usedCount: this.toNumber(obj['usedCount']),
+    };
+  }
+
+  private toReviewsMetrics(res: unknown): ReviewsMetrics {
+    const obj = this.unwrapRecord(res);
+    return {
+      total: this.toNumber(obj['total']),
+      avgRating: this.toNumber(obj['avgRating']),
+      lowRatings: this.toNumber(obj['lowRatings']),
+    };
+  }
+
   centsToEuros(value: unknown): string {
     const cents = Number(value || 0);
     const euros = cents / 100;
@@ -207,25 +285,52 @@ export class DashboardComponent implements OnInit {
       this.metrics.ordersByStatus['PENDING'] ?? this.ordersMetrics.byStatus['PENDING'] ?? 0;
     const inactive = this.productsMetrics.inactive ?? 0;
     const unverified = this.usersMetrics.unverified ?? 0;
+    const failedPayments = this.paymentsMetrics.byStatus['FAILED'] ?? 0;
+    const pendingPayments = this.paymentsMetrics.byStatus['CREATED'] ?? 0;
+    const shipmentsWaiting = this.shipmentsMetrics.byStatus['CREATED'] ?? 0;
+    const outOfStock = this.inventoryMetrics.outOfStock ?? 0;
+    const lowStock = this.inventoryMetrics.lowStock ?? 0;
+    const lowRatings = this.reviewsMetrics.lowRatings ?? 0;
 
     if (pending > 0) list.push(`${pending} orders pending`);
     if (inactive > 0) list.push(`${inactive} products inactive`);
     if (unverified > 0) list.push(`${unverified} users unverified`);
+    if (failedPayments > 0) list.push(`${failedPayments} failed payments`);
+    if (pendingPayments > 0) list.push(`${pendingPayments} payments to validate`);
+    if (shipmentsWaiting > 0) list.push(`${shipmentsWaiting} shipments to process`);
+    if (outOfStock > 0) list.push(`${outOfStock} products out of stock`);
+    if (lowStock > 0) list.push(`${lowStock} products low stock`);
+    if (lowRatings > 0) list.push(`${lowRatings} low-rated reviews to moderate`);
     return list;
   }
 
   loadMetrics() {
     forkJoin([
-      this.dataService.getAdminMetrics(),
-      this.dataService.getUsersMetrics(),
-      this.dataService.getProductsMetrics(),
-      this.dataService.getOrdersMetrics(),
-      this.dataService.getAuditMetrics(),
-    ]).subscribe(([adminRes, usersRes, productsRes, ordersRes, auditRes]: unknown[]) => {
+      this.dataService.getAdminMetrics().pipe(catchError(() => of({}))),
+      this.dataService.getUsersMetrics().pipe(catchError(() => of({ total: 0, verified: 0, unverified: 0 }))),
+      this.dataService.getProductsMetrics().pipe(catchError(() => of({ total: 0, active: 0, inactive: 0 }))),
+      this.dataService.getOrdersMetrics().pipe(catchError(() => of({ total: 0, byStatus: {} }))),
+      this.dataService.getAuditMetrics().pipe(catchError(() => of({ total: 0 }))),
+      this.dataService.getPaymentsMetrics().pipe(catchError(() => of({ total: 0, byStatus: {} }))),
+      this.dataService.getShipmentsMetrics().pipe(catchError(() => of({ total: 0, byStatus: {} }))),
+      this.dataService.getInventoryMetrics().pipe(catchError(() => of({ total: 0, outOfStock: 0, lowStock: 0 }))),
+      this.dataService.getCouponsMetrics().pipe(catchError(() => of({ total: 0, active: 0, inactive: 0, usedCount: 0 }))),
+      this.dataService.getReviewsMetrics().pipe(catchError(() => of({ total: 0, avgRating: 0, lowRatings: 0 }))),
+    ]).subscribe(
+      ([
+        adminRes,
+        usersRes,
+        productsRes,
+        ordersRes,
+        auditRes,
+        paymentsRes,
+        shipmentsRes,
+        inventoryRes,
+        couponsRes,
+        reviewsRes,
+      ]: unknown[]) => {
       const admin = this.unwrapRecord(adminRes);
       this.metrics.orders = this.toNumber(admin['orders']);
-      this.metrics.users = this.toNumber(admin['users']);
-      this.metrics.products = this.toNumber(admin['products']);
       this.metrics.revenueCents = this.toNumber(admin['revenueCents']);
       this.metrics.ordersByStatus = this.toRecordNumber(admin['ordersByStatus']);
 
@@ -233,8 +338,16 @@ export class DashboardComponent implements OnInit {
       this.productsMetrics = this.toProductsMetrics(productsRes);
       this.ordersMetrics = this.toOrdersMetrics(ordersRes);
       this.auditMetrics = this.toAuditMetrics(auditRes);
+      this.paymentsMetrics = this.toPaymentsMetrics(paymentsRes);
+      this.shipmentsMetrics = this.toShipmentsMetrics(shipmentsRes);
+      this.inventoryMetrics = this.toInventoryMetrics(inventoryRes);
+      this.couponsMetrics = this.toCouponsMetrics(couponsRes);
+      this.reviewsMetrics = this.toReviewsMetrics(reviewsRes);
+      this.metrics.users = this.usersMetrics.total;
+      this.metrics.products = this.productsMetrics.total;
       this.cdr.detectChanges();
-    });
+      },
+    );
   }
 
   loadRecent() {

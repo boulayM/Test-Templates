@@ -1,0 +1,44 @@
+.page-shell {
+  padding-top: 1rem;
+}
+
+.page-shell-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.page-shell-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.inline-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table-ui {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-ui th,
+.table-ui td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.5rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.muted {
+  color: #6b7280;
+}

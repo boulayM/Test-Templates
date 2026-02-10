@@ -1,0 +1,50 @@
+<section class="container-ui page-shell">
+  <header class="page-shell-header">
+    <h1>Coupons</h1>
+    <div class="page-shell-actions">
+      <button type="button" class="btn-ui" (click)="load()">Refresh</button>
+    </div>
+  </header>
+
+  <div class="inline-form">
+    <input data-testid="coupon-code" type="text" placeholder="Code" [(ngModel)]="newCode" />
+    <select data-testid="coupon-type" [(ngModel)]="newType">
+      <option value="PERCENT">PERCENT</option>
+      <option value="FIXED">FIXED</option>
+    </select>
+    <input data-testid="coupon-value" type="number" min="1" [(ngModel)]="newValue" />
+    <button data-testid="coupon-create" type="button" class="btn-ui" (click)="createCoupon()">Create</button>
+  </div>
+
+  <p *ngIf="loading" class="muted">Loading...</p>
+
+  <div *ngIf="!loading" class="table-responsive">
+    <table class="table-ui" *ngIf="rows.length; else emptyState">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>code</th>
+          <th>type</th>
+          <th>value</th>
+          <th>usageLimit</th>
+          <th>usedCount</th>
+          <th>isActive</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rows">
+          <td>{{ row['id'] }}</td>
+          <td>{{ row['code'] }}</td>
+          <td>{{ row['type'] }}</td>
+          <td>{{ row['value'] }}</td>
+          <td>{{ row['usageLimit'] }}</td>
+          <td>{{ row['usedCount'] }}</td>
+          <td>{{ row['isActive'] }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #emptyState>
+      <p class="muted">No data.</p>
+    </ng-template>
+  </div>
+</section>

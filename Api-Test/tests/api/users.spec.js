@@ -126,10 +126,12 @@ describe("users", () => {
     const res = await agent
       .patch("/api/users/" + user.id)
       .set("x-csrf-token", csrfToken)
-      .send({ firstName: "Updated" });
+      .send({ firstName: "Updated", isActive: false });
 
     expect(res.status).toBe(200);
     expect(res.body.user).toBeDefined();
+    const updated = await prisma.user.findUnique({ where: { id: user.id } });
+    expect(updated?.isActive).toBe(false);
   });
 
   it("rejects update without csrf", async () => {
@@ -170,6 +172,53 @@ describe("users", () => {
     const res = await agent.delete("/api/users/" + user.id).set("x-csrf-token", csrfToken);
 
     expect(res.status).toBe(200);
+  });
+
+
+
+  it("supports internal roles on admin register and users filter by role", async () => {
+    const { agent, csrfToken } = await loginAdmin();
+
+    const logisticsEmail = "logi_" + Date.now() + "@test.local";
+    const accountingEmail = "compta_" + Date.now() + "@test.local";
+
+    const logistics = await agent
+      .post("/api/users/register")
+      .set("x-csrf-token", csrfToken)
+      .send({
+        firstName: "Logi",
+        lastName: "One",
+        email: logisticsEmail,
+        password: "User123!",
+        role: "LOGISTIQUE",
+        emailVerified: true,
+        isActive: true
+      });
+    expect(logistics.status).toBe(201);
+
+    const accounting = await agent
+      .post("/api/users/register")
+      .set("x-csrf-token", csrfToken)
+      .send({
+        firstName: "Compta",
+        lastName: "One",
+        email: accountingEmail,
+        password: "User123!",
+        role: "COMPTABILITE",
+        emailVerified: true,
+        isActive: true
+      });
+    expect(accounting.status).toBe(201);
+
+    const filteredLogi = await agent.get('/api/users').query({ filters: JSON.stringify({ role: 'LOGISTIQUE' }) });
+    expect(filteredLogi.status).toBe(200);
+    expect(Array.isArray(filteredLogi.body.data)).toBe(true);
+    expect(filteredLogi.body.data.some((u) => u.email === logisticsEmail)).toBe(true);
+
+    const filteredCompta = await agent.get('/api/users').query({ filters: JSON.stringify({ role: 'COMPTABILITE' }) });
+    expect(filteredCompta.status).toBe(200);
+    expect(Array.isArray(filteredCompta.body.data)).toBe(true);
+    expect(filteredCompta.body.data.some((u) => u.email === accountingEmail)).toBe(true);
   });
 
   it("exports users csv", async () => {

@@ -42,8 +42,8 @@ export class UsersComponent implements OnInit {
   activeFilter = '';
   verifiedFilter = '';
 
-  // This API currently accepts USER/ADMIN only on users filters/create/update payloads.
-  roles: UserRole[] = ['ADMIN', 'USER'];
+  // Admin endpoint supports internal roles for create/update/filter.
+  roles: UserRole[] = ['ADMIN', 'USER', 'LOGISTIQUE', 'COMPTABILITE'];
   createAlert: FormAlertState | null = null;
   updateAlert: FormAlertState | null = null;
   createFieldErrors: Record<string, string> = {};
@@ -91,10 +91,10 @@ export class UsersComponent implements OnInit {
   }
 
   private buildFiltersParam(): string | undefined {
-    const obj: Record<string, string> = {};
+    const obj: Record<string, string | boolean> = {};
     if (this.roleFilter) obj['role'] = this.roleFilter;
-    if (this.activeFilter !== '') obj['isActive'] = this.activeFilter;
-    if (this.verifiedFilter !== '') obj['emailVerified'] = this.verifiedFilter;
+    if (this.activeFilter !== '') obj['isActive'] = this.activeFilter === 'true';
+    if (this.verifiedFilter !== '') obj['emailVerified'] = this.verifiedFilter === 'true';
     return Object.keys(obj).length > 0 ? JSON.stringify(obj) : undefined;
   }
 
@@ -245,6 +245,7 @@ export class UsersComponent implements OnInit {
         const mapped = mapBackendError(err, this.extractErrorMessage(err));
         this.createAlert = mapped.alert;
         this.createFieldErrors = mapped.fieldErrors;
+        this.cdr.detectChanges();
       }
     });
   }

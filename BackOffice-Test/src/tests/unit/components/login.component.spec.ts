@@ -44,7 +44,7 @@ describe('LoginComponent', () => {
     auth.login.and.returnValue(of({ user: { role: 'ADMIN' } }));
     await (component as any).processLoginResult({ user: { role: 'ADMIN' } });
     expect(auth.initCsrfAfterLogin).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
+    expect(router.navigate).toHaveBeenCalledWith(['/admin/dashboard']);
   });
 
   it('rejects non admin', async () => {

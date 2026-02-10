@@ -34,7 +34,7 @@
               [attr.data-testid]="'order-status-' + rowId(row)"
               [(ngModel)]="statusDrafts[+rowId(row)]"
             >
-              <option *ngFor="let s of statuses" [ngValue]="s">{{ s }}</option>
+              <option *ngFor="let s of getStatusOptions(row)" [ngValue]="s">{{ s }}</option>
             </select>
             <button
               type="button"

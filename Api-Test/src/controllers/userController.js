@@ -26,7 +26,7 @@ function parseListParams(query) {
     try {
       const parsed = JSON.parse(query.filters);
       if (parsed && typeof parsed === "object") {
-        if (typeof parsed.role === "string" && (parsed.role === "USER" || parsed.role === "ADMIN")) {
+        if (typeof parsed.role === "string" && ["USER", "ADMIN", "LOGISTIQUE", "COMPTABILITE"].includes(parsed.role)) {
           filters.role = parsed.role;
         }
         if (typeof parsed.emailVerified === "boolean") {

@@ -143,7 +143,7 @@ components:
           example: marc@example.com
         role:
           type: string
-          enum: [USER, ADMIN]
+          enum: [USER, ADMIN, LOGISTIQUE, COMPTABILITE]
           example: ADMIN
         emailVerified:
           type: boolean
@@ -174,7 +174,7 @@ components:
           format: password
         role:
           type: string
-          enum: [USER, ADMIN]
+          enum: [USER, ADMIN, LOGISTIQUE, COMPTABILITE]
 
     PublicRegisterInput:
       type: object
@@ -219,7 +219,7 @@ components:
           format: password
         role:
           type: string
-          enum: [USER, ADMIN]
+          enum: [USER, ADMIN, LOGISTIQUE, COMPTABILITE]
 
     CategoryCreateInput:
       type: object
@@ -670,7 +670,8 @@ paths:
   /auth/register:
     post:
       tags: [Auth]
-      summary: Register (public)
+      summary: Register public account (USER only)
+      description: Role is always USER on this endpoint (anti-enumeration onboarding flow).
       requestBody:
         required: true
         content:
@@ -679,7 +680,7 @@ paths:
               $ref: "#/components/schemas/PublicRegisterInput"
       responses:
         "201":
-          description: Registration accepted
+          description: Registration accepted for public onboarding
         "400":
           $ref: "#/components/responses/ValidationError"
 
@@ -759,7 +760,8 @@ paths:
   /users/register:
     post:
       tags: [Users]
-      summary: Register a new user (admin only)
+      summary: Register internal user (admin endpoint)
+      description: Creates internal users via RBAC (USER, ADMIN, LOGISTIQUE, COMPTABILITE).
       security:
         - cookieAuth: []
           csrfToken: []

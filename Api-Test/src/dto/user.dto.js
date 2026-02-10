@@ -19,5 +19,6 @@ export function toUserUpdate(data) {
   if (data.password !== undefined) out.password = data.password;
   if (data.role !== undefined) out.role = data.role;
   if (data.emailVerified !== undefined) out.emailVerified = data.emailVerified;
+  if (data.isActive !== undefined) out.isActive = data.isActive;
   return out;
 }

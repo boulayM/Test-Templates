@@ -6,9 +6,9 @@ export class AuditLogsService {
   constructor(private api: ApiService) {}
 
   list(params?: Record<string, string | number | boolean | null | undefined>) {
-    return this.api.get('/audit-logs', params, true);
+    return this.api.get('/admin/audit-logs', params);
   }
   exportCsv() {
-    return this.api.getBlob('/audit-logs/export', undefined, true);
+    return this.api.getBlob('/admin/audit-logs/export');
   }
 }

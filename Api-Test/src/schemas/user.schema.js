@@ -9,7 +9,7 @@ export const userCreateSchema = z
     lastName: z.string().min(2).max(50),
     email: z.string().email(),
     password: z.string().regex(passwordRegex),
-    role: z.enum(["USER", "ADMIN"]).optional(),
+    role: z.enum(["USER", "ADMIN", "LOGISTIQUE", "COMPTABILITE"]).optional(),
     emailVerified: z.boolean().optional(),
     isActive: z.boolean().optional()
   })
@@ -21,7 +21,7 @@ export const userUpdateSchema = z
     lastName: z.string().min(2).max(50).optional(),
     email: z.string().email().optional(),
     password: z.string().regex(passwordRegex).optional(),
-    role: z.enum(["USER", "ADMIN"]).optional(),
+    role: z.enum(["USER", "ADMIN", "LOGISTIQUE", "COMPTABILITE"]).optional(),
     emailVerified: z.boolean().optional(),
     isActive: z.boolean().optional()
   })

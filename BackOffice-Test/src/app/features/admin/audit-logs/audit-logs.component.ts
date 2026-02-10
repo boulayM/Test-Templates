@@ -175,7 +175,7 @@ export class AuditLogsComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err: unknown) => {
-        this.toast.show(this.extractErrorMessage(err));
+        this.toast.error(this.extractErrorMessage(err));
       }
     });
   }

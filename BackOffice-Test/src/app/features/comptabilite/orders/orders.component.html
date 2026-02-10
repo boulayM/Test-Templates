@@ -18,7 +18,7 @@
           <th>totalCents</th>
           <th>currency</th>
           <th>createdAt</th>
-          <th>action</th>
+          <th>scope</th>
         </tr>
       </thead>
       <tbody>
@@ -29,22 +29,7 @@
           <td>{{ row['totalCents'] }}</td>
           <td>{{ row['currency'] }}</td>
           <td>{{ row['createdAt'] }}</td>
-          <td>
-            <select
-              [attr.data-testid]="'order-status-' + rowId(row)"
-              [(ngModel)]="statusDrafts[+rowId(row)]"
-            >
-              <option *ngFor="let s of statuses" [ngValue]="s">{{ s }}</option>
-            </select>
-            <button
-              type="button"
-              class="btn-ui btn-sm"
-              [attr.data-testid]="'order-update-' + rowId(row)"
-              (click)="updateStatus(row)"
-            >
-              Update
-            </button>
-          </td>
+          <td><span class="muted">Read only</span></td>
         </tr>
       </tbody>
     </table>

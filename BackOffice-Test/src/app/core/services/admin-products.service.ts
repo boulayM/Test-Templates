@@ -6,6 +6,6 @@ export class AdminProductsService {
   constructor(private api: ApiService) {}
 
   list(params?: Record<string, string | number | boolean | null | undefined>) {
-    return this.api.get('/admin/products', params, true);
+    return this.api.get('/admin/products', params);
   }
 }

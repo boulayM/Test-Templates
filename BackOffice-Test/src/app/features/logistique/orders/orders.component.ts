@@ -16,6 +16,15 @@ export class OrdersComponent implements OnInit {
   statusDrafts: Record<number, string> = {};
 
   statuses = ['PENDING', 'PAID', 'PREPARING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'];
+  private readonly transitionMap: Record<string, string[]> = {
+    PENDING: ['PAID', 'CANCELLED'],
+    PAID: ['PREPARING', 'REFUNDED', 'CANCELLED'],
+    PREPARING: ['SHIPPED', 'CANCELLED'],
+    SHIPPED: ['DELIVERED'],
+    DELIVERED: [],
+    CANCELLED: [],
+    REFUNDED: []
+  };
 
   constructor(
     private service: AdminOrdersService,
@@ -46,6 +55,12 @@ export class OrdersComponent implements OnInit {
     return [];
   }
 
+
+  getStatusOptions(row: Record<string, unknown>): string[] {
+    const current = typeof row['status'] === 'string' ? row['status'] : '';
+    const next = this.transitionMap[current] || [];
+    return [current, ...next.filter((s) => s !== current)].filter(Boolean);
+  }
 
   rowId(row: Record<string, unknown>): number {
     const id = Number(row['id']);

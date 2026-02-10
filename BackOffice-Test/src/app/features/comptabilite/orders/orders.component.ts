@@ -13,9 +13,6 @@ import { ToastService } from '../../../shared/services/toast.service';
 export class OrdersComponent implements OnInit {
   rows: Record<string, unknown>[] = [];
   loading = false;
-  statusDrafts: Record<number, string> = {};
-
-  statuses = ['PENDING', 'PAID', 'PREPARING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'];
 
   constructor(
     private service: AdminOrdersService,
@@ -56,12 +53,6 @@ export class OrdersComponent implements OnInit {
     this.service.list({ page: 1, limit: 20 }).subscribe({
       next: (res: unknown) => {
         this.rows = this.asArray(res).map((x) => this.asRecord(x));
-        this.statusDrafts = {};
-        for (const row of this.rows) {
-          const id = Number(row['id']);
-          const status = typeof row['status'] === 'string' ? row['status'] : 'PENDING';
-          if (!Number.isNaN(id)) this.statusDrafts[id] = status;
-        }
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -73,20 +64,4 @@ export class OrdersComponent implements OnInit {
     });
   }
 
-  updateStatus(row: Record<string, unknown>): void {
-    const id = Number(row['id']);
-    if (Number.isNaN(id)) return;
-    const status = this.statusDrafts[id];
-    if (!status) return;
-
-    this.service.updateStatus(id, status).subscribe({
-      next: () => {
-        this.toast.success('Order status updated');
-        this.load();
-      },
-      error: (err: unknown) => {
-        this.toast.error(this.extractErrorMessage(err));
-      },
-    });
-  }
 }

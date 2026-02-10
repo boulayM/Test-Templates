@@ -78,8 +78,8 @@ test.describe('RBAC routes', () => {
     await expectAllowed(page, '/admin/dashboard');
     await expectAllowed(page, '/admin/users');
     await expectAllowed(page, '/admin/audit-logs');
-    await expectAllowed(page, '/logistique/inventory');
-    await expectAllowed(page, '/comptabilite/payments');
+    await expectAllowed(page, '/admin/inventory');
+    await expectAllowed(page, '/admin/payments');
   });
 
   test('LOGISTIQUE route matrix', async ({ page }) => {

@@ -44,7 +44,7 @@ export class CategoriesComponent implements OnInit {
 
   load(): void {
     this.loading = true;
-    this.service.list({ page: 1, limit: 20, sort: 'id', order: 'desc' }).subscribe({
+    this.service.list({ page: 1, limit: 20 }).subscribe({
       next: (res: unknown) => {
         this.rows = this.asArray(res).map((x) => this.asRecord(x));
         this.loading = false;

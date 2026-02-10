@@ -25,7 +25,14 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "format:fix": "prettier --write \"src/**/*\""
+    "format:fix": "prettier --write \"src/**/*\"",
+    "preflight:dev": "powershell -ExecutionPolicy Bypass -File scripts/preflight.ps1 -Target dev",
+    "preflight:test": "powershell -ExecutionPolicy Bypass -File scripts/preflight.ps1 -Target test",
+    "preflight:e2e": "powershell -ExecutionPolicy Bypass -File scripts/preflight.ps1 -Target e2e",
+    "predev:e2e": "npm run preflight:e2e",
+    "pretest:db": "npm run preflight:test",
+    "seed:e2e": "npm run preflight:e2e && dotenv -e .env.e2e -- prisma db seed",
+    "seed:test": "npm run preflight:test && dotenv -e .env.test -- prisma db seed"
   },
   "dependencies": {
     "@faker-js/faker": "^10.1.0",

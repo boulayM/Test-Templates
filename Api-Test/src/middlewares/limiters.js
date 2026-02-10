@@ -5,7 +5,8 @@ import rateLimit from "express-rate-limit";
 // (Angular/React/Vue) afin d'eviter que le rate-limit d'auth bloque la phase de setup.
 const disableRateLimit =
   String(process.env.DISABLE_RATE_LIMIT || "").toLowerCase() === "true" ||
-  (process.env.NODE_ENV === "test" && process.env.E2E === "true");
+  (process.env.NODE_ENV === "test" && process.env.E2E === "true") ||
+  process.env.NODE_ENV === "dev";
 
 const passThrough = (req, res, next) => next();
 

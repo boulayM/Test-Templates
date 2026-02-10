@@ -6,7 +6,7 @@
   "scripts": {
     "check:encoding": "powershell -ExecutionPolicy Bypass -File scripts/check-encoding.ps1",
     "predev": "npm run check:encoding",
-    "dev": "nodemon src/server.js",
+    "dev": "dotenv -e .env.dev -- nodemon src/server.js",
     "dev:e2e": "dotenv -e .env.e2e -- nodemon src/server.js",
     "prebuild": "npm run check:encoding",
     "build": "echo \"No build step required\"",

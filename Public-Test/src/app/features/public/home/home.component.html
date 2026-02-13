@@ -1,0 +1,84 @@
+<app-navbar>
+  <div navbar-actions>
+    <button class="btn-ui btn-primary" (click)="openLoginModal()">
+      Connexion
+    </button>
+    <button class="btn-ui btn-secondary" [routerLink]="'/register'">
+      Inscription
+    </button>
+  </div>
+</app-navbar>
+
+<main class="ds-container home-main">
+  <div class="ds-alert ds-alert-success home-hero">
+    <p class="mt-3">
+      <span class="fw-bold">Bienvenue sur le front Angular - shell public</span
+      ><br />
+      Cette application Angular consomme une API REST securisee avec
+      Node.js/Express et une base de donnees Postgres. <br />Elle sert de base
+      abstraite pour des projets varies (institutionnel, service, education,
+      etc.).<br />
+      Cette page expose une liste publique de contenu consultable sans
+      authentification.<br />
+      <strong>Connectez-vous pour acceder a votre espace utilisateur.</strong>
+    </p>
+  </div>
+  <h2 class="home-section-title">Contenu disponible</h2>
+
+  <div class="grid grid-md-3 grid-gap-md home-grid">
+    @for (contentItem of contentItems; track contentItem) {
+      <div class="home-grid-item">
+        <div class="card-ui home-card">
+          <div class="home-card-body">
+            <h5 class="card-ui__title">{{ contentItem.name }}</h5>
+            <p class="home-card-text">{{ contentItem.description }}</p>
+            <p class="home-card-text">
+              <strong>Valeur :</strong> {{ contentItem.price }} €
+            </p>
+            @if (contentItem.isActive) {
+              <span class="badge-ui badge-success">Actif</span>
+            }
+            @if (!contentItem.isActive) {
+              <span class="badge-ui badge-secondary">Inactif</span>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+  <!-- Modal Login -->
+  @if (showLoginModal()) {
+    <div
+      class="ds-modal is-open"
+      id="loginModal"
+      tabindex="-1"
+      aria-labelledby="loginModalLabel"
+      [attr.aria-hidden]="showLoginModal() ? 'false' : 'true'"
+    >
+      <div class="ds-modal-dialog">
+        <div class="ds-modal-content">
+          <div class="ds-modal-header">
+            <h5 class="ds-modal-title" id="loginModalLabel">Connexion</h5>
+            <button
+              type="button"
+              class="ds-modal-close"
+              (click)="closeLoginModal()"
+              aria-label="Close"
+            >
+              X
+            </button>
+          </div>
+          <div class="ds-modal-body">
+            <app-login></app-login>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  @if (showLoginModal()) {
+    <div class="ds-modal-backdrop is-open" (click)="closeLoginModal()"></div>
+  }
+
+</main>
+
+<app-footer></app-footer>

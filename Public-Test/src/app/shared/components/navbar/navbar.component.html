@@ -1,0 +1,64 @@
+<nav class="navbar-ui" ds-navbar>
+  <div class="ds-navbar-inner">
+    <a
+      class="navbar-brand"
+      [routerLink]="isLoggedIn() ? '/dashboard' : '/home'"
+    >
+      Angular Public
+    </a>
+
+    <div id="mainNavbar" class="ds-nav-links" [class.is-open]="isOpen()">
+      <ul class="ds-nav-list">
+        @if (!isLoggedIn()) {
+          <li class="ds-nav-item">
+            <a class="nav-link" [routerLink]="'/home'">Accueil</a>
+          </li>
+          <li class="ds-nav-item">
+            <a class="nav-link" [routerLink]="'/login'">Connexion</a>
+          </li>
+          <li class="ds-nav-item">
+            <a class="nav-link" [routerLink]="'/register'">Inscription</a>
+          </li>
+        }
+        @if (isLoggedIn()) {
+          <li class="ds-nav-item">
+            <a class="nav-link" [routerLink]="'/public/content'">Contenu</a>
+          </li>
+          <li class="ds-nav-item">
+            <a class="nav-link" [routerLink]="'/account/activity'">Activite</a>
+          </li>
+          <li class="ds-nav-item">
+            <a class="nav-link" [routerLink]="'/account/profile'">Profil</a>
+          </li>
+        }
+      </ul>
+
+      <!-- Actions internes quand connecté -->
+      <div class="ds-nav-actions">
+        @if (isLoggedIn()) {
+          <span class="ds-user-email">{{ user()?.email }}</span>
+          <button class="btn-ui btn-outline-light btn-sm" (click)="logout()">
+            Logout
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Actions externes quand NON connecté -->
+    @if (!isLoggedIn()) {
+      <div class="ds-navbar-actions" (click)="closeMenu()">
+        <ng-content select="[navbar-actions]"></ng-content>
+      </div>
+    }
+
+    <button class="ds-nav-toggle" type="button" (click)="toggleMenu()">
+      <span class="ds-nav-toggle-svg" aria-hidden="true">
+        <svg class="ds-burger" viewBox="0 0 24 24" focusable="false">
+          <path d="M4 7h16" />
+          <path d="M4 12h16" />
+          <path d="M4 17h16" />
+        </svg>
+      </span>
+    </button>
+  </div>
+</nav>

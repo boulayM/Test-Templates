@@ -1,0 +1,40 @@
+<div class="ds-container ds-container-sm auth-container">
+  <div class="auth-card">
+    <h2>Connexion</h2>
+
+    <form class="form-ui auth-form" (ngSubmit)="submit()">
+      <app-form-alert
+        [visible]="!!error"
+        title="Erreur de validation"
+        [message]="error || ''"
+        [items]="alertItems"
+      ></app-form-alert>
+
+      <div class="auth-field">
+        <label class="form-label">Email</label>
+        <input
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          class="form-control"
+          required
+          />
+      </div>
+
+      <div class="auth-field">
+        <label class="form-label">Mot de passe</label>
+        <input
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          class="form-control"
+          required
+          />
+      </div>
+
+      <button type="submit" class="btn-ui auth-submit" [disabled]="loading">
+        {{ loading ? "Connexion..." : "Connexion" }}
+      </button>
+    </form>
+  </div>
+</div>

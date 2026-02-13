@@ -1,0 +1,69 @@
+=== F:\Marc\Marc\DevWeb\Templates\FRONT ANGULAR\Front-Angular-21\src\app\features\auth\login.component.scss ===
+.auth-container {
+.auth-card {
+.auth-form {
+.auth-field {
+.form-control {
+.auth-submit {
+.auth-submit:disabled {
+.auth-error {
+
+=== F:\Marc\Marc\DevWeb\Templates\FRONT ANGULAR\Front-Angular-21\src\app\features\auth\register.component.scss ===
+.auth-container {
+.auth-form {
+.auth-field {
+.form-control {
+.auth-submit {
+.auth-submit:disabled {
+.auth-error {
+.auth-success {
+
+=== F:\Marc\Marc\DevWeb\Templates\FRONT ANGULAR\Front-Angular-21\src\app\features\dashboard\dashboard.component.scss ===
+
+=== F:\Marc\Marc\DevWeb\Templates\FRONT ANGULAR\Front-Angular-21\src\app\features\home\home.component.scss ===
+.home-navbar {
+.home-nav {
+.home-nav-actions {
+.home-main {
+.home-hero {
+.home-section-title {
+.home-grid {
+.home-grid-item {
+.home-card {
+.home-card-body {
+.home-card-text {
+
+=== F:\Marc\Marc\DevWeb\Templates\FRONT ANGULAR\Front-Angular-21\src\app\features\orders\orders.component.scss ===
+.orders-container {
+.order-card {
+.order-header {
+.order-status {
+.order-body {
+.table-compact td {
+.input-qty {
+.order-total {
+.form-control {
+
+=== F:\Marc\Marc\DevWeb\Templates\FRONT ANGULAR\Front-Angular-21\src\app\features\products\products.component.scss ===
+.products-header {
+.product-grid {
+.product-grid-item {
+.product-card {
+.product-card-body {
+.product-desc {
+.product-card-footer {
+.text-muted {
+.form-control {
+.form-label {
+.ds-check {
+
+=== F:\Marc\Marc\DevWeb\Templates\FRONT ANGULAR\Front-Angular-21\src\app\features\users\users.component.scss ===
+.users-header {
+.users-add {
+.table-wrapper {
+.table-striped tbody tr:nth-child(odd) {
+.text-right {
+.text-muted {
+.btn-gap {
+.form-control {
+.form-label {

@@ -1,0 +1,48 @@
+/* You can add global styles to this file, and also import other style files */
+@use "assets/design-system/abstracts/variables" as *;
+
+
+
+/* 3 - Tes composants */
+@use "assets/design-system/main";
+
+/* styles.scss */
+
+html,
+body {
+  height: auto;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.navbar.fixed-top {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1030;
+}
+
+/* espace sous la navbar */
+.app-main {
+  padding-top: 72px; /* hauteur navbar */
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+/* TOAST FORCE OVERRIDE */
+.ds-toast-container {
+  position: fixed !important;
+  top: 1rem !important;
+  right: 1rem !important;
+  z-index: 9999 !important;
+}
+
+.ds-toast {
+  background: #16a34a !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.25) !important;
+  border-radius: 10px !important;
+}

@@ -1,0 +1,45 @@
+@use "../../../../assets/design-system/abstracts" as *;
+
+.content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space-4;
+}
+
+.content-grid {
+  margin-top: $space-3;
+}
+
+.content-grid-item {
+  width: 100%;
+}
+
+.content-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+}
+
+.content-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.content-desc {
+  color: $gray-700;
+}
+
+.content-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.ds-check {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+}

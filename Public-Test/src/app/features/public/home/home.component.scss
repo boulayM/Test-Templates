@@ -1,0 +1,38 @@
+@use "../../../../assets/design-system/abstracts" as *;
+
+.home-main {
+  text-align: center;
+  padding-top: 2em;
+}
+
+.home-hero {
+  margin-top: $space-6;
+  padding: $space-4;
+  border-radius: $radius-md;
+}
+
+.home-section-title {
+  margin-bottom: $space-4;
+}
+
+.home-grid {
+  margin-top: $space-5;
+}
+
+.home-grid-item {
+  width: 100%;
+}
+
+.home-card {
+  min-height: 100%;
+}
+
+.home-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.home-card-text {
+  color: $gray-700;
+}

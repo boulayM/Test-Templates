@@ -1,0 +1,13 @@
+<section class="profile">
+  <h1>Profil</h1>
+
+  @if (user()) {
+    <p><strong>Prenom:</strong> {{ user()!.firstName }}</p>
+    <p><strong>Nom:</strong> {{ user()!.lastName }}</p>
+    <p><strong>Email:</strong> {{ user()!.email }}</p>
+  } @else {
+    <div class="ds-alert ds-alert-warning">
+      Connexion requise pour acceder au profil.
+    </div>
+  }
+</section>

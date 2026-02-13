@@ -1,0 +1,160 @@
+<div class="content-header">
+  <h2>Contenu</h2>
+
+  <!-- ADMIN uniquement -->
+  @if (auth.isAdmin()) {
+    <button
+      class="btn-ui btn-success btn-sm"
+      (click)="openIncludeModal()"
+      >
+      + Ajouter element
+    </button>
+  }
+</div>
+
+<!-- =======================
+CARDS CONTENU
+======================= -->
+<div class="grid grid-md-3 grid-gap-md content-grid">
+  @for (contentItem of contentItems; track contentItem) {
+    <div class="content-grid-item">
+      <div class="card-ui content-card">
+        <div class="content-card-body">
+          <h5 class="card-ui__title">{{ contentItem.name }}</h5>
+          <p class="content-desc">{{ contentItem.description }}</p>
+          <p>
+            <strong>{{ contentItem.price | currency: "EUR" }}</strong>
+          </p>
+          @if (!contentItem.isActive) {
+            <span class="badge-ui badge-warning">Inactif</span>
+          }
+        </div>
+        <div class="content-card-footer">
+          @if (auth.isLoggedIn() && !auth.isAdmin()) {
+            <button
+              class="btn-ui btn-block"
+          [ngClass]="
+            isIncluded(contentItem)
+              ? 'btn-secondary'
+              : activeActivityRecordId
+                ? 'btn-success'
+                : 'btn-primary'
+          "
+              (click)="includeContentItem(contentItem)"
+              [disabled]="isIncluded(contentItem)"
+              >
+              {{
+              isIncluded(contentItem)
+              ? "Element deja ajoute"
+              : activeActivityRecordId
+              ? "Ajouter"
+              : "Demarrer"
+              }}
+            </button>
+          }
+          @if (isIncluded(contentItem)) {
+            <small class="text-muted"
+              >Element deja ajoute.</small
+              >
+            }
+            <!-- Boutons admin -->
+            @if (auth.isAdmin()) {
+              <div class="btn-row">
+                <button
+                  class="btn-ui btn-sm btn-primary btn-half"
+                  (click)="openEditModal(contentItem)"
+                  >
+                  Éditer
+                </button>
+                <button
+                  class="btn-ui btn-sm btn-danger btn-half"
+                  (click)="deleteContentItem(contentItem)"
+                  >
+                  Supprimer
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- MODALE AJOUT / EDITION -->
+  @if (showIncludeModalSignal() && newContentItemForm(); as form) {
+    <div
+      class="ds-modal is-open"
+      tabindex="-1"
+      >
+      <div
+        class="ds-modal-dialog"
+        >
+        <div class="ds-modal-content">
+          <!-- HEADER -->
+          <div class="ds-modal-header">
+            <h5 class="ds-modal-title">
+              {{ form.id ? "Editer element" : "Ajouter element" }}
+            </h5>
+            <button
+              type="button"
+              class="ds-modal-close"
+              (click)="closeIncludeModal()"
+            ></button>
+          </div>
+          <!-- BODY -->
+          <div class="ds-modal-body">
+            <div class="mb-3">
+              <label class="form-label">Nom</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.name"
+                (ngModelChange)="newContentItemForm.set(form)"
+                />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              <textarea
+                class="form-control"
+                [(ngModel)]="form.description"
+                (ngModelChange)="newContentItemForm.set(form)"
+              ></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Prix</label>
+              <input
+                type="number"
+                class="form-control"
+                [(ngModel)]="form.price"
+                (ngModelChange)="newContentItemForm.set(form)"
+                />
+            </div>
+            <div class="ds-check">
+              <input
+                type="checkbox"
+                class="ds-check-input"
+                id="isActiveCheck"
+                [(ngModel)]="form.isActive"
+                (ngModelChange)="newContentItemForm.set(form)"
+                />
+              <label class="ds-check-label" for="isActiveCheck">Actif</label>
+            </div>
+          </div>
+          <!-- FOOTER -->
+          <div class="ds-modal-footer">
+            <button class="btn-ui btn-secondary" (click)="closeIncludeModal()">
+              Annuler
+            </button>
+            <button class="btn-ui btn-primary" (click)="saveContentItem()">
+              {{ form.id ? "Sauvegarder" : "Inclure" }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- BACKDROP -->
+  @if (showIncludeModalSignal()) {
+    <div class="ds-modal-backdrop is-open"></div>
+  }

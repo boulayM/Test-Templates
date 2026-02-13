@@ -1,0 +1,34 @@
+@use "../../../../assets/design-system/abstracts" as *;
+
+.activity-container {
+  max-width: 900px;
+  margin: auto;
+  margin-top: $space-3;
+}
+
+.activity-card {
+  margin-bottom: $space-3;
+}
+
+.activity-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+}
+
+.activity-status {
+  color: $gray-600;
+  font-size: 0.875rem;
+}
+
+.activity-body {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.activity-total {
+  margin-top: $space-2;
+}
+
+

@@ -1,16 +1,22 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 
-import { NavigationStart, Router, RouterModule } from '@angular/router';
+import {
+  ActivatedRoute,
+  NavigationStart,
+  Router,
+  RouterModule,
+} from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalCleanupService } from './core/services/modal-cleanup.service';
+import { SeoService } from './core/services/seo.service';
 import { ToastService } from './shared/services/toast.service';
 
 @Component({
-    selector: 'app-root',
-    imports: [RouterModule],
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
+  selector: 'app-root',
+  imports: [RouterModule],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
   private destroyRef = inject(DestroyRef);
@@ -18,8 +24,12 @@ export class AppComponent {
 
   constructor(
     private router: Router,
+    private activatedRoute: ActivatedRoute,
     private modalCleanup: ModalCleanupService,
+    private seo: SeoService,
   ) {
+    this.seo.bindToRouter(this.router, this.activatedRoute);
+
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationStart),

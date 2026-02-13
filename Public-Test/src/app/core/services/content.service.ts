@@ -1,9 +1,25 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { ApiMessage } from '../../shared/models/api-message.model';
 import { ContentItem, ContentItemDraft } from '../../shared/models/content-item.model';
-import { map } from 'rxjs/operators';
+
+type ApiProduct = {
+  id: number;
+  name: string;
+  description?: string | null;
+  priceCents: number;
+  isActive: boolean;
+};
+
+const mapProduct = (product: ApiProduct): ContentItem => ({
+  id: product.id,
+  name: product.name,
+  description: product.description || '',
+  price: product.priceCents / 100,
+  isActive: product.isActive,
+});
 
 @Injectable({ providedIn: 'root' })
 export class ContentService {
@@ -11,26 +27,28 @@ export class ContentService {
 
   getContentItems(): Observable<ContentItem[]> {
     return this.api
-      .get<{ data: ContentItem[] }>('/public/content')
-      .pipe(map((res) => res.data || []));
+      .get<{ data: ApiProduct[] }>('/public/products?page=1&limit=20&activeOnly=true')
+      .pipe(map((res) => (res.data || []).map(mapProduct)));
   }
 
   getContentItemById(contentItemId: number): Observable<ContentItem> {
-    return this.api.get<ContentItem>(`/public/content/${contentItemId}`);
+    return this.api
+      .get<{ product: ApiProduct }>(`/public/products/${contentItemId}`)
+      .pipe(map((res) => mapProduct(res.product)));
   }
 
-  createContentItem(contentItem: ContentItemDraft): Observable<ContentItem> {
-    return this.api.post<ContentItem>('/public/content', contentItem);
+  createContentItem(_contentItem: ContentItemDraft): Observable<ContentItem> {
+    return throwError(() => new Error('Not supported on public API'));
   }
 
   updateContentItem(
-    contentItemId: number,
-    contentItem: Partial<ContentItemDraft>,
+    _contentItemId: number,
+    _contentItem: Partial<ContentItemDraft>,
   ): Observable<ContentItem> {
-    return this.api.patch<ContentItem>(`/public/content/${contentItemId}`, contentItem);
+    return throwError(() => new Error('Not supported on public API'));
   }
 
-  deleteContentItem(contentItemId: number): Observable<ApiMessage> {
-    return this.api.deleteRequest<ApiMessage>(`/public/content/${contentItemId}`);
+  deleteContentItem(_contentItemId: number): Observable<ApiMessage> {
+    return throwError(() => new Error('Not supported on public API'));
   }
 }

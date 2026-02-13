@@ -1,6 +1,16 @@
 import { ContentItem } from './content-item.model';
 
-export type ActivityStatus = 'PENDING' | 'PAID' | 'CANCELLED';
+export type ActivityStatus =
+  | 'ACTIVE'
+  | 'CONVERTED'
+  | 'ABANDONED'
+  | 'PENDING'
+  | 'PAID'
+  | 'PREPARING'
+  | 'SHIPPED'
+  | 'DELIVERED'
+  | 'CANCELLED'
+  | 'REFUNDED';
 
 export interface ActivityItem {
   contentItemId: number;

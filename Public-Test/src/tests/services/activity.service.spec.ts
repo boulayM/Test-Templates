@@ -22,64 +22,90 @@ describe('ActivityService', () => {
     service = TestBed.inject(ActivityService);
   });
 
-  it('should get activity records', () => {
-    api.get.and.returnValue(of([]));
+  it('should get activity records from cart endpoint', () => {
+    api.get.and.returnValue(of({ cart: { id: 1, status: 'ACTIVE', items: [] } }));
 
     service.getActivityRecords().subscribe();
-    expect(api.get).toHaveBeenCalledWith('/account/activity');
+    expect(api.get).toHaveBeenCalledWith('/public/cart');
   });
 
-  it('should create activity record', () => {
+  it('should create activity by adding cart item', () => {
     api.post.and.returnValue(of({}));
+    api.get.and.returnValue(of({ cart: { id: 1, status: 'ACTIVE', items: [] } }));
 
     service.createActivityRecord([{ contentItemId: 1, quantity: 2 }]).subscribe();
-    expect(api.post).toHaveBeenCalledWith('/account/activity', {
-      items: [{ productId: 1, quantity: 2 }],
+    expect(api.post).toHaveBeenCalledWith('/public/cart/items', {
+      productId: 1,
+      quantity: 2,
     });
   });
 
-  it('should add content item to activity record', () => {
+  it('should add content item to active cart', () => {
     api.post.and.returnValue(of({}));
+    api.get.and.returnValue(of({ cart: { id: 1, status: 'ACTIVE', items: [] } }));
 
     service.addContentItemToActivityRecord(1, 2, 3).subscribe();
-    expect(api.post).toHaveBeenCalledWith('/account/activity/1/items', {
+    expect(api.post).toHaveBeenCalledWith('/public/cart/items', {
       productId: 2,
       quantity: 3,
     });
   });
 
-  it('should update quantity by delete then add', () => {
-    api.deleteRequest.and.returnValue(of({}));
-    api.post.and.returnValue(of({}));
+  it('should update quantity using cart item id', () => {
+    api.get.and.returnValues(
+      of({
+        cart: {
+          id: 5,
+          status: 'ACTIVE',
+          items: [
+            {
+              id: 99,
+              productId: 9,
+              quantity: 1,
+              unitPriceCents: 100,
+              product: { id: 9, name: 'A', priceCents: 100, isActive: true },
+            },
+          ],
+        },
+      }),
+      of({ cart: { id: 5, status: 'ACTIVE', items: [] } }),
+    );
+    api.patch.and.returnValue(of({}));
 
     service.updateQuantity(5, 9, 2).subscribe();
-    expect(api.deleteRequest).toHaveBeenCalledWith('/account/activity/5/items/9');
-    expect(api.post).toHaveBeenCalledWith('/account/activity/5/items', {
-      productId: 9,
+    expect(api.patch).toHaveBeenCalledWith('/public/cart/items/99', {
       quantity: 2,
     });
   });
 
-  it('should remove content item from activity record', () => {
+  it('should remove content item using cart item id', () => {
+    api.get.and.returnValue(
+      of({
+        cart: {
+          id: 1,
+          status: 'ACTIVE',
+          items: [
+            {
+              id: 77,
+              productId: 2,
+              quantity: 1,
+              unitPriceCents: 100,
+              product: { id: 2, name: 'A', priceCents: 100, isActive: true },
+            },
+          ],
+        },
+      }),
+    );
     api.deleteRequest.and.returnValue(of({}));
 
     service.removeContentItem(1, 2).subscribe();
-    expect(api.deleteRequest).toHaveBeenCalledWith('/account/activity/1/items/2');
+    expect(api.deleteRequest).toHaveBeenCalledWith('/public/cart/items/77');
   });
 
-  it('should update status', () => {
-    api.patch.and.returnValue(of({}));
-
-    service.updateStatus(10, 'PAID').subscribe();
-    expect(api.patch).toHaveBeenCalledWith('/account/activity/10/status', {
-      status: 'PAID',
-    });
-  });
-
-  it('should delete activity record', () => {
-    api.deleteRequest.and.returnValue(of({}));
+  it('should abandon cart when deleting activity record', () => {
+    api.post.and.returnValue(of({ message: 'ok' }));
 
     service.deleteActivityRecord(7).subscribe();
-    expect(api.deleteRequest).toHaveBeenCalledWith('/account/activity/7');
+    expect(api.post).toHaveBeenCalledWith('/public/cart/abandon', {});
   });
 });

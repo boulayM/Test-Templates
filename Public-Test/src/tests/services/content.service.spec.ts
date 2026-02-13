@@ -22,48 +22,36 @@ describe('ContentService', () => {
     service = TestBed.inject(ContentService);
   });
 
-  it('should get content items', () => {
-    api.get.and.returnValue(of([]));
+  it('should get content items from public products endpoint', () => {
+    api.get.and.returnValue(of({ data: [] }));
 
     service.getContentItems().subscribe();
-    expect(api.get).toHaveBeenCalledWith('/public/content');
+    expect(api.get).toHaveBeenCalledWith('/public/products?page=1&limit=20&activeOnly=true');
   });
 
-  it('should get content item by id', () => {
-    api.get.and.returnValue(of({}));
+  it('should get content item by id from public products endpoint', () => {
+    api.get.and.returnValue(
+      of({ product: { id: 3, name: 'P', priceCents: 1000, isActive: true } }),
+    );
 
     service.getContentItemById(3).subscribe();
-    expect(api.get).toHaveBeenCalledWith('/public/content/3');
+    expect(api.get).toHaveBeenCalledWith('/public/products/3');
   });
 
-  it('should create content item', () => {
-    api.post.and.returnValue(of({}));
-
+  it('should reject create on public API', (done) => {
     service
       .createContentItem({
         name: 'Test',
         price: 10,
         isActive: true,
       })
-      .subscribe();
-    expect(api.post).toHaveBeenCalledWith('/public/content', {
-      name: 'Test',
-      price: 10,
-      isActive: true,
-    });
-  });
-
-  it('should update content item', () => {
-    api.patch.and.returnValue(of({}));
-
-    service.updateContentItem(5, { name: 'Updated' }).subscribe();
-    expect(api.patch).toHaveBeenCalledWith('/public/content/5', { name: 'Updated' });
-  });
-
-  it('should delete content item', () => {
-    api.deleteRequest.and.returnValue(of({}));
-
-    service.deleteContentItem(9).subscribe();
-    expect(api.deleteRequest).toHaveBeenCalledWith('/public/content/9');
+      .subscribe({
+        next: () => fail('Expected error'),
+        error: (err: Error) => {
+          expect(err.message).toContain('Not supported on public API');
+          expect(api.post).not.toHaveBeenCalled();
+          done();
+        },
+      });
   });
 });

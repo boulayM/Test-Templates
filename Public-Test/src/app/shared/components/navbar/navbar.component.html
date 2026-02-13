@@ -1,10 +1,8 @@
 <nav class="navbar-ui" ds-navbar>
   <div class="ds-navbar-inner">
-    <a
-      class="navbar-brand"
-      [routerLink]="isLoggedIn() ? '/catalog' : '/home'"
-    >
-      Ma Boutique
+    <a class="navbar-brand" [routerLink]="isLoggedIn() ? '/catalog' : '/home'">
+      <img class="brand-logo" src="assets/images/logos/Logo-ma-boutique.svg" alt="Ma Boutique" />
+      <span class="brand-text">Ma Boutique</span>
     </a>
 
     <div id="mainNavbar" class="ds-nav-links" [class.is-open]="isOpen()">
@@ -33,7 +31,6 @@
         }
       </ul>
 
-      <!-- Actions internes quand connecté -->
       <div class="ds-nav-actions">
         @if (isLoggedIn()) {
           <span class="ds-user-email">{{ user()?.email }}</span>
@@ -44,7 +41,6 @@
       </div>
     </div>
 
-    <!-- Actions externes quand NON connecté -->
     @if (!isLoggedIn()) {
       <div class="ds-navbar-actions" (click)="closeMenu()">
         <ng-content select="[navbar-actions]"></ng-content>

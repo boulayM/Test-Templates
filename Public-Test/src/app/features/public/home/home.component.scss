@@ -2,13 +2,23 @@
 
 .home-main {
   text-align: center;
-  padding-top: 2em;
+  padding-top: 2rem;
 }
 
 .home-hero {
-  margin-top: $space-6;
-  padding: $space-4;
-  border-radius: $radius-md;
+  margin-top: $space-5;
+  margin-bottom: $space-6;
+  padding: 2rem;
+  border-radius: $radius-lg;
+  background: linear-gradient(135deg, rgba(240, 195, 164, 0.35), rgba(245, 17, 162, 0.12));
+}
+
+.hero-kicker {
+  margin: 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $gray-600;
+  font-size: 0.75rem;
 }
 
 .home-section-title {

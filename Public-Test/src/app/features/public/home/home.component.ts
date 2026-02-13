@@ -1,35 +1,29 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { ApiService } from '../../../core/services/api.service';
 import { LoginComponent } from '../../auth/login.component';
 import { FooterComponent } from '../../../shared/components/footer/footer.component';
 import { ContentItem } from '../../../shared/models/content-item.model';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+import { ContentService } from '../../../core/services/content.service';
 
 @Component({
   selector: 'app-home',
-  imports: [
-    RouterModule,
-    LoginComponent,
-    FooterComponent,
-    NavbarComponent,
-  ],
+  imports: [CommonModule, RouterModule, LoginComponent, FooterComponent, NavbarComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
   contentItems: ContentItem[] = [];
-
   showLoginModal = signal(false);
 
-  constructor(private api: ApiService) {}
+  constructor(private contentService: ContentService) {}
 
   ngOnInit(): void {
     this.showLoginModal.set(false);
-
-    this.api.get<{ data: ContentItem[] }>('/public/content').subscribe((res) => {
-      this.contentItems = res.data || [];
+    this.contentService.getContentItems().subscribe((items) => {
+      this.contentItems = items;
     });
   }
 

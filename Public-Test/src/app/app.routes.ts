@@ -25,36 +25,26 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
+        pathMatch: 'full',
+        redirectTo: 'catalog',
+      },
+      {
+        path: 'catalog',
         canMatch: [authMatchGuard],
         canActivate: [authGuard],
-            loadComponent: () =>
+        loadComponent: () =>
           import('./features/public/content/content.component').then(
             (m) => m.ContentComponent,
           ),
       },
       {
-        path: 'public',
-        canMatch: [authMatchGuard],
-        canActivate: [authGuard],
-            children: [
-          { path: '', redirectTo: 'content', pathMatch: 'full' },
-          {
-            path: 'content',
-            loadComponent: () =>
-              import('./features/public/content/content.component').then(
-                (m) => m.ContentComponent,
-              ),
-          },
-        ],
-      },
-      {
         path: 'account',
         canMatch: [authMatchGuard],
         canActivate: [authGuard],
-            children: [
+        children: [
           { path: '', redirectTo: 'profile', pathMatch: 'full' },
           {
-            path: 'activity',
+            path: 'cart',
             loadComponent: () =>
               import('./features/account/activity/activity.component').then(
                 (m) => m.ActivityComponent,
@@ -67,8 +57,12 @@ export const routes: Routes = [
                 (m) => m.ProfileComponent,
               ),
           },
+          // Compatibility aliases kept during migration.
+          { path: 'activity', pathMatch: 'full', redirectTo: 'cart' },
         ],
       },
+      // Compatibility aliases kept during migration.
+      { path: 'public/content', pathMatch: 'full', redirectTo: 'catalog' },
     ],
   },
   {

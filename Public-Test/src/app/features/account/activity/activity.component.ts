@@ -89,7 +89,7 @@ export class ActivityComponent implements OnInit {
   }
 
   includeContentItem(activityRecordId: number): void {
-    this.router.navigate(['/public/content'], {
+    this.router.navigate(['/catalog'], {
       queryParams: { includeActivityId: activityRecordId },
     });
   }

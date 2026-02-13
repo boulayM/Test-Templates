@@ -2,9 +2,9 @@
   <div class="ds-navbar-inner">
     <a
       class="navbar-brand"
-      [routerLink]="isLoggedIn() ? '/dashboard' : '/home'"
+      [routerLink]="isLoggedIn() ? '/catalog' : '/home'"
     >
-      Angular Public
+      Ma Boutique
     </a>
 
     <div id="mainNavbar" class="ds-nav-links" [class.is-open]="isOpen()">
@@ -22,10 +22,10 @@
         }
         @if (isLoggedIn()) {
           <li class="ds-nav-item">
-            <a class="nav-link" [routerLink]="'/public/content'">Contenu</a>
+            <a class="nav-link" [routerLink]="'/catalog'">Catalogue</a>
           </li>
           <li class="ds-nav-item">
-            <a class="nav-link" [routerLink]="'/account/activity'">Activite</a>
+            <a class="nav-link" [routerLink]="'/account/cart'">Panier</a>
           </li>
           <li class="ds-nav-item">
             <a class="nav-link" [routerLink]="'/account/profile'">Profil</a>

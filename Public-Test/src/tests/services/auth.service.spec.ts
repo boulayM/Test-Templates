@@ -64,7 +64,7 @@ describe('AuthService', () => {
     service.login({ email: 'a@b.com', password: 'x' }).subscribe((result) => {
       expect(result).toEqual(user);
       expect(modal.closeModalById).toHaveBeenCalledWith('loginModal');
-      expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
+      expect(router.navigate).toHaveBeenCalledWith(['/catalog']);
       done();
     });
   });

@@ -81,7 +81,7 @@ export class AuthService {
         void this.csrf.init();
         this.modalCleanup.closeModalById('loginModal');
         // Navigation vers dashboard
-        this.router.navigate(['/dashboard']).then(() => {
+        this.router.navigate(['/catalog']).then(() => {
           this.modalCleanup.closeAll();
         });
       }),

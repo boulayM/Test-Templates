@@ -1,10 +1,7 @@
 <!-- Message info pour USER -->
 @if (auth.isLoggedIn() && !auth.isAdmin()) {
   <div class="ds-alert ds-alert-info activity-alert text-center">
-    Pour demarrer une nouvelle activite, allez dans la page
-    <strong>Contenu</strong> puis cliquez sur "Demarrer".<br />
-    Vous pourrez ensuite ajouter d'autres elements a cette meme activite depuis
-    cet ecran.
+    Pour ajouter des produits, ouvrez la page <strong>Catalogue</strong> puis cliquez sur "Ajouter au panier".
   </div>
 }
 <div class="activity-container">
@@ -12,24 +9,24 @@
     <div class="card-ui activity-card">
       <div class="activity-header">
         <div>
-          <strong>Activite #{{ activityRecord.id }}</strong>
+          <strong>Panier #{{ activityRecord.id }}</strong>
           <span class="activity-status">({{ activityRecord.status }})</span>
         </div>
         <div>
           <!-- Bouton ajouter element -->
           <a
             class="btn-ui btn-primary btn-sm"
-            [routerLink]="['/public/content']"
+            [routerLink]="['/catalog']"
             [queryParams]="{ includeActivityId: activityRecord.id }"
           >
-            Ajouter element
+            Ajouter produit
           </a>
           <!-- Bouton supprimer l activite -->
           <button
             class="btn-ui btn-secondary btn-sm"
             (click)="deleteActivityRecord(activityRecord.id)"
           >
-            Supprimer activite
+            Vider le panier
           </button>
         </div>
       </div>
@@ -37,7 +34,7 @@
         <table class="table-ui table-compact">
           <thead>
             <tr>
-              <th>Element</th>
+              <th>Produit</th>
               <th>Quantite</th>
               <th>Prix unitaire</th>
               <th>Action</th>
@@ -62,7 +59,7 @@
                     class="btn-ui btn-danger btn-sm"
                     (click)="removeItem(activityRecord.id, item.contentItemId)"
                   >
-                    Retirer element
+                    Retirer
                   </button>
                 </td>
               </tr>
@@ -70,7 +67,7 @@
           </tbody>
         </table>
         <div class="activity-total">
-          <strong>Total: {{ getTotal(activityRecord) | currency: "EUR" }}</strong>
+          <strong>Total estime: {{ getTotal(activityRecord) | currency: "EUR" }}</strong>
         </div>
       </div>
     </div>

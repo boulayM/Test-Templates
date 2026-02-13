@@ -14,7 +14,7 @@ if (Test-Path $envFile) {
 $apiUrl = $env:E2E_API_URL
 if (-not $apiUrl) { $apiUrl = "http://localhost:3001/api" }
 
-$defaultApiPath = Join-Path (Split-Path -Parent $projectRoot) "Api-Express-Shell"
+$defaultApiPath = "F:\Marc\Marc\DevWeb\Templates\TESTS\Test-Templates\Api-Test"
 $apiPath = $env:E2E_API_PATH
 if (-not $apiPath) { $apiPath = $defaultApiPath }
 

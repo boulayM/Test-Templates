@@ -92,7 +92,10 @@ if (-not (Test-Path $apiPath)) {
     Write-Host ("Warning: API not reachable at " + $apiUri.Host + ":" + $apiUri.Port)
   }
 
-  if (([string]$env:E2E_RUN_SEED).ToLower() -eq "true") {
+  $seedMode = ([string]$env:E2E_RUN_SEED).Trim().ToLower()
+  if (-not $seedMode) { $seedMode = "true" }
+
+  if ($seedMode -eq "true") {
     try {
       Push-Location $apiPath
       Write-Host "Running prisma db seed with .env.e2e..."
@@ -103,6 +106,6 @@ if (-not (Test-Path $apiPath)) {
       Pop-Location
     }
   } else {
-    Write-Host "Seed skipped (set E2E_RUN_SEED=true to enable)"
+    Write-Host ("Seed skipped (E2E_RUN_SEED=" + $seedMode + ")")
   }
 }

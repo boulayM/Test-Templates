@@ -11,6 +11,7 @@ type ApiProduct = {
   description?: string | null;
   priceCents: number;
   isActive: boolean;
+  categories?: Array<{ category?: { name?: string | null } | null }>;
 };
 
 const mapProduct = (product: ApiProduct): ContentItem => ({
@@ -19,6 +20,9 @@ const mapProduct = (product: ApiProduct): ContentItem => ({
   description: product.description || '',
   price: product.priceCents / 100,
   isActive: product.isActive,
+  categories: (product.categories || [])
+    .map((entry) => entry.category?.name || '')
+    .filter((name) => !!name),
 });
 
 @Injectable({ providedIn: 'root' })

@@ -628,6 +628,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    NotImplementedError:
+      description: Feature not implemented/configured in this environment
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
 
 paths:
   /csrf:
@@ -1675,6 +1681,21 @@ paths:
       responses:
         "200":
           description: Order detail
+  /public/orders/{id}/shipments:
+    get:
+      tags: [Public]
+      summary: List shipments for one of my orders
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Shipments list for the requested order
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
   /public/payments:
     get:
@@ -1699,6 +1720,38 @@ paths:
       responses:
         "201":
           description: Payment created
+        "501":
+          $ref: "#/components/responses/NotImplementedError"
+  /public/payments/{orderId}:
+    get:
+      tags: [Public]
+      summary: List payments for one of my orders
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Payments list for the requested order
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+  /public/payments/providers/status:
+    get:
+      tags: [Public]
+      summary: Check external payment provider status in current environment
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Payment providers enabled
+        "501":
+          $ref: "#/components/responses/NotImplementedError"
 
   /public/coupons/validate:
     get:
@@ -1794,11 +1847,28 @@ paths:
       summary: List my shipments
       security:
         - cookieAuth: []
+      parameters:
+        - in: query
+          name: orderId
+          schema:
+            type: integer
+          description: Optional filter by my order id
       responses:
         "200":
           description: Shipments list
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+  /public/shipments/providers/status:
+    get:
+      tags: [Public]
+      summary: Check external tracking provider status in current environment
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Tracking provider enabled
+        "501":
+          $ref: "#/components/responses/NotImplementedError"
 
   /swagger.json:
     get:

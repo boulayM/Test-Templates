@@ -16,6 +16,12 @@ export const idParamSchema = z
   })
   .strict();
 
+export const orderIdParamSchema = z
+  .object({
+    orderId: z.coerce.number().int().positive()
+  })
+  .strict();
+
 export const listPageQuerySchema = z
   .object({
     page: pageInt.optional(),

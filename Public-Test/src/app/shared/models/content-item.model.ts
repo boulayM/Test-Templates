@@ -4,6 +4,7 @@ export interface ContentItem {
   description?: string;
   price: number;
   isActive: boolean;
+  categories?: string[];
 }
 
 export type ContentItemDraft = Omit<ContentItem, 'id'> & { id?: number };

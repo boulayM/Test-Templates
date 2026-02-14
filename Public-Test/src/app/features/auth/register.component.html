@@ -1,101 +1,104 @@
 <div class="ds-container ds-container-sm auth-container">
-<form class="form-ui auth-form" (ngSubmit)="submit()" autocomplete="off">
-  <app-form-alert
-    [visible]="!!error"
-    title="Erreur de validation"
-    [message]="error || ''"
-    [items]="alertItems"
-  ></app-form-alert>
+  <form class="form-ui auth-form" (ngSubmit)="submit()" autocomplete="off">
+    <app-form-alert
+      [visible]="!!error"
+      title="Erreur de validation"
+      [message]="error || ''"
+      [items]="alertItems"
+    ></app-form-alert>
 
-  <div class="ds-alert">
-    L inscription s appuie sur des services externes optionnels (captcha, email).
-    Selon la configuration backend, une indisponibilite temporaire peut etre
-    retournee de maniere explicite.
-  </div>
+    <div class="ds-alert text-center">
+      INSCRIPTION INDISPONIBLE EN MODE DEMO.<br />
+      Le formulaire est affiché à titre d'exemple de mise en page et de
+      validation, mais la fonctionnalité d'inscription est désactivée pour
+      éviter la création de comptes de test. Merci de votre compréhension.<br /><br />
+      <a class="btn-ui btn-secondary btn-sm mt-2" [routerLink]="'/home'"
+        >Retour à l'accueil</a
+      >
+    </div>
 
-  <div class="auth-field">
-    <label class="form-label" for="registerFirstName">Prénom</label>
-    <input
-      type="text"
-      [(ngModel)]="firstName"
-      name="firstName"
-      class="form-control"
-      placeholder="Prénom"
-      id="registerFirstName"
-      autocomplete="off"
-      required
-      />
-  </div>
-
-  <div class="auth-field">
-    <label class="form-label" for="registerLastName">Nom</label>
-    <input
-      type="text"
-      [(ngModel)]="lastName"
-      name="lastName"
-      class="form-control"
-      placeholder="Nom"
-      id="registerLastName"
-      autocomplete="off"
-      required
-      />
-  </div>
-
-  <div class="auth-field">
-    <label class="form-label" for="registerEmail">Email</label>
-    <input
-      type="email"
-      [(ngModel)]="email"
-      name="email"
-      class="form-control"
-      placeholder="Email"
-      id="registerEmail"
-      autocomplete="off"
-      required
-      />
-  </div>
-
-  <div class="auth-field">
-    <label class="form-label" for="registerPassword">Mot de passe</label>
-    <input
-      type="password"
-      [(ngModel)]="password"
-      name="password"
-      class="form-control"
-      placeholder="Mot de passe"
-      id="registerPassword"
-      autocomplete="new-password"
-      required
-      />
-  </div>
-
-  @if (captchaEnabled) {
-    <div class="captcha-block">
-      <label class="form-label" for="captchaToken">Captcha</label>
-      <div class="ds-alert ds-alert-info captcha-note">
-        Captcha active. Integre le widget fournisseur dans le projet concret
-        (site key: {{ captchaSiteKey || "non configuree" }}).
-      </div>
+    <div class="auth-field">
+      <label class="form-label" for="registerFirstName">Prénom</label>
       <input
         type="text"
-        [(ngModel)]="captchaToken"
-        name="captchaToken"
+        [(ngModel)]="firstName"
+        name="firstName"
         class="form-control"
-        placeholder="Captcha token"
-        id="captchaToken"
+        placeholder="Prénom"
+        id="registerFirstName"
         autocomplete="off"
+        required
       />
     </div>
-  }
 
-  @if (success) {
-    <div class="auth-success">
-      {{ success }}
+    <div class="auth-field">
+      <label class="form-label" for="registerLastName">Nom</label>
+      <input
+        type="text"
+        [(ngModel)]="lastName"
+        name="lastName"
+        class="form-control"
+        placeholder="Nom"
+        id="registerLastName"
+        autocomplete="off"
+        required
+      />
     </div>
-  }
-  <button type="submit" class="btn-ui auth-submit" [disabled]="loading">
-    {{ loading ? "Envoi..." : "Créer un compte" }}
-  </button>
-</form>
 
+    <div class="auth-field">
+      <label class="form-label" for="registerEmail">Email</label>
+      <input
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+        class="form-control"
+        placeholder="Email"
+        id="registerEmail"
+        autocomplete="off"
+        required
+      />
+    </div>
+
+    <div class="auth-field">
+      <label class="form-label" for="registerPassword">Mot de passe</label>
+      <input
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        class="form-control"
+        placeholder="Mot de passe"
+        id="registerPassword"
+        autocomplete="new-password"
+        required
+      />
+    </div>
+
+    @if (captchaEnabled) {
+      <div class="captcha-block">
+        <label class="form-label" for="captchaToken">Captcha</label>
+        <div class="ds-alert ds-alert-info captcha-note">
+          Captcha active. Integre le widget fournisseur dans le projet concret
+          (site key: {{ captchaSiteKey || "non configuree" }}).
+        </div>
+        <input
+          type="text"
+          [(ngModel)]="captchaToken"
+          name="captchaToken"
+          class="form-control"
+          placeholder="Captcha token"
+          id="captchaToken"
+          autocomplete="off"
+        />
+      </div>
+    }
+
+    @if (success) {
+      <div class="auth-success">
+        {{ success }}
+      </div>
+    }
+    <button type="submit" class="btn-ui auth-submit" [disabled]="loading">
+      {{ loading ? "Envoi..." : "Créer un compte" }}
+    </button>
+  </form>
 </div>

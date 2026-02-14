@@ -1,0 +1,26 @@
+<section class="categories">
+  <div class="content-header">
+    <h2>Categories</h2>
+  </div>
+
+  @if (filteredCategories.length === 0) {
+    <div class="ds-alert ds-alert-warning">
+      Aucune categorie trouvee.
+    </div>
+  }
+
+  <div class="grid grid-md-3 grid-gap-md categories-grid">
+    @for (category of filteredCategories; track category.id) {
+      <div class="categories-grid-item">
+        <button
+          type="button"
+          class="card-ui categories-card"
+          (click)="openCategory(category.name)"
+        >
+          <h5 class="card-ui__title">{{ category.name }}</h5>
+          <p class="categories-slug">{{ category.slug }}</p>
+        </button>
+      </div>
+    }
+  </div>
+</section>

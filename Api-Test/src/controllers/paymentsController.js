@@ -1,5 +1,9 @@
 import prisma from "../config/prisma.js";
 
+const externalProviders = new Set(["STRIPE", "PAYPAL"]);
+const externalPaymentEnabled =
+  String(process.env.DEMO_EXTERNAL_PAYMENT_ENABLED || "").toLowerCase() === "true";
+
 export async function listPayments(req, res, next) {
   try {
     const data = await prisma.payment.findMany({
@@ -16,6 +20,13 @@ export async function createPayment(req, res, next) {
   try {
     const orderId = Number(req.body.orderId);
     const provider = String(req.body.provider || "MANUAL").toUpperCase();
+    if (externalProviders.has(provider) && !externalPaymentEnabled) {
+      return res.status(501).json({
+        code: "PAYMENT_PROVIDER_NOT_CONFIGURED",
+        message: "Payment provider is not configured for this demo environment",
+        details: { provider }
+      });
+    }
     const order = await prisma.order.findUnique({ where: { id: orderId } });
     if (!order || order.userId !== req.user.id) {
       return res.status(404).json({ message: "Order not found" });
@@ -47,6 +58,36 @@ export async function listMyPayments(req, res, next) {
   } catch (err) {
     next(err);
   }
+}
+
+export async function getMyPaymentByOrder(req, res, next) {
+  try {
+    const orderId = Number(req.params.orderId);
+    const order = await prisma.order.findUnique({ where: { id: orderId }, select: { userId: true } });
+    if (!order || order.userId !== req.user.id) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    const data = await prisma.payment.findMany({
+      where: { orderId },
+      orderBy: { createdAt: "desc" }
+    });
+    res.json({ data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export function getPaymentProviderStatus(_req, res) {
+  if (!externalPaymentEnabled) {
+    return res.status(501).json({
+      code: "PAYMENT_PROVIDER_NOT_CONFIGURED",
+      message: "External payment providers are not configured for this demo environment"
+    });
+  }
+  return res.json({
+    providerEnabled: true,
+    providers: Array.from(externalProviders)
+  });
 }
 
 export async function updatePaymentStatus(req, res, next) {

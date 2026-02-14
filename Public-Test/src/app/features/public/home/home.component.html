@@ -1,9 +1,4 @@
-<app-navbar>
-  <div navbar-actions>
-    <button class="btn-ui btn-primary" (click)="openLoginModal()">Connexion</button>
-    <button class="btn-ui btn-secondary" [routerLink]="'/register'">Inscription</button>
-  </div>
-</app-navbar>
+<app-navbar></app-navbar>
 
 <main class="ds-container home-main">
   <section class="home-hero card-ui">
@@ -35,24 +30,6 @@
     }
   </div>
 
-  @if (showLoginModal()) {
-    <div class="ds-modal is-open" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" [attr.aria-hidden]="showLoginModal() ? 'false' : 'true'">
-      <div class="ds-modal-dialog">
-        <div class="ds-modal-content">
-          <div class="ds-modal-header">
-            <h5 class="ds-modal-title" id="loginModalLabel">Connexion</h5>
-            <button type="button" class="ds-modal-close" (click)="closeLoginModal()" aria-label="Close">X</button>
-          </div>
-          <div class="ds-modal-body">
-            <app-login></app-login>
-          </div>
-        </div>
-      </div>
-    </div>
-  }
-  @if (showLoginModal()) {
-    <div class="ds-modal-backdrop is-open" (click)="closeLoginModal()"></div>
-  }
 </main>
 
 <app-footer></app-footer>

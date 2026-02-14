@@ -1,5 +1,8 @@
 import prisma from "../config/prisma.js";
 
+const trackingProviderEnabled =
+  String(process.env.DEMO_TRACKING_PROVIDER_ENABLED || "").toLowerCase() === "true";
+
 async function hasCapturedPayment(orderId) {
   const payment = await prisma.payment.findFirst({
     where: { orderId, status: "CAPTURED" },
@@ -89,8 +92,17 @@ export async function deleteShipment(req, res, next) {
 
 export async function listMyShipments(req, res, next) {
   try {
+    const orderId = req.query.orderId ? Number(req.query.orderId) : null;
+    if (req.query.orderId !== undefined && Number.isNaN(orderId)) {
+      return res.status(400).json({ message: "Invalid orderId" });
+    }
     const data = await prisma.shipment.findMany({
-      where: { order: { userId: req.user.id } },
+      where: {
+        order: {
+          userId: req.user.id,
+          ...(orderId ? { id: orderId } : {})
+        }
+      },
       orderBy: { id: "desc" },
       include: { order: true }
     });
@@ -98,4 +110,14 @@ export async function listMyShipments(req, res, next) {
   } catch (err) {
     next(err);
   }
+}
+
+export function getTrackingProviderStatus(_req, res) {
+  if (!trackingProviderEnabled) {
+    return res.status(501).json({
+      code: "TRACKING_PROVIDER_NOT_CONFIGURED",
+      message: "External tracking provider is not configured for this demo environment"
+    });
+  }
+  return res.json({ providerEnabled: true });
 }

@@ -30,7 +30,10 @@ describe('ContentComponent', () => {
           provide: Router,
           useValue: jasmine.createSpyObj('Router', ['navigate']),
         },
-        { provide: ActivatedRoute, useValue: { queryParams: of({}) } },
+        {
+          provide: ActivatedRoute,
+          useValue: { queryParamMap: of(new Map() as any), snapshot: { queryParamMap: new Map() as any } },
+        },
       ],
     });
 
@@ -66,7 +69,10 @@ describe('ContentComponent', () => {
           provide: Router,
           useValue: jasmine.createSpyObj('Router', ['navigate']),
         },
-        { provide: ActivatedRoute, useValue: { queryParams: of({}) } },
+        {
+          provide: ActivatedRoute,
+          useValue: { queryParamMap: of(new Map() as any), snapshot: { queryParamMap: new Map() as any } },
+        },
       ],
     });
 

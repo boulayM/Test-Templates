@@ -9,3 +9,40 @@
 .profile p {
   margin: 6px 0;
 }
+
+.address-card {
+  margin-top: 12px;
+  padding: 14px;
+}
+
+.address-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.address-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.address-form input[type='text'] {
+  border: 1px solid #d4dbe2;
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.address-default {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.address-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+}

@@ -1,27 +1,46 @@
 <nav class="navbar-ui" ds-navbar>
   <div class="ds-navbar-inner">
-    <a class="navbar-brand" [routerLink]="isLoggedIn() ? '/catalog' : '/home'">
-      <img class="brand-logo" src="assets/images/logos/Logo-ma-boutique.svg" alt="Ma Boutique" />
-      <span class="brand-text">Ma Boutique</span>
-    </a>
+    <a class="navbar-brand text-bold" [routerLink]="'/home'">LOGO</a>
 
     <div id="mainNavbar" class="ds-nav-links" [class.is-open]="isOpen()">
       <ul class="ds-nav-list">
-        @if (!isLoggedIn()) {
-          <li class="ds-nav-item">
-            <a class="nav-link" [routerLink]="'/home'">Accueil</a>
-          </li>
-          <li class="ds-nav-item">
-            <a class="nav-link" [routerLink]="'/login'">Connexion</a>
-          </li>
-          <li class="ds-nav-item">
-            <a class="nav-link" [routerLink]="'/register'">Inscription</a>
-          </li>
-        }
+        <li class="ds-nav-item">
+          <a class="nav-link ml-space-6" [routerLink]="'/home'">Accueil</a>
+        </li>
+
+        <li class="ds-nav-item">
+          <a class="nav-link" [routerLink]="'/catalog'">Catalogue</a>
+        </li>
+        <li class="ds-nav-item ds-dropdown">
+          <button
+            type="button"
+            class="nav-link ds-dropdown-trigger"
+            (click)="toggleCategoriesMenu()"
+          >
+            Categories
+          </button>
+          @if (showCategoriesMenu()) {
+            <div class="ds-dropdown-menu">
+              @for (category of categoryQuickLinks; track category) {
+                <button
+                  type="button"
+                  class="ds-dropdown-item"
+                  (click)="goToCategory(category)"
+                >
+                  {{ category }}
+                </button>
+              }
+              <a
+                class="ds-dropdown-item"
+                [routerLink]="'/categories'"
+                (click)="closeCategoriesMenu()"
+              >
+                Voir toutes les categories
+              </a>
+            </div>
+          }
+        </li>
         @if (isLoggedIn()) {
-          <li class="ds-nav-item">
-            <a class="nav-link" [routerLink]="'/catalog'">Catalogue</a>
-          </li>
           <li class="ds-nav-item">
             <a class="nav-link" [routerLink]="'/account/cart'">Panier</a>
           </li>
@@ -32,6 +51,32 @@
       </ul>
 
       <div class="ds-nav-actions">
+        <form
+          class="ds-nav-search"
+          (submit)="$event.preventDefault(); runSearch()"
+        >
+          <button type="submit" class="btn-ui btn-secondary btn-sm">
+            Rechercher
+          </button>
+
+          <input
+            class="ds-search-input"
+            type="search"
+            placeholder="Rechercher produit ou categorie"
+            [(ngModel)]="searchQuery"
+            name="navbarSearch"
+          />
+        </form>
+
+        @if (!isLoggedIn()) {
+          <button class="btn-ui btn-primary btn-sm" (click)="openLoginModal()">
+            Connexion
+          </button>
+          <a class="btn-ui btn-success btn-sm" [routerLink]="'/register'"
+            >Inscription</a
+          >
+        }
+
         @if (isLoggedIn()) {
           <span class="ds-user-email">{{ user()?.email }}</span>
           <button class="btn-ui btn-outline-light btn-sm" (click)="logout()">
@@ -40,12 +85,6 @@
         }
       </div>
     </div>
-
-    @if (!isLoggedIn()) {
-      <div class="ds-navbar-actions" (click)="closeMenu()">
-        <ng-content select="[navbar-actions]"></ng-content>
-      </div>
-    }
 
     <button class="ds-nav-toggle" type="button" (click)="toggleMenu()">
       <span class="ds-nav-toggle-svg" aria-hidden="true">
@@ -58,3 +97,33 @@
     </button>
   </div>
 </nav>
+
+@if (showLoginModal()) {
+  <div
+    class="ds-modal is-open"
+    id="loginModal"
+    tabindex="-1"
+    aria-labelledby="loginModalLabel"
+    [attr.aria-hidden]="showLoginModal() ? 'false' : 'true'"
+  >
+    <div class="ds-modal-dialog">
+      <div class="ds-modal-content">
+        <div class="ds-modal-header">
+          <h5 class="ds-modal-title" id="loginModalLabel">Connexion</h5>
+          <button
+            type="button"
+            class="ds-modal-close"
+            (click)="closeLoginModal()"
+            aria-label="Close"
+          >
+            X
+          </button>
+        </div>
+        <div class="ds-modal-body">
+          <app-login></app-login>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-modal-backdrop is-open" (click)="closeLoginModal()"></div>
+}

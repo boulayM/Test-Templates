@@ -6,7 +6,6 @@ import { VerifyEmailComponent } from './features/auth/verify-email.component';
 import { HomeComponent } from './features/public/home/home.component';
 import { AuthenticatedLayoutComponent } from './layout/authenticated-layout/authenticated-layout.component';
 import { authGuard } from './core/guards/auth.guard';
-import { authMatchGuard } from './core/guards/auth-match.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { ErrorPageComponent } from './shared/components/error-page/error-page.component';
 
@@ -77,8 +76,6 @@ export const routes: Routes = [
   {
     path: '',
     component: AuthenticatedLayoutComponent,
-    canActivate: [authGuard],
-    canActivateChild: [authGuard],
     children: [
       {
         path: 'dashboard',
@@ -87,8 +84,6 @@ export const routes: Routes = [
       },
       {
         path: 'catalog',
-        canMatch: [authMatchGuard],
-        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/public/content/content.component').then(
             (m) => m.ContentComponent,
@@ -103,9 +98,24 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'categories',
+        loadComponent: () =>
+          import('./features/public/categories/categories.component').then(
+            (m) => m.CategoriesComponent,
+          ),
+        data: {
+          seo: {
+            title: 'Ma Boutique | Categories',
+            description: 'Parcourez les categories du catalogue.',
+            indexable: true,
+            canonicalPath: '/categories',
+          },
+        },
+      },
+      {
         path: 'account',
-        canMatch: [authMatchGuard],
         canActivate: [authGuard],
+        canActivateChild: [authGuard],
         children: [
           { path: '', redirectTo: 'profile', pathMatch: 'full' },
           {

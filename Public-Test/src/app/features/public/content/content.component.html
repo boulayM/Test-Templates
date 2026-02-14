@@ -2,8 +2,14 @@
   <h2>Catalogue</h2>
 </div>
 
+@if (filteredContentItems.length === 0) {
+  <div class="ds-alert ds-alert-warning">
+    Aucun produit ne correspond a la recherche.
+  </div>
+}
+
 <div class="grid grid-md-3 grid-gap-md content-grid">
-  @for (contentItem of contentItems; track contentItem.id) {
+  @for (contentItem of filteredContentItems; track contentItem.id) {
     <div class="content-grid-item">
       <div class="card-ui content-card">
         <div class="content-card-body">
@@ -12,6 +18,11 @@
           <p>
             <strong>{{ contentItem.price | currency: 'EUR' }}</strong>
           </p>
+          @if ((contentItem.categories || []).length > 0) {
+            <p class="content-categories">
+              {{ contentItem.categories?.join(', ') }}
+            </p>
+          }
           @if (!contentItem.isActive) {
             <span class="badge-ui badge-warning">Indisponible</span>
           }

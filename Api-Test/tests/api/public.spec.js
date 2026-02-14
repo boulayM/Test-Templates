@@ -163,6 +163,18 @@ describe("public api", () => {
     expect(shipments.status).toBe(200);
   });
 
+  test("demo provider status endpoints return not implemented", async () => {
+    const { agent } = await loginUser();
+
+    const paymentProviderStatus = await agent.get("/api/public/payments/providers/status");
+    expect(paymentProviderStatus.status).toBe(501);
+    expect(paymentProviderStatus.body.code).toBe("PAYMENT_PROVIDER_NOT_CONFIGURED");
+
+    const trackingProviderStatus = await agent.get("/api/public/shipments/providers/status");
+    expect(trackingProviderStatus.status).toBe(501);
+    expect(trackingProviderStatus.body.code).toBe("TRACKING_PROVIDER_NOT_CONFIGURED");
+  });
+
   test("addresses support multiple entries and single default switch", async () => {
     const { agent } = await loginUser();
     const stamp = Date.now();
@@ -284,6 +296,54 @@ describe("public api", () => {
 
     const foreignDetail = await user1.get("/api/public/orders/" + order2Id);
     expect(foreignDetail.status).toBe(404);
+
+    const ownShipments = await user1.get("/api/public/orders/" + order1Id + "/shipments");
+    expect(ownShipments.status).toBe(200);
+    expect(Array.isArray(ownShipments.body.data)).toBe(true);
+  });
+
+  test("external payment providers return 501 in demo mode", async () => {
+    const { agent } = await loginUser();
+    const product = await prisma.product.findFirst({ select: { id: true } });
+    expect(product).toBeTruthy();
+
+    const addrRes = await agent.post("/api/public/addresses").send({
+      label: "Pay Test",
+      fullName: "Payment Demo",
+      phone: "0600000099",
+      line1: "99 payment st",
+      line2: null,
+      postalCode: "75003",
+      city: "Paris",
+      country: "FR",
+      isDefault: true
+    });
+    expect(addrRes.status).toBe(201);
+    const addressId = addrRes.body.address.id;
+
+    const add = await agent.post("/api/public/cart/items").send({
+      productId: product.id,
+      quantity: 1
+    });
+    expect(add.status).toBe(201);
+
+    const orderRes = await agent.post("/api/public/orders").send({
+      shippingAddressId: addressId,
+      billingAddressId: addressId
+    });
+    expect(orderRes.status).toBe(201);
+    const orderId = orderRes.body.order.id;
+
+    const stripeRes = await agent.post("/api/public/payments").send({
+      orderId,
+      provider: "STRIPE"
+    });
+    expect(stripeRes.status).toBe(501);
+    expect(stripeRes.body.code).toBe("PAYMENT_PROVIDER_NOT_CONFIGURED");
+
+    const paymentByOrder = await agent.get("/api/public/payments/" + orderId);
+    expect(paymentByOrder.status).toBe(200);
+    expect(Array.isArray(paymentByOrder.body.data)).toBe(true);
   });
 
   test("can abandon active cart and get a new active cart", async () => {

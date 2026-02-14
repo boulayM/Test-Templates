@@ -5,6 +5,69 @@
     <p><strong>Prenom:</strong> {{ user()!.firstName }}</p>
     <p><strong>Nom:</strong> {{ user()!.lastName }}</p>
     <p><strong>Email:</strong> {{ user()!.email }}</p>
+
+    <h2>Adresses</h2>
+    @if (addresses().length === 0) {
+      <div class="ds-alert ds-alert-warning">Aucune adresse enregistree.</div>
+    }
+
+    @for (address of addresses(); track address.id) {
+      <article class="address-card card-ui">
+        @if (editingAddressId() !== address.id) {
+          <p><strong>{{ address.label }}</strong> @if (address.isDefault) {<span class="badge-ui badge-success">Defaut</span>}</p>
+          <p>{{ address.fullName }}</p>
+          <p>{{ address.phone }}</p>
+          <p>{{ address.line1 }}</p>
+          @if (address.line2) { <p>{{ address.line2 }}</p> }
+          <p>{{ address.postalCode }} {{ address.city }}</p>
+          <p>{{ address.country }}</p>
+          <button class="btn-ui btn-secondary btn-sm" (click)="startEdit(address)">Editer</button>
+        } @else {
+          <div class="address-form">
+            <label>
+              Label
+              <input type="text" [(ngModel)]="draftAddress.label" />
+            </label>
+            <label>
+              Nom complet
+              <input type="text" [(ngModel)]="draftAddress.fullName" />
+            </label>
+            <label>
+              Telephone
+              <input type="text" [(ngModel)]="draftAddress.phone" />
+            </label>
+            <label>
+              Ligne 1
+              <input type="text" [(ngModel)]="draftAddress.line1" />
+            </label>
+            <label>
+              Ligne 2
+              <input type="text" [(ngModel)]="draftAddress.line2" />
+            </label>
+            <label>
+              Code postal
+              <input type="text" [(ngModel)]="draftAddress.postalCode" />
+            </label>
+            <label>
+              Ville
+              <input type="text" [(ngModel)]="draftAddress.city" />
+            </label>
+            <label>
+              Pays
+              <input type="text" [(ngModel)]="draftAddress.country" />
+            </label>
+            <label class="address-default">
+              <input type="checkbox" [(ngModel)]="draftAddress.isDefault" />
+              Adresse par defaut
+            </label>
+            <div class="address-actions">
+              <button class="btn-ui btn-primary btn-sm" (click)="saveAddress(address.id)">Enregistrer</button>
+              <button class="btn-ui btn-secondary btn-sm" (click)="cancelEdit()">Annuler</button>
+            </div>
+          </div>
+        }
+      </article>
+    }
   } @else {
     <div class="ds-alert ds-alert-warning">
       Connexion requise pour acceder au profil.

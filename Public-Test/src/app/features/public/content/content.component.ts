@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { ActivityService } from '../../../core/services/activity.service';
 import { ContentService } from '../../../core/services/content.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -16,24 +17,51 @@ import { ToastService } from '../../../shared/services/toast.service';
 })
 export class ContentComponent implements OnInit {
   contentItems: ContentItem[] = [];
+  filteredContentItems: ContentItem[] = [];
   activeActivityRecordId: number | null = null;
   includedContentItems: number[] = [];
+  searchQuery = '';
 
   constructor(
     private contentService: ContentService,
     private activityService: ActivityService,
+    private route: ActivatedRoute,
     public auth: AuthService,
     private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
+    this.route.queryParamMap.subscribe((params) => {
+      this.searchQuery = (params.get('q') || '').trim().toLowerCase();
+      this.applyFilter();
+    });
     this.loadContentItems();
   }
 
   loadContentItems(): void {
     this.contentService.getContentItems().subscribe({
-      next: (res) => (this.contentItems = res),
+      next: (res) => {
+        this.contentItems = res;
+        this.applyFilter();
+      },
       error: () => this.toast.show('Impossible de charger le catalogue.'),
+    });
+  }
+
+  private applyFilter(): void {
+    if (!this.searchQuery) {
+      this.filteredContentItems = [...this.contentItems];
+      return;
+    }
+    this.filteredContentItems = this.contentItems.filter((item) => {
+      const inName = item.name.toLowerCase().includes(this.searchQuery);
+      const inDescription = (item.description || '')
+        .toLowerCase()
+        .includes(this.searchQuery);
+      const inCategory = (item.categories || []).some((category) =>
+        category.toLowerCase().includes(this.searchQuery),
+      );
+      return inName || inDescription || inCategory;
     });
   }
 

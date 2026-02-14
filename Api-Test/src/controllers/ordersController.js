@@ -125,6 +125,27 @@ export async function getMyOrder(req, res, next) {
   }
 }
 
+export async function listMyOrderShipments(req, res, next) {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (Number.isNaN(id)) return res.status(400).json({ message: "Invalid id" });
+    const order = await prisma.order.findUnique({
+      where: { id },
+      select: { id: true, userId: true }
+    });
+    if (!order || order.userId !== req.user.id) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    const data = await prisma.shipment.findMany({
+      where: { orderId: id },
+      orderBy: { id: "desc" }
+    });
+    res.json({ data });
+  } catch (err) {
+    next(err);
+  }
+}
+
 function computeDiscount(total, coupon) {
   if (!coupon) return 0;
   if (coupon.type === "PERCENT") {

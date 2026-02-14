@@ -30,17 +30,13 @@
                   {{ category }}
                 </button>
               }
-              <a
-                class="ds-dropdown-item"
-                [routerLink]="'/categories'"
-                (click)="closeCategoriesMenu()"
-              >
-                Voir toutes les categories
-              </a>
             </div>
           }
         </li>
         @if (isLoggedIn()) {
+          <li class="ds-nav-item">
+            <a class="nav-link" [routerLink]="'/account/orders'">Commandes</a>
+          </li>
           <li class="ds-nav-item">
             <a class="nav-link" [routerLink]="'/account/cart'">Panier</a>
           </li>

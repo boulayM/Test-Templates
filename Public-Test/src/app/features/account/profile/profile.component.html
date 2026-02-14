@@ -7,6 +7,51 @@
     <p><strong>Email:</strong> {{ user()!.email }}</p>
 
     <h2>Adresses</h2>
+    <article class="address-card card-ui">
+      <h3>Ajouter une adresse</h3>
+      <div class="address-form">
+        <label>
+          Label
+          <input type="text" [(ngModel)]="newAddress.label" />
+        </label>
+        <label>
+          Nom complet
+          <input type="text" [(ngModel)]="newAddress.fullName" />
+        </label>
+        <label>
+          Telephone
+          <input type="text" [(ngModel)]="newAddress.phone" />
+        </label>
+        <label>
+          Ligne 1
+          <input type="text" [(ngModel)]="newAddress.line1" />
+        </label>
+        <label>
+          Ligne 2
+          <input type="text" [(ngModel)]="newAddress.line2" />
+        </label>
+        <label>
+          Code postal
+          <input type="text" [(ngModel)]="newAddress.postalCode" />
+        </label>
+        <label>
+          Ville
+          <input type="text" [(ngModel)]="newAddress.city" />
+        </label>
+        <label>
+          Pays
+          <input type="text" [(ngModel)]="newAddress.country" />
+        </label>
+        <label class="address-default">
+          <input type="checkbox" [(ngModel)]="newAddress.isDefault" />
+          Adresse par defaut
+        </label>
+        <div class="address-actions">
+          <button class="btn-ui btn-primary btn-sm" (click)="createAddress()">Ajouter</button>
+        </div>
+      </div>
+    </article>
+
     @if (addresses().length === 0) {
       <div class="ds-alert ds-alert-warning">Aucune adresse enregistree.</div>
     }
@@ -21,7 +66,15 @@
           @if (address.line2) { <p>{{ address.line2 }}</p> }
           <p>{{ address.postalCode }} {{ address.city }}</p>
           <p>{{ address.country }}</p>
-          <button class="btn-ui btn-secondary btn-sm" (click)="startEdit(address)">Editer</button>
+          <div class="address-actions">
+            <button class="btn-ui btn-secondary btn-sm" (click)="startEdit(address)">Editer</button>
+            @if (!address.isDefault) {
+              <button class="btn-ui btn-outline-secondary btn-sm" (click)="setDefault(address)">
+                Definir par defaut
+              </button>
+            }
+            <button class="btn-ui btn-danger btn-sm" (click)="deleteAddress(address.id)">Supprimer</button>
+          </div>
         } @else {
           <div class="address-form">
             <label>

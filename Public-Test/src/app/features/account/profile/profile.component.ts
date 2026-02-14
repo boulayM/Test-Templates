@@ -18,6 +18,7 @@ export class ProfileComponent implements OnInit {
   addresses = signal<Address[]>([]);
   editingAddressId = signal<number | null>(null);
   draftAddress: Partial<Address> = {};
+  newAddress: Partial<Address> = this.getEmptyAddress();
 
   constructor(
     private auth: AuthService,
@@ -67,10 +68,68 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  createAddress(): void {
+    const payload = {
+      label: this.newAddress.label || '',
+      fullName: this.newAddress.fullName || '',
+      phone: this.newAddress.phone || '',
+      line1: this.newAddress.line1 || '',
+      line2: this.newAddress.line2 || null,
+      postalCode: this.newAddress.postalCode || '',
+      city: this.newAddress.city || '',
+      country: this.newAddress.country || '',
+      isDefault: Boolean(this.newAddress.isDefault),
+    };
+    this.addressesService.createAddress(payload).subscribe({
+      next: () => {
+        this.toast.show('Adresse ajoutee.');
+        this.newAddress = this.getEmptyAddress();
+        this.loadAddresses();
+      },
+      error: () => this.toast.show('Impossible d ajouter l adresse.'),
+    });
+  }
+
+  deleteAddress(addressId: number): void {
+    this.addressesService.deleteAddress(addressId).subscribe({
+      next: () => {
+        this.toast.show('Adresse supprimee.');
+        this.loadAddresses();
+      },
+      error: () => this.toast.show('Impossible de supprimer l adresse.'),
+    });
+  }
+
+  setDefault(address: Address): void {
+    this.addressesService
+      .updateAddress(address.id, { isDefault: true })
+      .subscribe({
+        next: () => {
+          this.toast.show('Adresse par defaut mise a jour.');
+          this.loadAddresses();
+        },
+        error: () => this.toast.show('Impossible de definir l adresse par defaut.'),
+      });
+  }
+
   private loadAddresses(): void {
     this.addressesService.getMyAddresses().subscribe({
       next: (data) => this.addresses.set(data),
       error: () => this.toast.show('Impossible de charger les adresses.'),
     });
+  }
+
+  private getEmptyAddress(): Partial<Address> {
+    return {
+      label: '',
+      fullName: '',
+      phone: '',
+      line1: '',
+      line2: '',
+      postalCode: '',
+      city: '',
+      country: '',
+      isDefault: false,
+    };
   }
 }

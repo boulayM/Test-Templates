@@ -31,4 +31,21 @@
   margin-top: $space-2;
 }
 
+.activity-coupon {
+  margin-top: $space-2;
+  display: flex;
+  gap: $space-2;
+  align-items: center;
+
+  input {
+    min-width: 180px;
+  }
+}
+
+.activity-actions {
+  margin-top: $space-2;
+  display: flex;
+  justify-content: flex-end;
+}
+
 

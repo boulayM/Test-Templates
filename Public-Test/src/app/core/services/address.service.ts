@@ -14,9 +14,19 @@ export class AddressService {
     );
   }
 
+  createAddress(input: Omit<Address, 'id'>): Observable<Address> {
+    return this.api
+      .post<{ address: Address }>('/public/addresses', input)
+      .pipe(map((res) => res.address));
+  }
+
   updateAddress(addressId: number, input: AddressUpdateInput): Observable<Address> {
     return this.api
       .patch<{ address: Address }>(`/public/addresses/${addressId}`, input)
       .pipe(map((res) => res.address));
+  }
+
+  deleteAddress(addressId: number): Observable<{ message: string }> {
+    return this.api.deleteRequest<{ message: string }>(`/public/addresses/${addressId}`);
   }
 }

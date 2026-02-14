@@ -28,6 +28,9 @@
           }
         </div>
         <div class="content-card-footer">
+          <a class="btn-ui btn-outline-secondary btn-block" [routerLink]="['/catalog', contentItem.id]">
+            Voir le detail
+          </a>
           @if (auth.isLoggedIn()) {
             <button
               class="btn-ui btn-block"

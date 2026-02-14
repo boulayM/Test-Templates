@@ -1,0 +1,37 @@
+@if (loading) {
+  <section class="payment"><p>Chargement...</p></section>
+} @else if (providerUnavailable) {
+  <app-service-unavailable
+    title="Paiement en ligne indisponible"
+    message="Le provider de paiement n est pas configure pour cette demonstration."
+    backRoute="/home"
+  />
+} @else {
+  <section class="payment">
+    <h2>Paiements commande #{{ orderId }}</h2>
+    <div class="card-ui payment-create">
+      <label for="provider">Provider</label>
+      <select id="provider" [(ngModel)]="provider">
+        <option value="MANUAL">MANUAL</option>
+        <option value="STRIPE">STRIPE</option>
+        <option value="PAYPAL">PAYPAL</option>
+      </select>
+      <button class="btn-ui btn-primary btn-sm" (click)="createPayment()" [disabled]="creating">
+        {{ creating ? 'Creation...' : 'Creer un paiement' }}
+      </button>
+    </div>
+
+    @if (payments.length === 0) {
+      <div class="ds-alert ds-alert-info">Aucun paiement enregistre.</div>
+    } @else {
+      <ul class="card-ui">
+        @for (payment of payments; track payment.id) {
+          <li>
+            {{ payment.provider }} - {{ payment.status }} -
+            {{ payment.amountCents / 100 | currency: payment.currency }}
+          </li>
+        }
+      </ul>
+    }
+  </section>
+}

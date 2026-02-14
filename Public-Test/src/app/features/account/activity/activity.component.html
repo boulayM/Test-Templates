@@ -69,6 +69,18 @@
         <div class="activity-total">
           <strong>Total estime: {{ getTotal(activityRecord) | currency: "EUR" }}</strong>
         </div>
+        <div class="activity-coupon">
+          <input type="text" [(ngModel)]="couponCode" placeholder="Code promo" />
+          <button class="btn-ui btn-secondary btn-sm" (click)="applyCoupon(activityRecord)">
+            Appliquer
+          </button>
+          @if (couponValid) {
+            <span class="text-success">Coupon applique au checkout</span>
+          }
+        </div>
+        <div class="activity-actions">
+          <button class="btn-ui btn-primary" (click)="goCheckout()">Commander</button>
+        </div>
       </div>
     </div>
   }

@@ -98,6 +98,20 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'catalog/:id',
+        loadComponent: () =>
+          import('./features/public/product-detail/product-detail.component').then(
+            (m) => m.ProductDetailComponent,
+          ),
+        data: {
+          seo: {
+            title: 'Ma Boutique | Detail produit',
+            description: 'Consultez la fiche detaillee d un produit.',
+            indexable: true,
+          },
+        },
+      },
+      {
         path: 'categories',
         loadComponent: () =>
           import('./features/public/categories/categories.component').then(
@@ -148,8 +162,67 @@ export const routes: Routes = [
               },
             },
           },
+          {
+            path: 'orders',
+            loadComponent: () =>
+              import('./features/account/orders/orders.component').then(
+                (m) => m.OrdersComponent,
+              ),
+            data: {
+              seo: {
+                title: 'Ma Boutique | Mes commandes',
+                description: 'Consultez l historique de vos commandes.',
+                indexable: false,
+                canonicalPath: '/account/orders',
+              },
+            },
+          },
+          {
+            path: 'orders/:id',
+            loadComponent: () =>
+              import('./features/account/order-detail/order-detail.component').then(
+                (m) => m.OrderDetailComponent,
+              ),
+            data: {
+              seo: {
+                title: 'Ma Boutique | Detail commande',
+                description: 'Consultez le detail de votre commande.',
+                indexable: false,
+              },
+            },
+          },
+          {
+            path: 'orders/:id/payment',
+            loadComponent: () =>
+              import('./features/account/payment/payment.component').then(
+                (m) => m.PaymentComponent,
+              ),
+            data: {
+              seo: {
+                title: 'Ma Boutique | Paiement',
+                description: 'Consultez et initiez le paiement de votre commande.',
+                indexable: false,
+              },
+            },
+          },
           { path: 'activity', pathMatch: 'full', redirectTo: 'cart' },
         ],
+      },
+      {
+        path: 'checkout',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/account/checkout/checkout.component').then(
+            (m) => m.CheckoutComponent,
+          ),
+        data: {
+          seo: {
+            title: 'Ma Boutique | Checkout',
+            description: 'Validez votre commande avec adresses et recapitulatif.',
+            indexable: false,
+            canonicalPath: '/checkout',
+          },
+        },
       },
       { path: 'public/content', pathMatch: 'full', redirectTo: 'catalog' },
     ],

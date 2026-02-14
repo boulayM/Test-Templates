@@ -4,8 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ActivityService } from '../../../core/services/activity.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CouponService } from '../../../core/services/coupon.service';
 import { UiMessages } from '../../../shared/messages/ui-messages';
 import { ActivityRecord, ActivityItem } from '../../../shared/models/activity.model';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
     selector: 'app-activity',
@@ -15,11 +17,15 @@ import { ActivityRecord, ActivityItem } from '../../../shared/models/activity.mo
 })
 export class ActivityComponent implements OnInit {
   activityRecords: ActivityRecord[] = [];
+  couponCode = '';
+  couponValid = false;
 
   constructor(
     private activityService: ActivityService,
+    private couponService: CouponService,
     private router: Router,
     public auth: AuthService,
+    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -91,6 +97,26 @@ export class ActivityComponent implements OnInit {
   includeContentItem(activityRecordId: number): void {
     this.router.navigate(['/catalog'], {
       queryParams: { includeActivityId: activityRecordId },
+    });
+  }
+
+  applyCoupon(activityRecord: ActivityRecord): void {
+    const totalCents = Math.round(this.getTotal(activityRecord) * 100);
+    this.couponService.validateCoupon(this.couponCode.trim(), totalCents).subscribe({
+      next: (res) => {
+        this.couponValid = res.valid;
+        this.toast.show(res.valid ? 'Coupon valide.' : 'Coupon invalide.');
+      },
+      error: () => {
+        this.couponValid = false;
+        this.toast.show('Impossible de valider le coupon.');
+      },
+    });
+  }
+
+  goCheckout(): void {
+    void this.router.navigate(['/checkout'], {
+      queryParams: this.couponCode.trim() ? { couponCode: this.couponCode.trim() } : {},
     });
   }
 }

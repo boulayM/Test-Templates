@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ActivityService } from '../../../core/services/activity.service';
 import { ContentService } from '../../../core/services/content.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -11,7 +11,7 @@ import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-content',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './content.component.html',
   styleUrls: ['./content.component.scss'],
 })

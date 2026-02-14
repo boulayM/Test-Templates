@@ -1,0 +1,53 @@
+<section class="checkout">
+  <h2>Checkout</h2>
+
+  <div class="card-ui">
+    <h3>Adresses</h3>
+    <label>
+      Livraison
+      <select [(ngModel)]="shippingAddressId">
+        <option [ngValue]="undefined">Selectionner</option>
+        @for (address of addresses; track address.id) {
+          <option [ngValue]="address.id">
+            {{ address.label }} - {{ address.line1 }} ({{ address.city }})
+          </option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Facturation
+      <select [(ngModel)]="billingAddressId">
+        <option [ngValue]="undefined">Selectionner</option>
+        @for (address of addresses; track address.id) {
+          <option [ngValue]="address.id">
+            {{ address.label }} - {{ address.line1 }} ({{ address.city }})
+          </option>
+        }
+      </select>
+    </label>
+  </div>
+
+  <div class="card-ui">
+    <h3>Coupon</h3>
+    <div class="checkout-row">
+      <input type="text" [(ngModel)]="couponCode" placeholder="Code promo" />
+      <button class="btn-ui btn-secondary btn-sm" (click)="applyCoupon()">Appliquer</button>
+    </div>
+    @if (couponApplied) {
+      <p class="text-success">Reduction appliquee.</p>
+    }
+  </div>
+
+  <div class="card-ui">
+    <h3>Recapitulatif</h3>
+    <p>Sous-total: {{ subtotalCents / 100 | currency: 'EUR' }}</p>
+    <p>Frais livraison: {{ shippingCents / 100 | currency: 'EUR' }}</p>
+    <p>Remise: -{{ discountCents / 100 | currency: 'EUR' }}</p>
+    <p><strong>Total estime: {{ totalCents / 100 | currency: 'EUR' }}</strong></p>
+  </div>
+
+  <button class="btn-ui btn-primary" [disabled]="submitting" (click)="submitOrder()">
+    {{ submitting ? 'Creation...' : 'Confirmer la commande' }}
+  </button>
+</section>

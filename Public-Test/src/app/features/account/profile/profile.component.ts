@@ -11,7 +11,6 @@ import { User } from '../../../shared/models/user.model';
   selector: 'app-profile',
   imports: [CommonModule, FormsModule],
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss'],
 })
 export class ProfileComponent implements OnInit {
   user = signal<User | null>(null);

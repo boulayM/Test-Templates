@@ -1,11 +1,11 @@
-<section class="checkout">
+<section class="container py-4 d-grid gap-3">
   <h2>Checkout</h2>
 
-  <div class="card-ui">
+  <div class="card">
     <h3>Adresses</h3>
-    <label>
+    <label class="form-label">
       Livraison
-      <select [(ngModel)]="shippingAddressId">
+      <select class="form-select" [(ngModel)]="shippingAddressId">
         <option [ngValue]="undefined">Selectionner</option>
         @for (address of addresses; track address.id) {
           <option [ngValue]="address.id">
@@ -15,9 +15,9 @@
       </select>
     </label>
 
-    <label>
+    <label class="form-label mt-2">
       Facturation
-      <select [(ngModel)]="billingAddressId">
+      <select class="form-select" [(ngModel)]="billingAddressId">
         <option [ngValue]="undefined">Selectionner</option>
         @for (address of addresses; track address.id) {
           <option [ngValue]="address.id">
@@ -28,18 +28,18 @@
     </label>
   </div>
 
-  <div class="card-ui">
+  <div class="card">
     <h3>Coupon</h3>
-    <div class="checkout-row">
-      <input type="text" [(ngModel)]="couponCode" placeholder="Code promo" />
-      <button class="btn-ui btn-secondary btn-sm" (click)="applyCoupon()">Appliquer</button>
+    <div class="d-flex gap-2 align-items-center">
+      <input class="form-control" type="text" [(ngModel)]="couponCode" placeholder="Code promo" />
+      <button class="btn btn-secondary btn-sm" (click)="applyCoupon()">Appliquer</button>
     </div>
     @if (couponApplied) {
       <p class="text-success">Reduction appliquee.</p>
     }
   </div>
 
-  <div class="card-ui">
+  <div class="card">
     <h3>Recapitulatif</h3>
     <p>Sous-total: {{ subtotalCents / 100 | currency: 'EUR' }}</p>
     <p>Frais livraison: {{ shippingCents / 100 | currency: 'EUR' }}</p>
@@ -47,7 +47,7 @@
     <p><strong>Total estime: {{ totalCents / 100 | currency: 'EUR' }}</strong></p>
   </div>
 
-  <button class="btn-ui btn-primary" [disabled]="submitting" (click)="submitOrder()">
+  <button class="btn btn-primary" [disabled]="submitting" (click)="submitOrder()">
     {{ submitting ? 'Creation...' : 'Confirmer la commande' }}
   </button>
 </section>

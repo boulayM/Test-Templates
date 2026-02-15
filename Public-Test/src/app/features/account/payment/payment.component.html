@@ -1,5 +1,5 @@
 @if (loading) {
-  <section class="payment"><p>Chargement...</p></section>
+  <section class="container py-4"><p>Chargement...</p></section>
 } @else if (providerUnavailable) {
   <app-service-unavailable
     title="Paiement en ligne indisponible"
@@ -7,24 +7,24 @@
     backRoute="/home"
   />
 } @else {
-  <section class="payment">
+  <section class="container py-4">
     <h2>Paiements commande #{{ orderId }}</h2>
-    <div class="card-ui payment-create">
+    <div class="card d-flex align-items-center gap-2 mb-3 flex-wrap">
       <label for="provider">Provider</label>
-      <select id="provider" [(ngModel)]="provider">
+      <select id="provider" class="form-select w-auto" [(ngModel)]="provider">
         <option value="MANUAL">MANUAL</option>
         <option value="STRIPE">STRIPE</option>
         <option value="PAYPAL">PAYPAL</option>
       </select>
-      <button class="btn-ui btn-primary btn-sm" (click)="createPayment()" [disabled]="creating">
+      <button class="btn btn-primary btn-sm" (click)="createPayment()" [disabled]="creating">
         {{ creating ? 'Creation...' : 'Creer un paiement' }}
       </button>
     </div>
 
     @if (payments.length === 0) {
-      <div class="ds-alert ds-alert-info">Aucun paiement enregistre.</div>
+      <div class="alert alert-info">Aucun paiement enregistre.</div>
     } @else {
-      <ul class="card-ui">
+      <ul class="card">
         @for (payment of payments; track payment.id) {
           <li>
             {{ payment.provider }} - {{ payment.status }} -

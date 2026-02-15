@@ -10,7 +10,6 @@ import { ToastService } from '../../../shared/services/toast.service';
   selector: 'app-order-detail',
   imports: [CommonModule, RouterModule],
   templateUrl: './order-detail.component.html',
-  styleUrls: ['./order-detail.component.scss'],
 })
 export class OrderDetailComponent implements OnInit {
   loading = true;
@@ -44,5 +43,9 @@ export class OrderDetailComponent implements OnInit {
         this.toast.show('Impossible de charger la commande.');
       },
     });
+  }
+
+  canPay(): boolean {
+    return this.order?.status === 'PENDING';
   }
 }

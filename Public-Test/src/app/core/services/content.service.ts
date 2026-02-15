@@ -11,6 +11,7 @@ type ApiProduct = {
   description?: string | null;
   priceCents: number;
   isActive: boolean;
+  inventory?: { quantity: number; reserved: number } | null;
   categories?: Array<{ category?: { name?: string | null } | null }>;
 };
 
@@ -20,6 +21,10 @@ const mapProduct = (product: ApiProduct): ContentItem => ({
   description: product.description || '',
   price: product.priceCents / 100,
   isActive: product.isActive,
+  isAvailable:
+    product.inventory == null
+      ? product.isActive
+      : product.isActive && product.inventory.quantity - product.inventory.reserved > 0,
   categories: (product.categories || [])
     .map((entry) => entry.category?.name || '')
     .filter((name) => !!name),

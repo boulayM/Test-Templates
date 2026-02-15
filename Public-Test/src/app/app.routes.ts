@@ -78,11 +78,6 @@ export const routes: Routes = [
     component: AuthenticatedLayoutComponent,
     children: [
       {
-        path: 'dashboard',
-        pathMatch: 'full',
-        redirectTo: 'catalog',
-      },
-      {
         path: 'catalog',
         loadComponent: () =>
           import('./features/public/content/content.component').then(
@@ -205,7 +200,6 @@ export const routes: Routes = [
               },
             },
           },
-          { path: 'activity', pathMatch: 'full', redirectTo: 'cart' },
         ],
       },
       {
@@ -224,7 +218,6 @@ export const routes: Routes = [
           },
         },
       },
-      { path: 'public/content', pathMatch: 'full', redirectTo: 'catalog' },
     ],
   },
   {

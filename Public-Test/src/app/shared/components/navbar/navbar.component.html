@@ -1,125 +1,84 @@
-<nav class="navbar-ui" ds-navbar>
-  <div class="ds-navbar-inner">
-    <a class="navbar-brand text-bold" [routerLink]="'/home'">LOGO</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" [routerLink]="'/home'">LOGO</a>
 
-    <div id="mainNavbar" class="ds-nav-links" [class.is-open]="isOpen()">
-      <ul class="ds-nav-list">
-        <li class="ds-nav-item">
-          <a class="nav-link ml-space-6" [routerLink]="'/home'">Accueil</a>
-        </li>
+    <button
+      class="navbar-toggler"
+      type="button"
+      (click)="isCollapsed.set(!isCollapsed())"
+      aria-controls="mainNavbar"
+      [attr.aria-expanded]="!isCollapsed()"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-        <li class="ds-nav-item">
-          <a class="nav-link" [routerLink]="'/catalog'">Catalogue</a>
+    <div id="mainNavbar" class="collapse navbar-collapse" [ngbCollapse]="isCollapsed()">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="'/home'" (click)="closeMenu()">Accueil</a>
         </li>
-        <li class="ds-nav-item ds-dropdown">
-          <button
-            type="button"
-            class="nav-link ds-dropdown-trigger"
-            (click)="toggleCategoriesMenu()"
-          >
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="'/catalog'" (click)="closeMenu()">Catalogue</a>
+        </li>
+        <li class="nav-item dropdown" ngbDropdown>
+          <button class="nav-link dropdown-toggle btn btn-link text-decoration-none" ngbDropdownToggle type="button">
             Categories
           </button>
-          @if (showCategoriesMenu()) {
-            <div class="ds-dropdown-menu">
-              @for (category of categoryQuickLinks; track category) {
-                <button
-                  type="button"
-                  class="ds-dropdown-item"
-                  (click)="goToCategory(category)"
-                >
-                  {{ category }}
-                </button>
-              }
-            </div>
-          }
+          <div ngbDropdownMenu>
+            @for (category of categoryQuickLinks; track category) {
+              <button class="dropdown-item" type="button" (click)="goToCategory(category)">
+                {{ category }}
+              </button>
+            }
+            <a class="dropdown-item" [routerLink]="'/categories'" (click)="closeMenu()">Toutes les categories</a>
+          </div>
         </li>
         @if (isLoggedIn()) {
-          <li class="ds-nav-item">
-            <a class="nav-link" [routerLink]="'/account/orders'">Commandes</a>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="'/account/orders'" (click)="closeMenu()">Commandes</a>
           </li>
-          <li class="ds-nav-item">
-            <a class="nav-link" [routerLink]="'/account/cart'">Panier</a>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="'/account/cart'" (click)="closeMenu()">Panier</a>
           </li>
-          <li class="ds-nav-item">
-            <a class="nav-link" [routerLink]="'/account/profile'">Profil</a>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="'/account/profile'" (click)="closeMenu()">Profil</a>
           </li>
         }
       </ul>
 
-      <div class="ds-nav-actions">
-        <form
-          class="ds-nav-search"
-          (submit)="$event.preventDefault(); runSearch()"
-        >
-          <button type="submit" class="btn-ui btn-secondary btn-sm">
-            Rechercher
-          </button>
+      <form class="d-flex me-2 mb-2 mb-lg-0" (submit)="$event.preventDefault(); runSearch()">
+        <input
+          class="form-control me-2"
+          type="search"
+          placeholder="Rechercher produit ou categorie"
+          [(ngModel)]="searchQuery"
+          name="navbarSearch"
+        />
+        <button type="submit" class="btn btn-outline-secondary">Rechercher</button>
+      </form>
 
-          <input
-            class="ds-search-input"
-            type="search"
-            placeholder="Rechercher produit ou categorie"
-            [(ngModel)]="searchQuery"
-            name="navbarSearch"
-          />
-        </form>
-
-        @if (!isLoggedIn()) {
-          <button class="btn-ui btn-primary btn-sm" (click)="openLoginModal()">
-            Connexion
-          </button>
-          <a class="btn-ui btn-success btn-sm" [routerLink]="'/register'"
-            >Inscription</a
-          >
-        }
-
-        @if (isLoggedIn()) {
-          <span class="ds-user-email">{{ user()?.email }}</span>
-          <button class="btn-ui btn-outline-light btn-sm" (click)="logout()">
-            Logout
-          </button>
-        }
-      </div>
+      @if (!isLoggedIn()) {
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary" (click)="openLoginModal(loginModal)">Connexion</button>
+          <a class="btn btn-success" [routerLink]="'/register'" (click)="closeMenu()">Inscription</a>
+        </div>
+      } @else {
+        <div class="d-flex align-items-center gap-2">
+          <span class="small text-muted">{{ user()?.email }}</span>
+          <button class="btn btn-outline-secondary" (click)="logout()">Logout</button>
+        </div>
+      }
     </div>
-
-    <button class="ds-nav-toggle" type="button" (click)="toggleMenu()">
-      <span class="ds-nav-toggle-svg" aria-hidden="true">
-        <svg class="ds-burger" viewBox="0 0 24 24" focusable="false">
-          <path d="M4 7h16" />
-          <path d="M4 12h16" />
-          <path d="M4 17h16" />
-        </svg>
-      </span>
-    </button>
   </div>
 </nav>
 
-@if (showLoginModal()) {
-  <div
-    class="ds-modal is-open"
-    id="loginModal"
-    tabindex="-1"
-    aria-labelledby="loginModalLabel"
-    [attr.aria-hidden]="showLoginModal() ? 'false' : 'true'"
-  >
-    <div class="ds-modal-dialog">
-      <div class="ds-modal-content">
-        <div class="ds-modal-header">
-          <h5 class="ds-modal-title" id="loginModalLabel">Connexion</h5>
-          <button
-            type="button"
-            class="ds-modal-close"
-            (click)="closeLoginModal()"
-            aria-label="Close"
-          >
-            X
-          </button>
-        </div>
-        <div class="ds-modal-body">
-          <app-login></app-login>
-        </div>
-      </div>
-    </div>
+<ng-template #loginModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Connexion</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
-  <div class="ds-modal-backdrop is-open" (click)="closeLoginModal()"></div>
-}
+  <div class="modal-body">
+    <app-login></app-login>
+  </div>
+</ng-template>

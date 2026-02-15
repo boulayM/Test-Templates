@@ -1,7 +1,7 @@
 <app-navbar></app-navbar>
 
-<main class="ds-container home-main">
-  <section class="home-hero card-ui">
+<main class="container home-main">
+  <section class="home-hero card">
     <p class="hero-kicker">Boutique en ligne</p>
     <h1>Bienvenue chez Ma Boutique</h1>
     <p>
@@ -11,18 +11,18 @@
 
   <h2 class="home-section-title">Produits disponibles</h2>
 
-  <div class="grid grid-md-3 grid-gap-md home-grid">
+  <div class="row row-cols-1 row-cols-md-3 g-3 home-grid">
     @for (contentItem of contentItems; track contentItem.id) {
-      <div class="home-grid-item">
-        <div class="card-ui home-card">
+      <div class="col home-grid-item">
+        <div class="card home-card">
           <div class="home-card-body">
-            <h5 class="card-ui__title">{{ contentItem.name }}</h5>
+            <h5 class="card-title">{{ contentItem.name }}</h5>
             <p class="home-card-text">{{ contentItem.description }}</p>
             <p class="home-card-text"><strong>Prix:</strong> {{ contentItem.price | currency: 'EUR' }}</p>
-            @if (contentItem.isActive) {
-              <span class="badge-ui badge-success">Disponible</span>
+            @if (contentItem.isActive && contentItem.isAvailable !== false) {
+              <span class="badge text-bg-success">Disponible</span>
             } @else {
-              <span class="badge-ui badge-secondary">Indisponible</span>
+              <span class="badge text-bg-secondary">Indisponible</span>
             }
           </div>
         </div>

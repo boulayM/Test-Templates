@@ -1,4 +1,4 @@
-<section class="orders">
+<section class="container py-4">
   <div class="content-header">
     <h2>Mes commandes</h2>
   </div>
@@ -6,11 +6,11 @@
   @if (loading) {
     <p>Chargement...</p>
   } @else if (orders.length === 0) {
-    <div class="ds-alert ds-alert-warning">Aucune commande.</div>
+    <div class="alert alert-warning">Aucune commande.</div>
   } @else {
     <div class="grid grid-gap-md">
       @for (order of orders; track order.id) {
-        <a class="card-ui order-card" [routerLink]="['/account/orders', order.id]">
+        <a class="card d-block text-reset text-decoration-none" [routerLink]="['/account/orders', order.id]">
           <p><strong>Commande #{{ order.id }}</strong></p>
           <p>Statut: {{ order.status }}</p>
           <p>Total: {{ order.totalCents / 100 | currency: order.currency }}</p>

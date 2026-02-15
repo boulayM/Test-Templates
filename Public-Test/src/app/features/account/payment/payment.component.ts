@@ -11,7 +11,6 @@ import { ToastService } from '../../../shared/services/toast.service';
   selector: 'app-payment',
   imports: [CommonModule, FormsModule, ServiceUnavailableComponent],
   templateUrl: './payment.component.html',
-  styleUrls: ['./payment.component.scss'],
 })
 export class PaymentComponent implements OnInit {
   orderId = 0;

@@ -16,7 +16,6 @@ import { ToastService } from './shared/services/toast.service';
   selector: 'app-root',
   imports: [RouterModule],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
   private destroyRef = inject(DestroyRef);

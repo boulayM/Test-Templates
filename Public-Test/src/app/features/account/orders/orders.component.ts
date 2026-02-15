@@ -9,7 +9,6 @@ import { ToastService } from '../../../shared/services/toast.service';
   selector: 'app-orders',
   imports: [CommonModule, RouterModule],
   templateUrl: './orders.component.html',
-  styleUrls: ['./orders.component.scss'],
 })
 export class OrdersComponent implements OnInit {
   loading = true;

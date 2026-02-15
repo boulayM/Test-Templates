@@ -8,12 +8,12 @@ import { CouponService } from '../../../core/services/coupon.service';
 import { OrderService } from '../../../core/services/order.service';
 import { Address } from '../../../shared/models/address.model';
 import { ToastService } from '../../../shared/services/toast.service';
+import { computeCartSubtotalCents } from '../../../shared/utils/cart-totals';
 
 @Component({
   selector: 'app-checkout',
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './checkout.component.html',
-  styleUrls: ['./checkout.component.scss'],
 })
 export class CheckoutComponent implements OnInit {
   addresses: Address[] = [];
@@ -45,6 +45,9 @@ export class CheckoutComponent implements OnInit {
         if (defaultAddress) {
           this.shippingAddressId = defaultAddress.id;
           this.billingAddressId = defaultAddress.id;
+        } else if (data.length > 0) {
+          this.shippingAddressId = data[0].id;
+          this.billingAddressId = data[0].id;
         }
       },
       error: () => this.toast.show('Impossible de charger les adresses.'),
@@ -52,11 +55,7 @@ export class CheckoutComponent implements OnInit {
     this.activityService.getActivityRecords().subscribe({
       next: (records) => {
         const cart = records[0];
-        this.subtotalCents = cart
-          ? Math.round(
-              cart.items.reduce((sum, item) => sum + item.quantity * item.price, 0) * 100,
-            )
-          : 0;
+        this.subtotalCents = cart ? computeCartSubtotalCents(cart.items) : 0;
       },
       error: () => this.toast.show('Impossible de charger le panier.'),
     });
@@ -93,12 +92,16 @@ export class CheckoutComponent implements OnInit {
       this.toast.show('Selectionnez les adresses de livraison et facturation.');
       return;
     }
+    if (this.subtotalCents <= 0) {
+      this.toast.show('Panier vide: ajoutez des produits avant de commander.');
+      return;
+    }
     this.submitting = true;
     this.orderService
       .createOrder({
         shippingAddressId: this.shippingAddressId,
         billingAddressId: this.billingAddressId,
-        couponCode: this.couponCode.trim() || undefined,
+        couponCode: this.couponApplied ? this.couponCode.trim() : undefined,
       })
       .subscribe({
         next: (order) => {
@@ -106,9 +109,18 @@ export class CheckoutComponent implements OnInit {
           this.toast.show('Commande creee.');
           void this.router.navigate(['/account/orders', order.id]);
         },
-        error: () => {
+        error: (err) => {
           this.submitting = false;
-          this.toast.show('Impossible de creer la commande.');
+          const message =
+            err?.error?.message || 'Impossible de creer la commande.';
+          if (String(message).toLowerCase().includes('insufficient inventory')) {
+            this.toast.show(
+              'Stock insuffisant sur un ou plusieurs articles. Ajustez le panier puis recommencez.',
+            );
+            void this.router.navigate(['/account/cart']);
+            return;
+          }
+          this.toast.show(message);
         },
       });
   }

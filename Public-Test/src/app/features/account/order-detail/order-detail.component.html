@@ -1,22 +1,24 @@
-<section class="order-detail">
+<section class="container py-4 d-grid gap-3">
   @if (loading) {
     <p>Chargement...</p>
   } @else if (!order) {
-    <div class="ds-alert ds-alert-warning">Commande introuvable.</div>
+    <div class="alert alert-warning">Commande introuvable.</div>
   } @else {
-    <div class="card-ui">
+    <div class="card">
       <h2>Commande #{{ order.id }}</h2>
       <p>Statut: <strong>{{ order.status }}</strong></p>
       <p>Sous-total: {{ order.subtotalCents / 100 | currency: order.currency }}</p>
       <p>Livraison: {{ order.shippingCents / 100 | currency: order.currency }}</p>
       <p>Remise: -{{ order.discountCents / 100 | currency: order.currency }}</p>
       <p>Total: <strong>{{ order.totalCents / 100 | currency: order.currency }}</strong></p>
-      <a class="btn-ui btn-primary btn-sm" [routerLink]="['/account/orders', order.id, 'payment']">
-        Payer cette commande
-      </a>
+      @if (canPay()) {
+        <a class="btn btn-primary btn-sm" [routerLink]="['/account/orders', order.id, 'payment']">
+          Payer cette commande
+        </a>
+      }
     </div>
 
-    <div class="card-ui">
+    <div class="card">
       <h3>Articles</h3>
       <ul>
         @for (item of order.items; track item.id) {
@@ -27,7 +29,7 @@
       </ul>
     </div>
 
-    <div class="card-ui">
+    <div class="card">
       <h3>Livraison</h3>
       @if (shipments.length === 0) {
         <p>Aucun suivi disponible pour cette commande.</p>

@@ -1,5 +1,5 @@
-<div class="ds-container ds-container-sm auth-container">
-  <form class="form-ui auth-form" (ngSubmit)="submit()" autocomplete="off">
+<div class="container container-sm auth-container">
+  <form class="auth-form" (ngSubmit)="submit()" autocomplete="off">
     <app-form-alert
       [visible]="!!error"
       title="Erreur de validation"
@@ -7,12 +7,12 @@
       [items]="alertItems"
     ></app-form-alert>
 
-    <div class="ds-alert text-center">
+    <div class="alert text-center">
       INSCRIPTION INDISPONIBLE EN MODE DEMO.<br />
       Le formulaire est affiché à titre d'exemple de mise en page et de
       validation, mais la fonctionnalité d'inscription est désactivée pour
       éviter la création de comptes de test. Merci de votre compréhension.<br /><br />
-      <a class="btn-ui btn-secondary btn-sm mt-2" [routerLink]="'/home'"
+      <a class="btn btn-secondary btn-sm mt-2" [routerLink]="'/home'"
         >Retour à l'accueil</a
       >
     </div>
@@ -74,9 +74,9 @@
     </div>
 
     @if (captchaEnabled) {
-      <div class="captcha-block">
+      <div class="mt-3">
         <label class="form-label" for="captchaToken">Captcha</label>
-        <div class="ds-alert ds-alert-info captcha-note">
+        <div class="alert alert-info mb-3">
           Captcha active. Integre le widget fournisseur dans le projet concret
           (site key: {{ captchaSiteKey || "non configuree" }}).
         </div>
@@ -97,7 +97,7 @@
         {{ success }}
       </div>
     }
-    <button type="submit" class="btn-ui auth-submit" [disabled]="loading">
+    <button type="submit" class="btn btn-primary auth-submit" [disabled]="loading">
       {{ loading ? "Envoi..." : "Créer un compte" }}
     </button>
   </form>

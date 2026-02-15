@@ -1,25 +1,27 @@
-<section class="product-detail">
+<section class="container py-4 d-grid gap-3">
   @if (loading) {
     <p>Chargement...</p>
   } @else if (!product) {
-    <div class="ds-alert ds-alert-warning">Produit introuvable.</div>
+    <div class="alert alert-warning">Produit introuvable.</div>
   } @else {
-    <div class="card-ui">
+    <div class="card">
       <h2>{{ product.name }}</h2>
       <p>{{ product.description }}</p>
       <p><strong>{{ product.price | currency: 'EUR' }}</strong></p>
     </div>
 
-    <div class="card-ui">
-      <h3>Laisser un avis</h3>
-      <label>Note (1-5)</label>
-      <input type="number" min="1" max="5" [(ngModel)]="rating" />
-      <label>Commentaire</label>
-      <textarea rows="3" [(ngModel)]="comment"></textarea>
-      <button class="btn-ui btn-primary btn-sm" (click)="submitReview()">Publier</button>
-    </div>
+    @if (auth.isLoggedIn()) {
+      <div class="card">
+        <h3>Laisser un avis</h3>
+        <label class="form-label">Note (1-5)</label>
+        <input class="form-control mb-2" type="number" min="1" max="5" [(ngModel)]="rating" />
+        <label class="form-label">Commentaire</label>
+        <textarea class="form-control mb-2" rows="3" [(ngModel)]="comment"></textarea>
+        <button class="btn btn-primary btn-sm" (click)="submitReview()">Publier</button>
+      </div>
+    }
 
-    <div class="card-ui">
+    <div class="card">
       <h3>Avis</h3>
       @if (reviews.length === 0) {
         <p>Aucun avis.</p>
@@ -28,7 +30,9 @@
           @for (review of reviews; track review.id) {
             <li>
               <strong>{{ review.rating }}/5</strong> - {{ review.comment || 'Sans commentaire' }}
-              <button class="btn-ui btn-danger btn-sm" (click)="deleteReview(review.id)">Supprimer</button>
+              @if (canDeleteReview(review)) {
+                <button class="btn btn-danger btn-sm" (click)="deleteReview(review.id)">Supprimer</button>
+              }
             </li>
           }
         </ul>

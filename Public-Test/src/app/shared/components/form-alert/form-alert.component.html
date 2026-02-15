@@ -1,7 +1,7 @@
-<div *ngIf="visible" class="form-alert" role="alert" aria-live="assertive">
-  <div class="form-alert-title">{{ title }}</div>
-  <div class="form-alert-message" *ngIf="message">{{ message }}</div>
-  <ul class="form-alert-list" *ngIf="items.length > 0">
+<div *ngIf="visible" class="alert alert-danger mb-3" role="alert" aria-live="assertive">
+  <div class="fw-bold">{{ title }}</div>
+  <div *ngIf="message">{{ message }}</div>
+  <ul class="mb-0 ps-3" *ngIf="items.length > 0">
     <li *ngFor="let item of items">{{ item }}</li>
   </ul>
 </div>

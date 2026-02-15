@@ -1,23 +1,23 @@
-<section class="categories">
+<section class="categories container py-4">
   <div class="content-header">
     <h2>Categories</h2>
   </div>
 
   @if (filteredCategories.length === 0) {
-    <div class="ds-alert ds-alert-warning">
+    <div class="alert alert-warning">
       Aucune categorie trouvee.
     </div>
   }
 
-  <div class="grid grid-md-3 grid-gap-md categories-grid">
+  <div class="row row-cols-1 row-cols-md-3 g-3 categories-grid">
     @for (category of filteredCategories; track category.id) {
-      <div class="categories-grid-item">
+      <div class="col categories-grid-item">
         <button
           type="button"
-          class="card-ui categories-card"
+          class="card categories-card"
           (click)="openCategory(category.name)"
         >
-          <h5 class="card-ui__title">{{ category.name }}</h5>
+          <h5 class="card-title">{{ category.name }}</h5>
           <p class="categories-slug">{{ category.slug }}</p>
         </button>
       </div>

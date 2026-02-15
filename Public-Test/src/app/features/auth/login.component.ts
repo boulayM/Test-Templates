@@ -10,7 +10,6 @@ import { ValidationMessages } from '../../shared/messages/validation-messages';
   selector: 'app-login',
   imports: [FormsModule, FormAlertComponent],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
   email = 'admin@example.com';

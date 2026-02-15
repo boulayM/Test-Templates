@@ -1,18 +1,12 @@
-@use "../../../../assets/design-system/abstracts" as *;
-
 .content-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: $space-4;
+  margin-bottom: 1rem;
 }
 
 .content-grid {
-  margin-top: $space-3;
-}
-
-.content-grid-item {
-  width: 100%;
+  margin-top: 0.75rem;
 }
 
 .content-card {
@@ -25,27 +19,21 @@
 .content-card-body {
   display: flex;
   flex-direction: column;
-  gap: $space-2;
+  gap: 0.5rem;
 }
 
 .content-desc {
-  color: $gray-700;
+  color: #374151;
 }
 
 .content-categories {
   margin: 0;
-  color: $gray-600;
+  color: #4b5563;
   font-size: 0.9rem;
 }
 
 .content-card-footer {
   display: flex;
   flex-direction: column;
-  gap: $space-2;
-}
-
-.ds-check {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
+  gap: 0.5rem;
 }

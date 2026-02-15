@@ -5,7 +5,6 @@ import { Component, Input } from '@angular/core';
   selector: 'app-form-alert',
   imports: [CommonModule],
   templateUrl: './form-alert.component.html',
-  styleUrl: './form-alert.component.scss',
 })
 export class FormAlertComponent {
   @Input() visible = false;

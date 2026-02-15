@@ -12,7 +12,6 @@ import { environment } from '../../../environments/environment';
   selector: 'app-register',
   imports: [FormsModule, FormAlertComponent, RouterModule],
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent {
   firstName = '';

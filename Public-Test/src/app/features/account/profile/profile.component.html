@@ -1,128 +1,133 @@
-<section class="profile">
-  <h1>Profil</h1>
+<section class="profile container py-4">
+  <h1 class="mb-3">Profil</h1>
 
   @if (user()) {
-    <p><strong>Prenom:</strong> {{ user()!.firstName }}</p>
-    <p><strong>Nom:</strong> {{ user()!.lastName }}</p>
-    <p><strong>Email:</strong> {{ user()!.email }}</p>
+    <p class="mb-1"><strong>Prenom:</strong> {{ user()!.firstName }}</p>
+    <p class="mb-1"><strong>Nom:</strong> {{ user()!.lastName }}</p>
+    <p class="mb-3"><strong>Email:</strong> {{ user()!.email }}</p>
 
     <h2>Adresses</h2>
-    <article class="address-card card-ui">
+    <article class="card mt-3">
       <h3>Ajouter une adresse</h3>
-      <div class="address-form">
-        <label>
+      <div class="row g-2">
+        <label class="col-md-6">
           Label
-          <input type="text" [(ngModel)]="newAddress.label" />
+          <input class="form-control" type="text" [(ngModel)]="newAddress.label" />
         </label>
-        <label>
+        <label class="col-md-6">
           Nom complet
-          <input type="text" [(ngModel)]="newAddress.fullName" />
+          <input class="form-control" type="text" [(ngModel)]="newAddress.fullName" />
         </label>
-        <label>
+        <label class="col-md-6">
           Telephone
-          <input type="text" [(ngModel)]="newAddress.phone" />
+          <input class="form-control" type="text" [(ngModel)]="newAddress.phone" />
         </label>
-        <label>
+        <label class="col-md-6">
           Ligne 1
-          <input type="text" [(ngModel)]="newAddress.line1" />
+          <input class="form-control" type="text" [(ngModel)]="newAddress.line1" />
         </label>
-        <label>
+        <label class="col-md-6">
           Ligne 2
-          <input type="text" [(ngModel)]="newAddress.line2" />
+          <input class="form-control" type="text" [(ngModel)]="newAddress.line2" />
         </label>
-        <label>
+        <label class="col-md-6">
           Code postal
-          <input type="text" [(ngModel)]="newAddress.postalCode" />
+          <input class="form-control" type="text" [(ngModel)]="newAddress.postalCode" />
         </label>
-        <label>
+        <label class="col-md-6">
           Ville
-          <input type="text" [(ngModel)]="newAddress.city" />
+          <input class="form-control" type="text" [(ngModel)]="newAddress.city" />
         </label>
-        <label>
+        <label class="col-md-6">
           Pays
-          <input type="text" [(ngModel)]="newAddress.country" />
+          <input class="form-control" type="text" [(ngModel)]="newAddress.country" />
         </label>
-        <label class="address-default">
-          <input type="checkbox" [(ngModel)]="newAddress.isDefault" />
-          Adresse par defaut
-        </label>
-        <div class="address-actions">
-          <button class="btn-ui btn-primary btn-sm" (click)="createAddress()">Ajouter</button>
+        <div class="col-12 form-check mt-2">
+          <input class="form-check-input" id="newIsDefault" type="checkbox" [(ngModel)]="newAddress.isDefault" />
+          <label class="form-check-label" for="newIsDefault">Adresse par defaut</label>
+        </div>
+        <div class="col-12 d-flex gap-2 mt-2">
+          <button class="btn btn-primary btn-sm" (click)="createAddress()">Ajouter</button>
         </div>
       </div>
     </article>
 
     @if (addresses().length === 0) {
-      <div class="ds-alert ds-alert-warning">Aucune adresse enregistree.</div>
+      <div class="alert alert-warning">Aucune adresse enregistree.</div>
     }
 
     @for (address of addresses(); track address.id) {
-      <article class="address-card card-ui">
+      <article class="card mt-3">
         @if (editingAddressId() !== address.id) {
-          <p><strong>{{ address.label }}</strong> @if (address.isDefault) {<span class="badge-ui badge-success">Defaut</span>}</p>
+          <p><strong>{{ address.label }}</strong> @if (address.isDefault) {<span class="badge text-bg-success">Defaut</span>}</p>
           <p>{{ address.fullName }}</p>
           <p>{{ address.phone }}</p>
           <p>{{ address.line1 }}</p>
           @if (address.line2) { <p>{{ address.line2 }}</p> }
           <p>{{ address.postalCode }} {{ address.city }}</p>
           <p>{{ address.country }}</p>
-          <div class="address-actions">
-            <button class="btn-ui btn-secondary btn-sm" (click)="startEdit(address)">Editer</button>
+          <div class="d-flex gap-2 mt-2">
+            <button class="btn btn-secondary btn-sm" (click)="startEdit(address)">Editer</button>
             @if (!address.isDefault) {
-              <button class="btn-ui btn-outline-secondary btn-sm" (click)="setDefault(address)">
+              <button class="btn btn-outline-secondary btn-sm" (click)="setDefault(address)">
                 Definir par defaut
               </button>
             }
-            <button class="btn-ui btn-danger btn-sm" (click)="deleteAddress(address.id)">Supprimer</button>
+            <button class="btn btn-danger btn-sm" (click)="deleteAddress(address.id)">Supprimer</button>
           </div>
         } @else {
-          <div class="address-form">
-            <label>
+          <div class="row g-2">
+            <label class="col-md-6">
               Label
-              <input type="text" [(ngModel)]="draftAddress.label" />
+              <input class="form-control" type="text" [(ngModel)]="draftAddress.label" />
             </label>
-            <label>
+            <label class="col-md-6">
               Nom complet
-              <input type="text" [(ngModel)]="draftAddress.fullName" />
+              <input class="form-control" type="text" [(ngModel)]="draftAddress.fullName" />
             </label>
-            <label>
+            <label class="col-md-6">
               Telephone
-              <input type="text" [(ngModel)]="draftAddress.phone" />
+              <input class="form-control" type="text" [(ngModel)]="draftAddress.phone" />
             </label>
-            <label>
+            <label class="col-md-6">
               Ligne 1
-              <input type="text" [(ngModel)]="draftAddress.line1" />
+              <input class="form-control" type="text" [(ngModel)]="draftAddress.line1" />
             </label>
-            <label>
+            <label class="col-md-6">
               Ligne 2
-              <input type="text" [(ngModel)]="draftAddress.line2" />
+              <input class="form-control" type="text" [(ngModel)]="draftAddress.line2" />
             </label>
-            <label>
+            <label class="col-md-6">
               Code postal
-              <input type="text" [(ngModel)]="draftAddress.postalCode" />
+              <input class="form-control" type="text" [(ngModel)]="draftAddress.postalCode" />
             </label>
-            <label>
+            <label class="col-md-6">
               Ville
-              <input type="text" [(ngModel)]="draftAddress.city" />
+              <input class="form-control" type="text" [(ngModel)]="draftAddress.city" />
             </label>
-            <label>
+            <label class="col-md-6">
               Pays
-              <input type="text" [(ngModel)]="draftAddress.country" />
+              <input class="form-control" type="text" [(ngModel)]="draftAddress.country" />
             </label>
-            <label class="address-default">
-              <input type="checkbox" [(ngModel)]="draftAddress.isDefault" />
-              Adresse par defaut
-            </label>
-            <div class="address-actions">
-              <button class="btn-ui btn-primary btn-sm" (click)="saveAddress(address.id)">Enregistrer</button>
-              <button class="btn-ui btn-secondary btn-sm" (click)="cancelEdit()">Annuler</button>
+            <div class="col-12 form-check mt-2">
+              <input
+                class="form-check-input"
+                [id]="'editIsDefault-' + address.id"
+                type="checkbox"
+                [(ngModel)]="draftAddress.isDefault"
+              />
+              <label class="form-check-label" [for]="'editIsDefault-' + address.id">Adresse par defaut</label>
+            </div>
+            <div class="col-12 d-flex gap-2 mt-2">
+              <button class="btn btn-primary btn-sm" (click)="saveAddress(address.id)">Enregistrer</button>
+              <button class="btn btn-secondary btn-sm" (click)="cancelEdit()">Annuler</button>
             </div>
           </div>
         }
       </article>
     }
   } @else {
-    <div class="ds-alert ds-alert-warning">
+    <div class="alert alert-warning">
       Connexion requise pour acceder au profil.
     </div>
   }

@@ -8,7 +8,6 @@ import { AuthMessages } from '../../messages/auth-messages';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './error-page.component.html',
-  styleUrl: './error-page.component.scss'
 })
 export class ErrorPageComponent {
   private route = inject(ActivatedRoute);

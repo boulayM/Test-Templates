@@ -3,17 +3,17 @@
 </div>
 
 @if (filteredContentItems.length === 0) {
-  <div class="ds-alert ds-alert-warning">
+  <div class="alert alert-warning">
     Aucun produit ne correspond a la recherche.
   </div>
 }
 
-<div class="grid grid-md-3 grid-gap-md content-grid">
+<div class="row row-cols-1 row-cols-md-3 g-3 content-grid">
   @for (contentItem of filteredContentItems; track contentItem.id) {
-    <div class="content-grid-item">
-      <div class="card-ui content-card">
+    <div class="col content-grid-item">
+      <div class="card content-card">
         <div class="content-card-body">
-          <h5 class="card-ui__title">{{ contentItem.name }}</h5>
+          <h5 class="card-title">{{ contentItem.name }}</h5>
           <p class="content-desc">{{ contentItem.description }}</p>
           <p>
             <strong>{{ contentItem.price | currency: 'EUR' }}</strong>
@@ -23,17 +23,19 @@
               {{ contentItem.categories?.join(', ') }}
             </p>
           }
-          @if (!contentItem.isActive) {
-            <span class="badge-ui badge-warning">Indisponible</span>
+          @if (!contentItem.isActive || contentItem.isAvailable === false) {
+            <span class="badge text-bg-warning">Indisponible</span>
+          } @else {
+            <span class="badge text-bg-success">Disponible</span>
           }
         </div>
         <div class="content-card-footer">
-          <a class="btn-ui btn-outline-secondary btn-block" [routerLink]="['/catalog', contentItem.id]">
+          <a class="btn btn-outline-secondary w-100" [routerLink]="['/catalog', contentItem.id]">
             Voir le detail
           </a>
           @if (auth.isLoggedIn()) {
             <button
-              class="btn-ui btn-block"
+              class="btn w-100"
               [ngClass]="isIncluded(contentItem) ? 'btn-secondary' : 'btn-primary'"
               (click)="includeContentItem(contentItem)"
               [disabled]="isIncluded(contentItem)"

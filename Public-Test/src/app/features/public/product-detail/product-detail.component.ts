@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 import { ContentService } from '../../../core/services/content.service';
 import { ReviewService } from '../../../core/services/review.service';
 import { ContentItem } from '../../../shared/models/content-item.model';
@@ -12,7 +13,6 @@ import { ToastService } from '../../../shared/services/toast.service';
   selector: 'app-product-detail',
   imports: [CommonModule, FormsModule],
   templateUrl: './product-detail.component.html',
-  styleUrls: ['./product-detail.component.scss'],
 })
 export class ProductDetailComponent implements OnInit {
   product: ContentItem | null = null;
@@ -23,6 +23,7 @@ export class ProductDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    public auth: AuthService,
     private contentService: ContentService,
     private reviewService: ReviewService,
     private toast: ToastService,
@@ -89,5 +90,10 @@ export class ProductDetailComponent implements OnInit {
       },
       error: () => this.toast.show('Impossible de supprimer l avis.'),
     });
+  }
+
+  canDeleteReview(review: Review): boolean {
+    const currentUser = this.auth.getCurrentUser();
+    return !!currentUser && review.userId === currentUser.id;
   }
 }

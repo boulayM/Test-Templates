@@ -4,6 +4,7 @@ export interface ContentItem {
   description?: string;
   price: number;
   isActive: boolean;
+  isAvailable?: boolean;
   categories?: string[];
 }
 

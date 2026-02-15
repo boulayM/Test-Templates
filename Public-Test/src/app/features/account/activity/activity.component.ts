@@ -8,12 +8,15 @@ import { CouponService } from '../../../core/services/coupon.service';
 import { UiMessages } from '../../../shared/messages/ui-messages';
 import { ActivityRecord, ActivityItem } from '../../../shared/models/activity.model';
 import { ToastService } from '../../../shared/services/toast.service';
+import {
+  computeCartSubtotalCents,
+  computeCartSubtotalEuros,
+} from '../../../shared/utils/cart-totals';
 
 @Component({
     selector: 'app-activity',
     imports: [CommonModule, FormsModule, RouterModule],
     templateUrl: './activity.component.html',
-    styleUrls: ['./activity.component.scss']
 })
 export class ActivityComponent implements OnInit {
   activityRecords: ActivityRecord[] = [];
@@ -42,10 +45,7 @@ export class ActivityComponent implements OnInit {
   }
 
   getTotal(activityRecord: ActivityRecord): number {
-    return activityRecord.items.reduce(
-      (sum, item) => sum + item.quantity * item.price,
-      0,
-    );
+    return computeCartSubtotalEuros(activityRecord.items);
   }
 
   updateQuantity(activityRecord: ActivityRecord, item: ActivityItem): void {
@@ -101,7 +101,7 @@ export class ActivityComponent implements OnInit {
   }
 
   applyCoupon(activityRecord: ActivityRecord): void {
-    const totalCents = Math.round(this.getTotal(activityRecord) * 100);
+    const totalCents = computeCartSubtotalCents(activityRecord.items);
     this.couponService.validateCoupon(this.couponCode.trim(), totalCents).subscribe({
       next: (res) => {
         this.couponValid = res.valid;

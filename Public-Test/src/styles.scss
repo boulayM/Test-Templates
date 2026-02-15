@@ -1,12 +1,5 @@
-/* You can add global styles to this file, and also import other style files */
-@use "assets/design-system/abstracts/variables" as *;
-
-
-
-/* 3 - Tes composants */
-@use "assets/design-system/main";
-
-/* styles.scss */
+@use "bootstrap/scss/bootstrap";
+@use "styles/bootstrap-overrides";
 
 html,
 body {
@@ -18,20 +11,12 @@ body {
   overflow-x: hidden;
 }
 
-.navbar.fixed-top {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1030;
-}
-
-/* espace sous la navbar */
 .app-main {
-  padding-top: 72px; /* hauteur navbar */
+  padding-top: 72px;
   padding-left: 1rem;
   padding-right: 1rem;
 }
-/* TOAST FORCE OVERRIDE */
+
 .ds-toast-container {
   position: fixed !important;
   top: 1rem !important;
@@ -45,4 +30,63 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.25) !important;
   box-shadow: 0 12px 30px rgba(2, 6, 23, 0.25) !important;
   border-radius: 10px !important;
+}
+
+.ds-toast-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.ds-toast-title {
+  font-weight: 700;
+}
+
+.ds-toast-close {
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.ds-toast-body {
+  padding: 0.65rem 0.75rem 0.75rem;
+}
+
+.auth-container {
+  margin-top: 2rem;
+}
+
+.auth-card,
+.auth-form {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+}
+
+.auth-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.auth-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.auth-submit {
+  width: 100%;
+}
+
+.auth-success {
+  color: #166534;
+  font-weight: 600;
+}
+
+.card {
+  padding: 1rem;
 }

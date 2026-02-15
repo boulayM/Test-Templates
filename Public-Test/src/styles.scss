@@ -1,4 +1,4 @@
-@use "bootstrap/scss/bootstrap";
+@use "styles/bootstrap-partial";
 @use "styles/bootstrap-overrides";
 
 html,
@@ -90,3 +90,4 @@ body {
 .card {
   padding: 1rem;
 }
+

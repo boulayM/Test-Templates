@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 export class ApiService {
   private baseUrl =
     (window as Window & { __env?: { API_URL?: string } }).__env?.API_URL ||
-    'http://localhost:3000/api';
+    'https://mabdev.alwaysdata.net/api-postgres';
 
   constructor(private http: HttpClient) {}
 

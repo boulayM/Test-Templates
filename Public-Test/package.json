@@ -28,7 +28,11 @@
     "pree2e:ui": "set E2E_RUN_SEED=false&& npm run setup:e2e",
     "e2e:ui": "set PW_REUSE_SERVER=true&& set E2E_API_URL=http://localhost:3001/api&& playwright test --ui",
     "pree2e:debug": "set E2E_RUN_SEED=false&& npm run setup:e2e",
-    "e2e:debug": "set PW_REUSE_SERVER=true&& set E2E_API_URL=http://localhost:3001/api&& playwright test --debug"
+    "e2e:debug": "set PW_REUSE_SERVER=true&& set E2E_API_URL=http://localhost:3001/api&& playwright test --debug",
+    "build:stats": "ng build --stats-json",
+    "seo:check": "node scripts/check-seo.mjs",
+    "seo:perf:guide": "echo Run Lighthouse manually: npx lighthouse http://localhost:4200/home --preset=desktop --view",
+    "e2e:seo": "playwright test -c playwright.seo.config.ts"
   },
   "private": true,
   "dependencies": {
@@ -71,7 +75,6 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "prettier": "^3.7.4",
     "sass": "^1.97.0",
-    "source-map-explorer": "^2.5.3",
     "typescript": "~5.9.3"
   }
 }

@@ -8,6 +8,7 @@ import { User } from '../../shared/models/user.model';
 import { ModalCleanupService } from './modal-cleanup.service';
 import { CsrfService } from './csrf.service';
 import { AuthMessages } from '../../shared/messages/auth-messages';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -86,7 +87,9 @@ export class AuthService {
         });
       }),
       catchError((err: HttpErrorResponse) => {
-        console.error('[Auth] login failed', err);
+        if (environment.showSanityLogs) {
+          console.error('[Auth] login failed', err);
+        }
         this.currentUserSubject.next(null);
         this.userLoadedSubject.next(true);
         this.lastLoginError = 'INVALID_CREDENTIALS';
@@ -144,7 +147,9 @@ export class AuthService {
     this.api.post('/auth/logout', {}).subscribe({
       next: () => this.csrf.clear(),
       error: (err) => {
-        console.error('[Auth] logout failed', err);
+        if (environment.showSanityLogs) {
+          console.error('[Auth] logout failed', err);
+        }
       },
     });
   }

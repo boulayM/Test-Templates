@@ -18,8 +18,13 @@ export class HomeComponent implements OnInit {
   constructor(private contentService: ContentService) {}
 
   ngOnInit(): void {
-    this.contentService.getContentItems().subscribe((items) => {
-      this.contentItems = items;
+    this.contentService.getContentItems().subscribe({
+      next: (items) => {
+        this.contentItems = items;
+      },
+      error: () => {
+        this.contentItems = [];
+      },
     });
   }
 }

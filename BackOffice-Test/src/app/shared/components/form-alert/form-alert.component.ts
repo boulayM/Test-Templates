@@ -8,9 +8,10 @@ import { Component, Input } from '@angular/core';
   styleUrl: './form-alert.component.scss',
 })
 export class FormAlertComponent {
+  private static uid = 0;
+  readonly headingId = `form-alert-title-${++FormAlertComponent.uid}`;
   @Input() visible = false;
   @Input() title = 'Validation error';
   @Input() message = '';
   @Input() items: string[] = [];
 }
-

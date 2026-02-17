@@ -1,10 +1,5 @@
-/* You can add global styles to this file, and also import other style files */
-@use 'assets/design-system/abstracts/variables' as *;
-
-/* 3 - Tes composants */
-@use 'assets/design-system/main';
-
-/* styles.scss */
+@use 'styles/bootstrap-partial';
+@use 'styles/bootstrap-overrides';
 
 html,
 body {
@@ -23,24 +18,58 @@ body {
   z-index: 1030;
 }
 
-/* espace sous la navbar */
 .app-main {
-  padding-top: 72px; /* hauteur navbar */
+  padding-top: 72px;
   padding-left: 1rem;
   padding-right: 1rem;
 }
-/* TOAST FORCE OVERRIDE */
-.ds-toast-container {
-  position: fixed !important;
-  top: 1rem !important;
-  right: 1rem !important;
-  z-index: 9999 !important;
+
+
+
+/* Compatibility layer to preserve original BO visual language after class migration */
+.app-main .card {
+  border: 1px solid #000;
+  border-radius: 0;
+  background: #fff;
+  padding: 1rem;
 }
 
-.ds-toast {
-  background: #16a34a !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
-  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.25) !important;
-  border-radius: 10px !important;
+.app-main .table {
+  border: 1px solid #000;
+  margin-bottom: 0;
+}
+
+.app-main .table th,
+.app-main .table td {
+  border: 1px solid #000;
+  vertical-align: middle;
+}
+
+.app-main .btn {
+  border-radius: 0;
+  font-weight: 600;
+}
+
+.app-main .form-control,
+.app-main .form-select,
+.app-main textarea {
+  border: 1px solid #000;
+  border-radius: 0;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .grid-md-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 992px) {
+  .grid-lg-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }

@@ -7,7 +7,18 @@ const globals = require('globals');
 const prettierRules = require('eslint-config-prettier');
 
 module.exports = [
-  { ignores: ['**/node_modules/**', '**/dist/**', '**/.angular/**', '**/coverage/**', '**/playwright-report/**', '**/test-results/**', 'playwright.config.ts'] },
+  {
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.angular/**',
+      '**/coverage/**',
+      '**/playwright-report/**',
+      '**/test-results/**',
+      'playwright.config.ts',
+      'playwright.seo.config.ts',
+    ],
+  },
   {
     files: ['**/*.ts'],
     languageOptions: {

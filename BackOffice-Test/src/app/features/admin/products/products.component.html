@@ -2,14 +2,14 @@
   <header class="page-shell-header">
     <h1>Products</h1>
     <div class="page-shell-actions">
-      <button type="button" class="btn-ui" (click)="load()">Refresh</button>
+      <button type="button" class="btn btn-outline-secondary" (click)="load()">Refresh</button>
     </div>
   </header>
 
   <p *ngIf="loading" class="muted">Loading...</p>
 
   <div *ngIf="!loading" class="table-responsive">
-    <table class="table-ui" *ngIf="rows.length; else emptyState">
+    <table class="table table-striped table-hover align-middle" *ngIf="rows.length; else emptyState">
       <thead>
         <tr>
       <th>id</th>

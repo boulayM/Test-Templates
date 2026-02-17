@@ -28,6 +28,11 @@ src/app/
     utils/
 ```
 
+Conventions techniques:
+- formulaires auth en Reactive Forms types;
+- etat UI local via Angular Signals (`signal`/`computed`);
+- feedback formulaire accessible via `aria-live` sur `FormAlertComponent`.
+
 ## Routes principales
 
 Routes publiques:
@@ -68,8 +73,13 @@ Exemples:
 ## SEO
 
 - metadata route-level via `data.seo` dans `src/app/app.routes.ts`
-- application automatique title/meta/canonical via `SeoService`
-- pages auth et compte marquees `noindex`
+- application automatique `title/meta/canonical/robots` via `SeoService`
+- OG + Twitter minimales (`og:*`, `twitter:*`)
+- image sociale par defaut: `src/assets/og-default.svg`
+- JSON-LD `WebSite` injecte uniquement sur pages indexables
+- pages auth et compte en `noindex,nofollow`
+
+Validation SEO: `docs/seo-checklist.md`.
 
 ## Scripts utiles
 
@@ -111,3 +121,11 @@ Le test e2e "seeded user can login and open profile" est optionnel et demande:
 - API disponible;
 - donnees e2e pre-seedees;
 - variables e2e compatibles.
+
+## SEO validation
+
+- `npm run seo:check` : verification statique (title/description/canonical/robots/social setup)
+- `npm run e2e:seo` : verification meta tags au runtime (serveur dedie port 4210)
+- Lighthouse/DevTools (manuel): verifier LCP/CLS/INP sur `/home`, `/catalog`, `/categories`
+- Preview social (manuel): verifier OG/Twitter avec URL publique de test
+

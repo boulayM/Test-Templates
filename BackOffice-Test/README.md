@@ -8,6 +8,8 @@ Front back-office adapte a l API `Api-Test`.
 - Dashboards dedies par role
 - Guards auth/role/permission actifs
 - Validation encodee + lint + tests unitaires + e2e full valides
+- Login en Reactive Forms types + etat UI local en Angular Signals
+- Feedback formulaire accessible (`aria-live`) via `FormAlertComponent`
 
 ## Prerequis
 

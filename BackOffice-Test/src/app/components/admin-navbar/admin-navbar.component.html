@@ -1,5 +1,5 @@
-<nav class="navbar-ui">
-  <div class="ds-container nav-inner">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-xxl nav-inner px-3">
     <div class="nav-left">
       <a class="navbar-brand" [routerLink]="dashboardPath()" *ngIf="can('dashboard.view')">Dashboard</a>
       <a class="nav-link" [routerLink]="pathFor('users.read')" *ngIf="can('users.read')">Users</a>
@@ -15,10 +15,10 @@
     </div>
     <div class="nav-right">
       <span class="nav-email" *ngIf="isLoggedIn()">{{ user()?.email }}</span>
-      <button *ngIf="isLoggedIn()" class="btn-ui btn-outline-light btn-sm" (click)="handleLogout()">
+      <button *ngIf="isLoggedIn()" class="btn btn-outline-light btn-sm" (click)="handleLogout()">
         Logout
       </button>
-      <a *ngIf="!isLoggedIn()" class="btn-ui btn-outline-light btn-sm" routerLink="/login">Login</a>
+      <a *ngIf="!isLoggedIn()" class="btn btn-outline-light btn-sm" routerLink="/login">Login</a>
     </div>
   </div>
 </nav>

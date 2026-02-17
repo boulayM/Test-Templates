@@ -1,8 +1,14 @@
-<div *ngIf="visible" class="form-alert" role="alert" aria-live="assertive">
-  <div class="form-alert-title">{{ title }}</div>
+<div
+  *ngIf="visible"
+  class="form-alert"
+  role="alert"
+  aria-live="assertive"
+  aria-atomic="true"
+  [attr.aria-labelledby]="headingId"
+>
+  <div class="form-alert-title" [id]="headingId">{{ title }}</div>
   <div class="form-alert-message" *ngIf="message">{{ message }}</div>
   <ul class="form-alert-list" *ngIf="items.length > 0">
     <li *ngFor="let item of items">{{ item }}</li>
   </ul>
 </div>
-

@@ -2,20 +2,20 @@
   <div class="auth-card">
     <h2>Connexion</h2>
 
-    <form class="auth-form" (ngSubmit)="submit()">
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
       <app-form-alert
-        [visible]="!!error"
+        [visible]="hasError()"
         title="Erreur de validation"
-        [message]="error || ''"
-        [items]="alertItems"
+        [message]="error() || ''"
+        [items]="alertItems()"
       ></app-form-alert>
 
       <div class="auth-field">
-        <label class="form-label">Email</label>
+        <label class="form-label" for="loginEmail">Email</label>
         <input
+          id="loginEmail"
           type="email"
-          [(ngModel)]="email"
-          name="email"
+          formControlName="email"
           class="form-control"
           required
           />
@@ -24,16 +24,16 @@
       <div class="auth-field">
         <label class="form-label">Mot de passe</label>
         <input
+          id="loginPassword"
           type="password"
-          [(ngModel)]="password"
-          name="password"
+          formControlName="password"
           class="form-control"
           required
           />
       </div>
 
-      <button type="submit" class="btn btn-primary auth-submit" [disabled]="loading">
-        {{ loading ? "Connexion..." : "Connexion" }}
+      <button type="submit" class="btn btn-primary auth-submit" [disabled]="loading()">
+        {{ loading() ? "Connexion..." : "Connexion" }}
       </button>
     </form>
   </div>

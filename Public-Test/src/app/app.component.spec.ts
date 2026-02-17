@@ -14,7 +14,7 @@ describe('AppComponent', () => {
         },
         {
           provide: SeoService,
-          useValue: { bindToRouter: () => {} },
+          useValue: { init: () => {} },
         },
       ],
     }).compileComponents();

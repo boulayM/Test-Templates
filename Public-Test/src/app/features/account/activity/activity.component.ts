@@ -8,15 +8,16 @@ import { CouponService } from '../../../core/services/coupon.service';
 import { UiMessages } from '../../../shared/messages/ui-messages';
 import { ActivityRecord, ActivityItem } from '../../../shared/models/activity.model';
 import { ToastService } from '../../../shared/services/toast.service';
+import { environment } from '../../../../environments/environment';
 import {
   computeCartSubtotalCents,
   computeCartSubtotalEuros,
 } from '../../../shared/utils/cart-totals';
 
 @Component({
-    selector: 'app-activity',
-    imports: [CommonModule, FormsModule, RouterModule],
-    templateUrl: './activity.component.html',
+  selector: 'app-activity',
+  imports: [CommonModule, FormsModule, RouterModule],
+  templateUrl: './activity.component.html',
 })
 export class ActivityComponent implements OnInit {
   activityRecords: ActivityRecord[] = [];
@@ -40,7 +41,11 @@ export class ActivityComponent implements OnInit {
       next: (res) => {
         this.activityRecords = res;
       },
-      error: (err) => console.error(err),
+      error: (err) => {
+        if (environment.showSanityLogs) {
+          console.error(err);
+        }
+      },
     });
   }
 
@@ -63,7 +68,11 @@ export class ActivityComponent implements OnInit {
             if (targetItem) targetItem.quantity = item.quantity;
           }
         },
-        error: (err) => console.error(err),
+        error: (err) => {
+          if (environment.showSanityLogs) {
+            console.error(err);
+          }
+        },
       });
   }
 
@@ -78,7 +87,11 @@ export class ActivityComponent implements OnInit {
           );
         }
       },
-      error: (err) => console.error(err),
+      error: (err) => {
+        if (environment.showSanityLogs) {
+          console.error(err);
+        }
+      },
     });
   }
 
@@ -90,7 +103,11 @@ export class ActivityComponent implements OnInit {
           (record) => record.id !== activityRecordId,
         );
       },
-      error: (err) => console.error(err),
+      error: (err) => {
+        if (environment.showSanityLogs) {
+          console.error(err);
+        }
+      },
     });
   }
 

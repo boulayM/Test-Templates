@@ -1,37 +1,47 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService, LoginResult } from '../../../core/services/auth.service';
 import { AuthMessages } from '../../../shared/messages/auth-messages';
+import { FormAlertComponent } from '../../../shared/components/form-alert/form-alert.component';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormAlertComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {
   private readonly allowedRoles = new Set(['ADMIN', 'LOGISTIQUE', 'COMPTABILITE']);
-  email = '';
-  password = '';
-  loading = false;
-  error: string | null = null;
+  private readonly fb = inject(FormBuilder);
+  readonly form = this.fb.nonNullable.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]],
+  });
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly hasError = computed(() => !!this.error());
+  readonly alertItems = computed(() => (this.error() ? [this.error() as string] : []));
 
   constructor(
     private auth: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef,
   ) {}
 
   submit(): void {
-    this.loading = true;
-    this.error = null;
+    this.form.markAllAsTouched();
+    if (this.form.invalid) {
+      this.error.set('Veuillez renseigner un email valide et un mot de passe.');
+      return;
+    }
+    this.loading.set(true);
+    this.error.set(null);
+    const { email, password } = this.form.getRawValue();
 
-    this.auth.login(this.email, this.password).subscribe((result: LoginResult) => {
+    this.auth.login(email, password).subscribe((result: LoginResult) => {
       this.processLoginResult(result).finally(() => {
-        this.loading = false;
-        this.cdr.detectChanges();
+        this.loading.set(false);
       });
     });
   }
@@ -39,32 +49,31 @@ export class LoginComponent {
   private async processLoginResult(result: LoginResult): Promise<void> {
     if (!result.user) {
       if (result.status === 429) {
-        this.error = AuthMessages.loginLimitReached;
+        this.error.set(AuthMessages.loginLimitReached);
       } else {
         const baseMessage = result.error || AuthMessages.loginInvalid;
         if (result.limitTotal !== undefined && result.remaining !== undefined) {
           const total = result.limitTotal ?? 5;
           const remaining = result.remaining ?? 0;
           if (remaining <= 0) {
-            this.error = AuthMessages.loginLimitReached;
+            this.error.set(AuthMessages.loginLimitReached);
           } else {
-            this.error = `${baseMessage}. ${AuthMessages.loginRemaining(remaining, total)}`;
+            this.error.set(
+              `${baseMessage}. ${AuthMessages.loginRemaining(remaining, total)}`,
+            );
           }
         } else {
-          this.error = baseMessage;
+          this.error.set(baseMessage);
         }
       }
-      this.email = '';
-      this.password = '';
-      this.cdr.detectChanges();
+      this.form.patchValue({ email: '', password: '' });
       return;
     }
 
     if (!this.allowedRoles.has(result.user.role)) {
       await this.auth.initCsrfAfterLogin();
       await this.auth.logout();
-      this.error = AuthMessages.adminOnly;
-      this.cdr.detectChanges();
+      this.error.set(AuthMessages.adminOnly);
       return;
     }
 

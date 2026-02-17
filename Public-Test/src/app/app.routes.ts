@@ -87,7 +87,7 @@ export const routes: Routes = [
           seo: {
             title: 'Ma Boutique | Catalogue',
             description: 'Consultez le catalogue produits et ajoutez des articles au panier.',
-            indexable: false,
+            indexable: true,
             canonicalPath: '/catalog',
           },
         },
@@ -103,6 +103,7 @@ export const routes: Routes = [
             title: 'Ma Boutique | Detail produit',
             description: 'Consultez la fiche detaillee d un produit.',
             indexable: true,
+            canonicalPath: '/catalog',
           },
         },
       },

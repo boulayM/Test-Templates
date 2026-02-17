@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap, timeout } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { CsrfService } from './csrf.service';
@@ -42,6 +42,7 @@ export class AuthService {
     this.api
       .get<{ user: UserDto }>('/users/me')
       .pipe(
+        timeout(5000),
         map((res: { user: UserDto }) => res.user || null),
         catchError(() => of(null)),
       )

@@ -19,3 +19,14 @@
   align-items: center;
   gap: 10px;
 }
+
+.navbar-brand,
+.nav-link,
+.nav-email {
+  color: #fff !important;
+}
+
+.nav-link:hover,
+.navbar-brand:hover {
+  color: #e5e7eb !important;
+}

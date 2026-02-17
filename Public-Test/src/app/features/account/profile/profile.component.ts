@@ -1,28 +1,63 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { AddressService } from '../../../core/services/address.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { Address } from '../../../shared/models/address.model';
 import { User } from '../../../shared/models/user.model';
 
+type AddressFormValue = {
+  label: string;
+  fullName: string;
+  phone: string;
+  line1: string;
+  line2: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  isDefault: boolean;
+};
+
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './profile.component.html',
 })
 export class ProfileComponent implements OnInit {
   user = signal<User | null>(null);
   addresses = signal<Address[]>([]);
   editingAddressId = signal<number | null>(null);
-  draftAddress: Partial<Address> = {};
-  newAddress: Partial<Address> = this.getEmptyAddress();
+
+  readonly createAddressForm = this.fb.nonNullable.group({
+    label: ['', [Validators.required]],
+    fullName: ['', [Validators.required]],
+    phone: ['', [Validators.required]],
+    line1: ['', [Validators.required]],
+    line2: [''],
+    postalCode: ['', [Validators.required]],
+    city: ['', [Validators.required]],
+    country: ['', [Validators.required]],
+    isDefault: [false],
+  });
+
+  readonly editAddressForm = this.fb.nonNullable.group({
+    label: ['', [Validators.required]],
+    fullName: ['', [Validators.required]],
+    phone: ['', [Validators.required]],
+    line1: ['', [Validators.required]],
+    line2: [''],
+    postalCode: ['', [Validators.required]],
+    city: ['', [Validators.required]],
+    country: ['', [Validators.required]],
+    isDefault: [false],
+  });
 
   constructor(
     private auth: AuthService,
     private addressesService: AddressService,
     private toast: ToastService,
+    private fb: FormBuilder,
   ) {}
 
   ngOnInit(): void {
@@ -34,28 +69,32 @@ export class ProfileComponent implements OnInit {
 
   startEdit(address: Address): void {
     this.editingAddressId.set(address.id);
-    this.draftAddress = { ...address };
+    this.editAddressForm.reset({
+      label: address.label,
+      fullName: address.fullName,
+      phone: address.phone,
+      line1: address.line1,
+      line2: address.line2 ?? '',
+      postalCode: address.postalCode,
+      city: address.city,
+      country: address.country,
+      isDefault: address.isDefault,
+    });
   }
 
   cancelEdit(): void {
     this.editingAddressId.set(null);
-    this.draftAddress = {};
+    this.editAddressForm.reset(this.getEmptyAddress());
   }
 
   saveAddress(addressId: number): void {
-    const payload = {
-      label: this.draftAddress.label || '',
-      fullName: this.draftAddress.fullName || '',
-      phone: this.draftAddress.phone || '',
-      line1: this.draftAddress.line1 || '',
-      line2: this.draftAddress.line2 || null,
-      postalCode: this.draftAddress.postalCode || '',
-      city: this.draftAddress.city || '',
-      country: this.draftAddress.country || '',
-      isDefault: Boolean(this.draftAddress.isDefault),
-    };
+    if (this.editAddressForm.invalid) {
+      this.editAddressForm.markAllAsTouched();
+      this.toast.show('Formulaire adresse invalide.');
+      return;
+    }
 
-    this.addressesService.updateAddress(addressId, payload).subscribe({
+    this.addressesService.updateAddress(addressId, this.toPayload(this.editAddressForm.getRawValue())).subscribe({
       next: () => {
         this.toast.show('Adresse mise a jour.');
         this.cancelEdit();
@@ -68,21 +107,16 @@ export class ProfileComponent implements OnInit {
   }
 
   createAddress(): void {
-    const payload = {
-      label: this.newAddress.label || '',
-      fullName: this.newAddress.fullName || '',
-      phone: this.newAddress.phone || '',
-      line1: this.newAddress.line1 || '',
-      line2: this.newAddress.line2 || null,
-      postalCode: this.newAddress.postalCode || '',
-      city: this.newAddress.city || '',
-      country: this.newAddress.country || '',
-      isDefault: Boolean(this.newAddress.isDefault),
-    };
-    this.addressesService.createAddress(payload).subscribe({
+    if (this.createAddressForm.invalid) {
+      this.createAddressForm.markAllAsTouched();
+      this.toast.show('Formulaire adresse invalide.');
+      return;
+    }
+
+    this.addressesService.createAddress(this.toPayload(this.createAddressForm.getRawValue())).subscribe({
       next: () => {
         this.toast.show('Adresse ajoutee.');
-        this.newAddress = this.getEmptyAddress();
+        this.createAddressForm.reset(this.getEmptyAddress());
         this.loadAddresses();
       },
       error: () => this.toast.show('Impossible d ajouter l adresse.'),
@@ -100,15 +134,13 @@ export class ProfileComponent implements OnInit {
   }
 
   setDefault(address: Address): void {
-    this.addressesService
-      .updateAddress(address.id, { isDefault: true })
-      .subscribe({
-        next: () => {
-          this.toast.show('Adresse par defaut mise a jour.');
-          this.loadAddresses();
-        },
-        error: () => this.toast.show('Impossible de definir l adresse par defaut.'),
-      });
+    this.addressesService.updateAddress(address.id, { isDefault: true }).subscribe({
+      next: () => {
+        this.toast.show('Adresse par defaut mise a jour.');
+        this.loadAddresses();
+      },
+      error: () => this.toast.show('Impossible de definir l adresse par defaut.'),
+    });
   }
 
   private loadAddresses(): void {
@@ -118,7 +150,21 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  private getEmptyAddress(): Partial<Address> {
+  private toPayload(value: AddressFormValue) {
+    return {
+      label: value.label,
+      fullName: value.fullName,
+      phone: value.phone,
+      line1: value.line1,
+      line2: value.line2.trim() ? value.line2 : null,
+      postalCode: value.postalCode,
+      city: value.city,
+      country: value.country,
+      isDefault: value.isDefault,
+    };
+  }
+
+  private getEmptyAddress(): AddressFormValue {
     return {
       label: '',
       fullName: '',

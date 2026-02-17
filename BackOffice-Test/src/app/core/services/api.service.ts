@@ -1,14 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  private baseUrl =
+  private readonly baseUrl =
     (window as Window & { __env?: { API_URL?: string } }).__env?.API_URL ||
-    'https://mabdev.alwaysdata.net/api-postgres';
+    environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    if (environment.showSanityLogs) {
+      console.log('API BASE URL =', this.baseUrl);
+    }
+  }
 
   private buildUrl(
     path: string,

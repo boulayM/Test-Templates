@@ -1,23 +1,13 @@
 # Test-Templates
 
-Monorepo de demonstration :
-- `Api-Test`
-- `BackOffice-Test`
-- `Public-Test`
+Monorepo de projets de test autour des socles templates.
 
-## Ouvrir dans GitHub Codespaces
+## Projets inclus
 
-Lien direct :
+- `Api-Test` : API Express/Prisma adaptee au cas e-commerce (auth, RBAC, catalogue, commandes, etc.).
+- `BackOffice-Test` : Front Angular back-office connecte a l API (admin, operations, controle metier).
+- `Public-Test` : Front Angular public connecte a l API (catalogue, compte utilisateur, panier, checkout).
 
-https://github.com/codespaces/new?repo=boulayM/Test-Templates
+## Objectif du repository
 
-## Demarrage rapide en Codespaces
-
-1. Creer le Codespace depuis le lien ci-dessus.
-2. Suivre `CODESPACES.md` a la racine du repo.
-3. Demarrer l API en `dev:e2e`, puis les fronts.
-
-## Notes
-
-- Les scripts npm sont alignes cross-platform (Windows/Linux/macOS).
-- Les setups e2e front utilisent `E2E_API_URL` et `E2E_API_PATH`.
+Fournir un espace de validation et de demonstration des adaptations realisees a partir des socles (API + fronts).

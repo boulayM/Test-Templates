@@ -17,7 +17,7 @@ export default defineConfig({
   webServer: {
     command: 'npx ng serve --port 4200',
     url: 'http://localhost:4200',
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     timeout: 120000,
   },
   projects: [

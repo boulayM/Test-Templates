@@ -84,7 +84,7 @@ if (-not (Test-Path $apiPath)) {
       Write-Host "API probe /csrf: no HTTP response"
     }
   } else {
-    Write-Host ("Warning: API not reachable at " + $apiUri.Host + ":" + $apiUri.Port)
+    throw ("API not reachable at " + $apiUri.Host + ":" + $apiUri.Port + ". Start API in dev:e2e before running e2e.")
   }
 
   $seedMode = ([string]$env:E2E_RUN_SEED).Trim().ToLower()

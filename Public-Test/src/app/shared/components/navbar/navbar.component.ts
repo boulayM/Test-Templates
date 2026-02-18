@@ -5,13 +5,16 @@ import {
   OnInit,
   OnDestroy,
   TemplateRef,
+  HostListener,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { CategoryService } from '../../../core/services/category.service';
 import { LoginComponent } from '../../../features/auth/login.component';
 import { Subscription } from 'rxjs';
 import { User } from '../../../shared/models/user.model';
+import { CategoryItem } from '../../../shared/models/category-item.model';
 import {
   NgbCollapseModule,
   NgbDropdownModule,
@@ -35,17 +38,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
   isLoggedIn = computed(() => !!this.user());
   isCollapsed = signal(true);
   searchQuery = signal('');
-  readonly categoryQuickLinks = [
-    'Books',
-    'Beauty',
-    'Fashion',
-    'Electronics',
-  ];
+  categories = signal<CategoryItem[]>([]);
 
   private authSub?: Subscription;
 
   constructor(
     private auth: AuthService,
+    private categoryService: CategoryService,
     private router: Router,
     private modalService: NgbModal,
   ) {}
@@ -53,6 +52,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.authSub = this.auth.currentUser$.subscribe((user) => {
       this.user.set(user);
+    });
+    this.loadCategories();
+  }
+
+  @HostListener('window:focus')
+  onWindowFocus(): void {
+    this.loadCategories();
+  }
+
+  private loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (items) => this.categories.set(items),
+      error: () => this.categories.set([]),
     });
   }
 

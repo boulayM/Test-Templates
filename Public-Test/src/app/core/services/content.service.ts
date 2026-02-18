@@ -12,7 +12,30 @@ type ApiProduct = {
   priceCents: number;
   isActive: boolean;
   inventory?: { quantity: number; reserved: number } | null;
-  categories?: Array<{ category?: { name?: string | null } | null }>;
+  categories?: Array<
+    | { category?: { name?: string | null } | null }
+    | { name?: string | null }
+    | string
+  >;
+};
+
+const extractCategoryName = (
+  entry: { category?: { name?: string | null } | null } | { name?: string | null } | string,
+): string => {
+  if (typeof entry === 'string') return entry;
+  if (entry && typeof entry === 'object') {
+    if ('category' in entry) {
+      const cat = (entry as { category?: unknown }).category;
+      if (typeof cat === 'string') return cat;
+      if (cat && typeof cat === 'object' && 'name' in cat) {
+        return String((cat as { name?: unknown }).name ?? '');
+      }
+      return '';
+    }
+    if ('categoryName' in entry) return String((entry as { categoryName?: unknown }).categoryName ?? '');
+    if ('name' in entry) return entry.name || '';
+  }
+  return '';
 };
 
 const mapProduct = (product: ApiProduct): ContentItem => ({
@@ -26,7 +49,8 @@ const mapProduct = (product: ApiProduct): ContentItem => ({
       ? product.isActive
       : product.isActive && product.inventory.quantity - product.inventory.reserved > 0,
   categories: (product.categories || [])
-    .map((entry) => entry.category?.name || '')
+    .map((entry) => extractCategoryName(entry))
+    .map((name) => name.trim())
     .filter((name) => !!name),
 });
 

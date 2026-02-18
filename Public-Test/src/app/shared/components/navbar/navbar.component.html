@@ -26,9 +26,9 @@
             Categories
           </button>
           <div ngbDropdownMenu>
-            @for (category of categoryQuickLinks; track category) {
-              <button class="dropdown-item" type="button" (click)="goToCategory(category)">
-                {{ category }}
+            @for (category of categories(); track category.id) {
+              <button class="dropdown-item" type="button" (click)="goToCategory(category.name)">
+                {{ category.name }}
               </button>
             }
             <a class="dropdown-item" [routerLink]="'/categories'" (click)="closeMenu()">Toutes les categories</a>

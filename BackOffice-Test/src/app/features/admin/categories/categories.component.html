@@ -8,6 +8,21 @@
 
   <p *ngIf="loading" class="muted">Loading...</p>
 
+  <div class="inline-form">
+    <input type="text" placeholder="Name" [(ngModel)]="newName" />
+    <input type="text" placeholder="Slug" [(ngModel)]="newSlug" />
+    <input type="number" min="1" placeholder="Parent ID (optional)" [(ngModel)]="newParentId" />
+    <button type="button" class="btn btn-outline-secondary" (click)="createCategory()">Create</button>
+  </div>
+
+  <div class="inline-form" *ngIf="editingId">
+    <input type="text" placeholder="Name" [(ngModel)]="editName" />
+    <input type="text" placeholder="Slug" [(ngModel)]="editSlug" />
+    <input type="number" min="1" placeholder="Parent ID (optional)" [(ngModel)]="editParentId" />
+    <button type="button" class="btn btn-outline-secondary" (click)="updateCategory()">Save</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">Cancel</button>
+  </div>
+
   <div *ngIf="!loading" class="table-responsive">
     <table class="table table-striped table-hover align-middle" *ngIf="rows.length; else emptyState">
       <thead>
@@ -16,6 +31,7 @@
       <th>name</th>
       <th>slug</th>
       <th>parentId</th>
+      <th>actions</th>
         </tr>
       </thead>
       <tbody>
@@ -24,6 +40,10 @@
       <td>{{ row['name'] }}</td>
       <td>{{ row['slug'] }}</td>
       <td>{{ row['parentId'] }}</td>
+      <td>
+        <button type="button" class="btn btn-sm btn-outline-secondary me-2" (click)="startEdit(row)">Edit</button>
+        <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteCategory(row)">Delete</button>
+      </td>
         </tr>
       </tbody>
     </table>

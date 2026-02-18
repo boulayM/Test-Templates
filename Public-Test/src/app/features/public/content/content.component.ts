@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ActivityService } from '../../../core/services/activity.service';
@@ -35,6 +35,11 @@ export class ContentComponent implements OnInit {
       this.searchQuery = (params.get('q') || '').trim().toLowerCase();
       this.applyFilter();
     });
+    this.loadContentItems();
+  }
+
+  @HostListener('window:focus')
+  onWindowFocus(): void {
     this.loadContentItems();
   }
 

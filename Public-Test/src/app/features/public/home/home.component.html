@@ -19,6 +19,9 @@
             <h5 class="card-title">{{ contentItem.name }}</h5>
             <p class="home-card-text">{{ contentItem.description }}</p>
             <p class="home-card-text"><strong>Prix:</strong> {{ contentItem.price | currency: 'EUR' }}</p>
+            @if ((contentItem.categories || []).length > 0) {
+              <p class="home-card-text"><strong>Categories:</strong> {{ contentItem.categories?.join(', ') }}</p>
+            }
             @if (contentItem.isActive && contentItem.isAvailable !== false) {
               <span class="badge text-bg-success">Disponible</span>
             } @else {

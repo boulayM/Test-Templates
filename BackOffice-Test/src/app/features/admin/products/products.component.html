@@ -8,6 +8,51 @@
 
   <p *ngIf="loading" class="muted">Loading...</p>
 
+  <div class="inline-form">
+    <input type="text" placeholder="Name" [(ngModel)]="newName" />
+    <input type="text" placeholder="Slug" [(ngModel)]="newSlug" />
+    <textarea
+      rows="2"
+      placeholder="Description"
+      class="form-control form-control-sm"
+      style="min-width: 260px;"
+      [(ngModel)]="newDescription"
+    ></textarea>
+    <input type="number" min="0" placeholder="Price cents" [(ngModel)]="newPriceCents" />
+    <input type="text" placeholder="Currency" [(ngModel)]="newCurrency" />
+    <input type="text" placeholder="SKU" [(ngModel)]="newSku" />
+    <select [(ngModel)]="newCategoryId">
+      <option value="" disabled>Category</option>
+      <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+    </select>
+    <label class="d-inline-flex align-items-center gap-1">
+      <input type="checkbox" [(ngModel)]="newIsActive" />
+      Active
+    </label>
+    <button type="button" class="btn btn-outline-secondary" (click)="createProduct()">Create</button>
+  </div>
+
+  <div class="inline-form" *ngIf="editingId">
+    <input type="text" placeholder="Name" [(ngModel)]="editName" />
+    <input type="text" placeholder="Slug" [(ngModel)]="editSlug" />
+    <textarea
+      rows="2"
+      placeholder="Description"
+      class="form-control form-control-sm"
+      style="min-width: 260px;"
+      [(ngModel)]="editDescription"
+    ></textarea>
+    <input type="number" min="0" placeholder="Price cents" [(ngModel)]="editPriceCents" />
+    <input type="text" placeholder="Currency" [(ngModel)]="editCurrency" />
+    <input type="text" placeholder="SKU" [(ngModel)]="editSku" />
+    <label class="d-inline-flex align-items-center gap-1">
+      <input type="checkbox" [(ngModel)]="editIsActive" />
+      Active
+    </label>
+    <button type="button" class="btn btn-outline-secondary" (click)="updateProduct()">Save</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">Cancel</button>
+  </div>
+
   <div *ngIf="!loading" class="table-responsive">
     <table class="table table-striped table-hover align-middle" *ngIf="rows.length; else emptyState">
       <thead>
@@ -19,6 +64,7 @@
       <th>priceCents</th>
       <th>currency</th>
       <th>isActive</th>
+      <th>actions</th>
         </tr>
       </thead>
       <tbody>
@@ -30,6 +76,10 @@
       <td>{{ row['priceCents'] }}</td>
       <td>{{ row['currency'] }}</td>
       <td>{{ row['isActive'] }}</td>
+      <td>
+        <button type="button" class="btn btn-sm btn-outline-secondary me-2" (click)="startEdit(row)">Edit</button>
+        <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteProduct(row)">Delete</button>
+      </td>
         </tr>
       </tbody>
     </table>

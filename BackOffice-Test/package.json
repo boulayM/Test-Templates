@@ -1,6 +1,6 @@
 {
-  "name": "admin-angular",
-  "version": "0.0.0",
+  "name": "backoffice-test",
+  "version": "1.0.0",
   "scripts": {
     "check:encoding": "node scripts/check-encoding.mjs",
     "check:dom-xss": "node scripts/check-dom-xss.mjs",

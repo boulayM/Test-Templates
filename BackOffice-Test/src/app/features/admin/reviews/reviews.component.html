@@ -12,22 +12,26 @@
     <table class="table table-striped table-hover align-middle" *ngIf="rows.length; else emptyState">
       <thead>
         <tr>
-      <th>id</th>
-      <th>productId</th>
-      <th>userId</th>
-      <th>rating</th>
-      <th>comment</th>
-      <th>createdAt</th>
+      <th class="col-id">id</th>
+      <th class="col-id">productId</th>
+      <th class="col-id">userId</th>
+      <th class="col-rating">rating</th>
+      <th class="col-date">createdAt</th>
+      <th class="col-action">action</th>
+      <th class="col-comment">comment</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let row of rows">
-      <td>{{ row['id'] }}</td>
-      <td>{{ row['productId'] }}</td>
-      <td>{{ row['userId'] }}</td>
-      <td>{{ row['rating'] }}</td>
-      <td>{{ row['comment'] }}</td>
-      <td>{{ row['createdAt'] }}</td>
+      <td class="col-id">{{ row['id'] }}</td>
+      <td class="col-id">{{ row['productId'] }}</td>
+      <td class="col-id">{{ row['userId'] }}</td>
+      <td class="col-rating">{{ row['rating'] }}</td>
+      <td class="col-date">{{ row['createdAt'] }}</td>
+      <td class="col-action">
+        <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteReview(row)">Delete</button>
+      </td>
+      <td class="comment-cell" [title]="(row['comment'] || '') + ''">{{ row['comment'] }}</td>
         </tr>
       </tbody>
     </table>

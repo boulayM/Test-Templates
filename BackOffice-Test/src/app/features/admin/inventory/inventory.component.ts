@@ -14,6 +14,7 @@ export class InventoryComponent implements OnInit {
   rows: Record<string, unknown>[] = [];
   loading = false;
   quantityDrafts: Record<number, number> = {};
+  reservedDrafts: Record<number, number> = {};
 
   constructor(
     private service: AdminInventoryService,
@@ -55,10 +56,13 @@ export class InventoryComponent implements OnInit {
       next: (res: unknown) => {
         this.rows = this.asArray(res).map((x) => this.asRecord(x));
         this.quantityDrafts = {};
+        this.reservedDrafts = {};
         for (const row of this.rows) {
           const id = Number(row['id']);
           const qty = Number(row['quantity']);
+          const reserved = Number(row['reserved']);
           if (!Number.isNaN(id) && !Number.isNaN(qty)) this.quantityDrafts[id] = qty;
+          if (!Number.isNaN(id) && !Number.isNaN(reserved)) this.reservedDrafts[id] = reserved;
         }
         this.loading = false;
         this.cdr.detectChanges();
@@ -75,12 +79,21 @@ export class InventoryComponent implements OnInit {
     const id = Number(row['id']);
     if (Number.isNaN(id)) return;
     const quantity = Number(this.quantityDrafts[id]);
+    const reserved = Number(this.reservedDrafts[id]);
     if (Number.isNaN(quantity) || quantity < 0) {
       this.toast.error('Quantity must be a positive integer');
       return;
     }
+    if (Number.isNaN(reserved) || reserved < 0) {
+      this.toast.error('Reserved must be a positive integer');
+      return;
+    }
+    if (reserved > quantity) {
+      this.toast.error('Reserved cannot exceed quantity');
+      return;
+    }
 
-    this.service.update(id, { quantity }).subscribe({
+    this.service.update(id, { quantity, reserved }).subscribe({
       next: () => {
         this.toast.success('Inventory updated');
         this.load();

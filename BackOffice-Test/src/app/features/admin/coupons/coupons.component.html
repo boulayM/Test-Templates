@@ -29,6 +29,7 @@
           <th>usageLimit</th>
           <th>usedCount</th>
           <th>isActive</th>
+          <th>delete</th>
         </tr>
       </thead>
       <tbody>
@@ -40,6 +41,9 @@
           <td>{{ row['usageLimit'] }}</td>
           <td>{{ row['usedCount'] }}</td>
           <td>{{ row['isActive'] }}</td>
+          <td>
+            <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteCoupon(row)">Delete</button>
+          </td>
         </tr>
       </tbody>
     </table>

@@ -42,6 +42,11 @@ export class ReviewsComponent implements OnInit {
     return [];
   }
 
+  rowId(row: Record<string, unknown>): number {
+    const id = Number(row['id']);
+    return Number.isNaN(id) ? 0 : id;
+  }
+
   load(): void {
     this.loading = true;
     this.service.list().subscribe({
@@ -54,6 +59,21 @@ export class ReviewsComponent implements OnInit {
         this.loading = false;
         this.toast.error(this.extractErrorMessage(err));
         this.cdr.detectChanges();
+      },
+    });
+  }
+
+  deleteReview(row: Record<string, unknown>): void {
+    const id = this.rowId(row);
+    if (!id) return;
+    if (!confirm('Delete this review?')) return;
+    this.service.delete(id).subscribe({
+      next: () => {
+        this.toast.success('Review deleted');
+        this.load();
+      },
+      error: (err: unknown) => {
+        this.toast.error(this.extractErrorMessage(err));
       },
     });
   }

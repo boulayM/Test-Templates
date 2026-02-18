@@ -32,7 +32,15 @@
               [attr.data-testid]="'inventory-quantity-' + rowId(row)"
               type="number"
               min="0"
+              class="form-control form-control-sm d-inline-block w-auto me-2"
               [(ngModel)]="quantityDrafts[+rowId(row)]"
+            />
+            <input
+              [attr.data-testid]="'inventory-reserved-' + rowId(row)"
+              type="number"
+              min="0"
+              class="form-control form-control-sm d-inline-block w-auto me-2"
+              [(ngModel)]="reservedDrafts[+rowId(row)]"
             />
             <button
               type="button"

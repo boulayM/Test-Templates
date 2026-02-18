@@ -22,6 +22,7 @@ body {
   padding-top: 72px;
   padding-left: 1rem;
   padding-right: 1rem;
+  padding-bottom: 1rem;
 }
 
 
@@ -37,6 +38,16 @@ body {
 .app-main .table {
   border: 1px solid #000;
   margin-bottom: 0;
+}
+
+.app-main .page-shell {
+  padding-bottom: 1rem;
+}
+
+.app-main .table-responsive {
+  overflow-x: auto;
+  overflow-y: visible;
+  margin-bottom: 1rem;
 }
 
 .app-main .table th,

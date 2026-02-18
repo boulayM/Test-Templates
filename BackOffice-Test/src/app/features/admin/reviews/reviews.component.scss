@@ -21,14 +21,45 @@
 .table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .table th,
 .table td {
-  border-bottom: 1px solid #e5e7eb;
+  border: 1px solid #000;
   padding: 0.5rem;
   text-align: left;
   white-space: nowrap;
+}
+
+.table .col-id {
+  width: 72px;
+}
+
+.table .col-rating {
+  width: 72px;
+}
+
+.table .col-date {
+  width: 220px;
+}
+
+.table .col-action {
+  width: 120px;
+}
+
+.table .comment-cell,
+.table .col-comment {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.table td.col-date,
+.table th.col-date {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .muted {

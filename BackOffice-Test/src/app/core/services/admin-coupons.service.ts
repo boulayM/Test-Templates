@@ -12,4 +12,8 @@ export class AdminCouponsService {
   create(body: Record<string, unknown>) {
     return this.api.post('/admin/coupons', body);
   }
+
+  delete(id: number) {
+    return this.api.deleteRequest('/admin/coupons/' + id);
+  }
 }

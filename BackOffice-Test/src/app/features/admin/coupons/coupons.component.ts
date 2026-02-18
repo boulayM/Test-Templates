@@ -47,6 +47,11 @@ export class CouponsComponent implements OnInit {
     return [];
   }
 
+  rowId(row: Record<string, unknown>): number {
+    const id = Number(row['id']);
+    return Number.isNaN(id) ? 0 : id;
+  }
+
   load(): void {
     this.loading = true;
     this.service.list({ page: 1, limit: 20, sort: 'id', order: 'desc' }).subscribe({
@@ -89,5 +94,20 @@ export class CouponsComponent implements OnInit {
           this.toast.error(this.extractErrorMessage(err));
         },
       });
+  }
+
+  deleteCoupon(row: Record<string, unknown>): void {
+    const id = this.rowId(row);
+    if (!id) return;
+    if (!confirm('Delete this coupon?')) return;
+    this.service.delete(id).subscribe({
+      next: () => {
+        this.toast.success('Coupon deleted');
+        this.load();
+      },
+      error: (err: unknown) => {
+        this.toast.error(this.extractErrorMessage(err));
+      },
+    });
   }
 }

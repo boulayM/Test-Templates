@@ -42,8 +42,8 @@ export class UsersComponent implements OnInit {
   activeFilter = '';
   verifiedFilter = '';
 
-  // Admin endpoint supports internal roles for create/update/filter.
-  roles: UserRole[] = ['ADMIN', 'USER', 'LOGISTIQUE', 'COMPTABILITE'];
+  // For internal user creation, ADMIN role is intentionally excluded in BO UI.
+  roles: UserRole[] = ['USER', 'LOGISTIQUE', 'COMPTABILITE'];
   createAlert: FormAlertState | null = null;
   updateAlert: FormAlertState | null = null;
   createFieldErrors: Record<string, string> = {};

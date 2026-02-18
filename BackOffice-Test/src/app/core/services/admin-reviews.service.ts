@@ -8,4 +8,8 @@ export class AdminReviewsService {
   list(params?: Record<string, string | number | boolean | null | undefined>) {
     return this.api.get('/admin/reviews', params);
   }
+
+  delete(id: number) {
+    return this.api.deleteRequest('/admin/reviews/' + id);
+  }
 }

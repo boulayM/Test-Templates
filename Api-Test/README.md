@@ -71,9 +71,9 @@ npm run dev
 - POST /api/users/register (CSRF requis)
 - PATCH /api/users/:id
 - DELETE /api/users/:id
-- GET /api/audit-logs (necessite Mongo + ENABLE_AUDIT_LOG=true)
-- GET /api/audit-logs/export (necessite Mongo + ENABLE_AUDIT_LOG=true)
-- GET /api/audit-logs/:id (necessite Mongo + ENABLE_AUDIT_LOG=true)
+- GET /api/audit-logs (nécessite Mongo + ENABLE_AUDIT_LOG=true)
+- GET /api/audit-logs/export (nécessite Mongo + ENABLE_AUDIT_LOG=true)
+- GET /api/audit-logs/:id (nécessite Mongo + ENABLE_AUDIT_LOG=true)
 
 ## Routes e-commerce (principales)
 
@@ -101,12 +101,34 @@ npm run dev
   - `GET|DELETE /api/admin/reviews`
   - `GET /api/admin/audit-logs` (bridge vers audit logs)
 
+## Runs Newman (Postman CLI)
+
+Executer les deux suites séparées (admin et user) avec l'environnement local:
+
+```powershell
+newman run postman/api-test-admin.postman_collection.json `
+  -e postman/Api-Test.postman_environment.json `
+  -r "cli,htmlextra" `
+  --reporter-htmlextra-export ".\postman\reports\report-admin.html"
+
+newman run postman/api-test-user.postman_collection.json `
+  -e postman/Api-Test.postman_environment.json `
+  -r "cli,htmlextra" `
+  --reporter-htmlextra-export ".\postman\reports\report-user.html"
+```
+
+Notes QA:
+
+- Les collections sont séparées pour éviter l'écrasement de session entre login admin et login user.
+- Les endpoints provider status (`/api/public/payments/providers/status`, `/api/public/shipments/providers/status`) peuvent retourner `501` en mode test (provider non configure).
+- Voir `docs/KNOWN_LIMITATIONS.md`.
+
 ## Notes
 
 - CSRF requis pour les routes qui modifient les donnees.
 - /users/register (admin) requiert CSRF.
-- Audit logs optionnels; desactive via ENABLE_AUDIT_LOG=false.
-- Refresh token en rotation avec detection de reutilisation (reuse detection).
+- Audit logs optionnels; désactive via ENABLE_AUDIT_LOG=false.
+- Refresh token en rotation avec detection de réutilisation (reuse detection).
 - Mettre a jour `docs/swagger.yaml` quand les routes changent.
 - Verification complete locale:
   - `npm run lint`

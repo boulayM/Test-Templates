@@ -1,4 +1,3 @@
-// src/utils/generateCsrfToken.js
 import crypto from "crypto";
 
 export function generateCsrfToken() {

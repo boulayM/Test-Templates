@@ -10,7 +10,7 @@ const startServer = async () => {
     await connectMongo();
   }
   app.listen(PORT, () => {
-    console.log("API PostgreSQL prete sur port " + PORT);
+    console.log("API PostgreSQL prête sur port " + PORT);
   });
 };
 

@@ -386,7 +386,7 @@ export const logoutAll = async (req, res, next) => {
       req
     });
 
-    res.json({ message: "Toutes les sessions ont ete revoquees" });
+    res.json({ message: "Toutes les sessions ont été révoquées" });
   } catch (err) {
     next(err);
   }
@@ -424,7 +424,7 @@ export const refresh = async (req, res, next) => {
         status: "FAIL",
         req
       });
-      return res.status(401).json({ message: "Refresh token reuse detecte" });
+      return res.status(401).json({ message: "Refresh token reuse détecté" });
     }
 
     if (storedToken.expiresAt < new Date()) {

@@ -4,7 +4,7 @@ import prisma from "../config/prisma.js";
 export async function authRequired(req, res, next) {
   const token = req.cookies.accessToken;
 
-  if (!token) return res.status(401).json({ message: "Non authentifie" });
+  if (!token) return res.status(401).json({ message: "Non authentifié" });
 
   let payload;
   try {
@@ -19,8 +19,8 @@ export async function authRequired(req, res, next) {
       select: { id: true, role: true, isActive: true }
     });
 
-    if (!user) return res.status(401).json({ message: "Non authentifie" });
-    if (!user.isActive) return res.status(403).json({ message: "Compte desactive" });
+    if (!user) return res.status(401).json({ message: "Non authentifié" });
+    if (!user.isActive) return res.status(403).json({ message: "Compte désactivé" });
 
     req.user = { ...payload, role: user.role };
     next();
@@ -30,7 +30,7 @@ export async function authRequired(req, res, next) {
 }
 
 export function adminOnly(req, res, next) {
-  if (req.user.role !== "ADMIN") return res.status(403).json({ message: "Acces refuse" });
+  if (req.user.role !== "ADMIN") return res.status(403).json({ message: "Accès refusé" });
 
   next();
 }

@@ -135,3 +135,4 @@ Notes QA:
   - `npm test`
 - Rapport de cloture adaptation:
   - `docs/adaptation-final-report.md`
+- Stratégie DTO: `docs/adr/ADR-001-dto-strategy.md`.

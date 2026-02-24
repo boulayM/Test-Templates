@@ -1,8 +1,7 @@
-// src/middlewares/limiters.js
 import rateLimit from "express-rate-limit";
 
-// NOTE: disableRateLimit est utilise pour les tests E2E automatises sur plusieurs frontends
-// (Angular/React/Vue) afin d'eviter que le rate-limit d'auth bloque la phase de setup.
+// NOTE: disableRateLimit est utilisé pour les tests E2E automatisés sur plusieurs frontends
+// (Angular/React/Vue) afin d'éviter que le rate-limit d'auth bloque la phase de setup.
 const disableRateLimit =
   String(process.env.DISABLE_RATE_LIMIT || "").toLowerCase() === "true" ||
   (process.env.NODE_ENV === "test" && process.env.E2E === "true") ||

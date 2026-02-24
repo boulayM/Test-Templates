@@ -3,7 +3,9 @@ export default function errorHandler(err, req, res, _next) {
   const status = err?.status || err?.statusCode || (prismaConflict ? 409 : 500);
   const isServerError = status >= 500;
 
-  // Keep error logs for real server failures; 4xx business errors are expected and should stay quiet.
+  // Conserver les logs d’erreurs pour les véritables défaillances serveur ;
+  // les erreurs métier 4xx sont attendues et doivent rester silencieuses.
+
   if (isServerError) {
     console.error(err);
   }

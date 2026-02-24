@@ -17,7 +17,8 @@ export const routes: Routes = [
     data: {
       seo: {
         title: 'Ma Boutique | Accueil',
-        description: 'Decouvrez les produits de Ma Boutique et connectez-vous pour gerer votre panier.',
+        description:
+          'Découvrez les produits de Ma Boutique et connectez-vous pour gérer votre panier.',
         indexable: true,
         canonicalPath: '/home',
       },
@@ -43,7 +44,8 @@ export const routes: Routes = [
     data: {
       seo: {
         title: 'Ma Boutique | Inscription',
-        description: 'Creez votre compte client pour commander sur Ma Boutique.',
+        description:
+          'Créez votre compte client pour commander sur Ma Boutique.',
         indexable: false,
         canonicalPath: '/register',
       },
@@ -67,8 +69,9 @@ export const routes: Routes = [
     data: {
       reason: 'forbidden',
       seo: {
-        title: 'Ma Boutique | Acces refuse',
-        description: 'Vous ne disposez pas des droits necessaires pour acceder a cette page.',
+        title: 'Ma Boutique | Accès refusé',
+        description:
+          'Vous ne disposez pas des droits nécessaires pour accéder à cette page.',
         indexable: false,
       },
     },
@@ -86,7 +89,8 @@ export const routes: Routes = [
         data: {
           seo: {
             title: 'Ma Boutique | Catalogue',
-            description: 'Consultez le catalogue produits et ajoutez des articles au panier.',
+            description:
+              'Consultez le catalogue produits et ajoutez des articles au panier.',
             indexable: true,
             canonicalPath: '/catalog',
           },
@@ -101,7 +105,7 @@ export const routes: Routes = [
         data: {
           seo: {
             title: 'Ma Boutique | Detail produit',
-            description: 'Consultez la fiche detaillee d un produit.',
+            description: "Consultez la fiche détaillée d'un produit.",
             indexable: true,
             canonicalPath: '/catalog',
           },
@@ -116,7 +120,7 @@ export const routes: Routes = [
         data: {
           seo: {
             title: 'Ma Boutique | Categories',
-            description: 'Parcourez les categories du catalogue.',
+            description: 'Parcourez les catégories du catalogue.',
             indexable: true,
             canonicalPath: '/categories',
           },
@@ -137,7 +141,7 @@ export const routes: Routes = [
             data: {
               seo: {
                 title: 'Ma Boutique | Panier',
-                description: 'Consultez et mettez a jour votre panier.',
+                description: 'Consultez et mettez à jour votre panier.',
                 indexable: false,
                 canonicalPath: '/account/cart',
               },
@@ -167,7 +171,7 @@ export const routes: Routes = [
             data: {
               seo: {
                 title: 'Ma Boutique | Mes commandes',
-                description: 'Consultez l historique de vos commandes.',
+                description: "Consultez l'historique de vos commandes.",
                 indexable: false,
                 canonicalPath: '/account/orders',
               },
@@ -182,7 +186,7 @@ export const routes: Routes = [
             data: {
               seo: {
                 title: 'Ma Boutique | Detail commande',
-                description: 'Consultez le detail de votre commande.',
+                description: 'Consultez le détail de votre commande.',
                 indexable: false,
               },
             },
@@ -196,7 +200,8 @@ export const routes: Routes = [
             data: {
               seo: {
                 title: 'Ma Boutique | Paiement',
-                description: 'Consultez et initiez le paiement de votre commande.',
+                description:
+                  'Consultez et initiez le paiement de votre commande.',
                 indexable: false,
               },
             },
@@ -213,7 +218,8 @@ export const routes: Routes = [
         data: {
           seo: {
             title: 'Ma Boutique | Checkout',
-            description: 'Validez votre commande avec adresses et recapitulatif.',
+            description:
+              'Validez votre commande avec adresses et récapitulatif.',
             indexable: false,
             canonicalPath: '/checkout',
           },
@@ -228,7 +234,7 @@ export const routes: Routes = [
       reason: 'not-found',
       seo: {
         title: 'Ma Boutique | Page introuvable',
-        description: 'La page demandee est introuvable.',
+        description: 'La page demandée est introuvable.',
         indexable: false,
       },
     },

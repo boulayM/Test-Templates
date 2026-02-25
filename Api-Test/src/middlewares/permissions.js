@@ -79,7 +79,7 @@ export function requirePermission(permission) {
         metadata: { permission, role: role || null }
       });
 
-      return res.status(403).json({ message: "Acces refuse" });
+      return res.status(403).json({ message: "Accès refusé" });
     }
 
     next();

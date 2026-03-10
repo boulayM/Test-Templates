@@ -110,7 +110,7 @@ export const login = async (req, res, next) => {
         req,
         metadata: { reason: "email_not_verified" }
       });
-      return res.status(403).json({ message: "Email non verifie" });
+      return res.status(403).json({ message: "Email non vérifié" });
     }
 
     if (!user.isActive) {
@@ -123,7 +123,7 @@ export const login = async (req, res, next) => {
         req,
         metadata: { reason: "account_disabled" }
       });
-      return res.status(403).json({ message: "Compte desactive" });
+      return res.status(403).json({ message: "Compte désactivé" });
     }
 
     const accessToken = generateAccessToken(user);

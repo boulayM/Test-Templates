@@ -56,6 +56,23 @@ npx prisma db seed
 
 npm run dev
 
+## CI (GitHub Actions)
+
+Pipeline: `.github/workflows/ci.yml`
+
+Checks executes on `push`/`pull_request` (main/master):
+
+- `npm run check:encoding`
+- `npm run lint`
+- `npm test` (with PostgreSQL + Mongo services)
+- `npm run build`
+
+Equivalent local command:
+
+```powershell
+npm run ci:check
+```
+
 ## Routes Core
 
 - GET /api/csrf
@@ -136,3 +153,4 @@ Notes QA:
 - Rapport de cloture adaptation:
   - `docs/adaptation-final-report.md`
 - Stratégie DTO: `docs/adr/ADR-001-dto-strategy.md`.
+

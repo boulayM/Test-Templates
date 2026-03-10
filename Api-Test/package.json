@@ -32,7 +32,11 @@
     "predev:e2e": "npm run preflight:e2e",
     "pretest:db": "npm run preflight:test",
     "seed:e2e": "npm run preflight:e2e && dotenv -e .env.e2e -- prisma db seed",
-    "seed:test": "npm run preflight:test && dotenv -e .env.test -- prisma db seed"
+    "seed:test": "npm run preflight:test && dotenv -e .env.test -- prisma db seed",
+    "ci:lint": "npm run lint",
+    "ci:test": "npm test",
+    "ci:build": "npm run build",
+    "ci:check": "npm run check:encoding && npm run ci:lint && npm run ci:test && npm run ci:build"
   },
   "dependencies": {
     "@faker-js/faker": "^10.1.0",

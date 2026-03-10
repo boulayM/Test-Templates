@@ -38,7 +38,6 @@ pids/
 prisma/dev.db
 prisma/test.db
 prisma/*.sqlite
-prisma/migrations/
 
 # Prisma studio temp
 .prisma/

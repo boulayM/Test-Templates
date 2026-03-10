@@ -13,6 +13,7 @@
     "prestart": "npm run check:encoding",
     "start": "node src/server.js",
     "prisma:generate": "prisma generate",
+    "prisma:generate:test": "dotenv -e .env.test -- prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "tools:test-db": "node tools/test-db.js",
@@ -36,7 +37,7 @@
     "ci:lint": "npm run lint",
     "ci:test": "npm test",
     "ci:build": "npm run build",
-    "ci:check": "npm run check:encoding && npm run ci:lint && npm run prisma:generate && npm run ci:test && npm run ci:build"
+    "ci:check": "npm run check:encoding && npm run ci:lint && npm run prisma:generate:test && npm run ci:test && npm run ci:build"
   },
   "dependencies": {
     "@faker-js/faker": "^10.1.0",

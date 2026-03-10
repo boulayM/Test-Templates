@@ -3,13 +3,22 @@ name: CI Api-Test
 on:
   push:
     branches: ["main", "master"]
+    paths:
+      - "Api-Test/**"
+      - ".github/workflows/ci-api-test.yml"
   pull_request:
     branches: ["main", "master"]
+    paths:
+      - "Api-Test/**"
+      - ".github/workflows/ci-api-test.yml"
   workflow_dispatch:
 
 jobs:
   ci:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Api-Test
 
     services:
       postgres:
@@ -45,6 +54,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: Api-Test/package-lock.json
 
       - name: Install dependencies
         run: npm ci

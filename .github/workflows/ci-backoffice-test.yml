@@ -38,7 +38,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Configure Chrome no-sandbox wrapper
+        run: |
+          cat > /tmp/chrome-no-sandbox <<'EOF'
+          #!/usr/bin/env bash
+          "${{ steps.setup-chrome.outputs.chrome-path }}" --no-sandbox --disable-dev-shm-usage "$@"
+          EOF
+          chmod +x /tmp/chrome-no-sandbox
+          echo "CHROME_BIN=/tmp/chrome-no-sandbox" >> "$GITHUB_ENV"
+
       - name: Run CI checks
         env:
-          CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
+          CHROME_BIN: ${{ env.CHROME_BIN }}
         run: npm run ci:check

@@ -19,7 +19,7 @@
     "tools:test-db": "node tools/test-db.js",
     "purge:tokens": "node tools/purge-tokens.js",
     "test:db": "cross-env NODE_ENV=test SKIP_SEED=1 dotenv -e .env.test -- prisma migrate reset --force",
-    "test": "npm run test:db && node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand --detectOpenHandles",
+    "test": "npm run test:db && cross-env NODE_ENV=test dotenv -e .env.test -- node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand --detectOpenHandles",
     "test:watch": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch --runInBand",
     "prepreview": "npm run check:encoding",
     "lint": "eslint .",

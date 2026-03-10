@@ -29,7 +29,12 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "build:stats": "ng build --stats-json"
+    "build:stats": "ng build --stats-json",
+    "ci:lint": "npm run lint",
+    "ci:typecheck": "npm run typecheck",
+    "ci:test": "npm run test:unit",
+    "ci:build": "npm run build",
+    "ci:check": "npm run check:encoding && npm run check:dom-xss && npm run ci:lint && npm run ci:typecheck && npm run ci:test && npm run ci:build"
   },
   "prettier": {
     "printWidth": 100,

@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "check:encoding": "node scripts/check-encoding.mjs",
+    "check:dom-xss": "node scripts/check-dom-xss.mjs",
     "prestart": "npm run check:encoding && npm run check:dom-xss",
     "start": "ng serve",
     "prebuild": "npm run check:encoding && npm run check:dom-xss",
@@ -13,7 +14,6 @@
     "test": "ng test",
     "predev": "npm run check:encoding && npm run check:dom-xss",
     "prepreview": "npm run check:encoding && npm run check:dom-xss",
-    "check:dom-xss": "node scripts/check-dom-xss.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
@@ -32,7 +32,13 @@
     "build:stats": "ng build --stats-json",
     "seo:check": "node scripts/check-seo.mjs",
     "seo:perf:guide": "echo Run Lighthouse manually: npx lighthouse http://localhost:4200/home --preset=desktop --view",
-    "e2e:seo": "playwright test -c playwright.seo.config.ts"
+    "e2e:seo": "playwright test -c playwright.seo.config.ts",
+    "ci:lint": "npm run lint",
+    "ci:typecheck": "npm run typecheck",
+    "ci:test": "npm run test:unit",
+    "ci:seo": "npm run seo:check",
+    "ci:build": "npm run build",
+    "ci:check": "npm run check:encoding && npm run check:dom-xss && npm run ci:lint && npm run ci:typecheck && npm run ci:test && npm run ci:seo && npm run ci:build"
   },
   "private": true,
   "dependencies": {

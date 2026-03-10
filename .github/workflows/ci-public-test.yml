@@ -16,6 +16,7 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: Public-Test
@@ -40,12 +41,31 @@ jobs:
         run: |
           cat > /tmp/chrome-no-sandbox <<'EOF'
           #!/usr/bin/env bash
-          "${{ steps.setup-chrome.outputs.chrome-path }}" --no-sandbox --disable-dev-shm-usage "$@"
+          exec "${{ steps.setup-chrome.outputs.chrome-path }}" --no-sandbox --disable-dev-shm-usage "$@"
           EOF
           chmod +x /tmp/chrome-no-sandbox
           echo "CHROME_BIN=/tmp/chrome-no-sandbox" >> "$GITHUB_ENV"
 
-      - name: Run CI checks
+      - name: Check encoding
+        run: npm run check:encoding
+
+      - name: Check DOM XSS
+        run: npm run check:dom-xss
+
+      - name: Lint
+        run: npm run ci:lint
+
+      - name: Typecheck
+        run: npm run ci:typecheck
+
+      - name: Unit tests
         env:
           CHROME_BIN: ${{ env.CHROME_BIN }}
-        run: npm run ci:check
+          CI: "true"
+        run: npm run ci:test
+
+      - name: SEO checks
+        run: npm run ci:seo
+
+      - name: Build
+        run: npm run ci:build

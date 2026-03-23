@@ -3,14 +3,8 @@ name: CI BackOffice-Test
 on:
   push:
     branches: ["main", "master"]
-    paths:
-      - "BackOffice-Test/**"
-      - ".github/workflows/ci-backoffice-test.yml"
   pull_request:
     branches: ["main", "master"]
-    paths:
-      - "BackOffice-Test/**"
-      - ".github/workflows/ci-backoffice-test.yml"
   workflow_dispatch:
 
 jobs:
@@ -24,20 +18,35 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect BackOffice-Test changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backoffice:
+              - 'BackOffice-Test/**'
+              - '.github/workflows/ci-backoffice-test.yml'
 
       - name: Setup Node.js
+        if: steps.filter.outputs.backoffice == 'true' || github.event_name == 'workflow_dispatch'
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Setup Chrome
+        if: steps.filter.outputs.backoffice == 'true' || github.event_name == 'workflow_dispatch'
         id: setup-chrome
         uses: browser-actions/setup-chrome@v1
 
       - name: Install dependencies
+        if: steps.filter.outputs.backoffice == 'true' || github.event_name == 'workflow_dispatch'
         run: npm ci
 
       - name: Configure Chrome no-sandbox wrapper
+        if: steps.filter.outputs.backoffice == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           cat > /tmp/chrome-no-sandbox <<'EOF'
           #!/usr/bin/env bash
@@ -47,22 +56,32 @@ jobs:
           echo "CHROME_BIN=/tmp/chrome-no-sandbox" >> "$GITHUB_ENV"
 
       - name: Check encoding
+        if: steps.filter.outputs.backoffice == 'true' || github.event_name == 'workflow_dispatch'
         run: npm run check:encoding
 
       - name: Check DOM XSS
+        if: steps.filter.outputs.backoffice == 'true' || github.event_name == 'workflow_dispatch'
         run: npm run check:dom-xss
 
       - name: Lint
+        if: steps.filter.outputs.backoffice == 'true' || github.event_name == 'workflow_dispatch'
         run: npm run ci:lint
 
       - name: Typecheck
+        if: steps.filter.outputs.backoffice == 'true' || github.event_name == 'workflow_dispatch'
         run: npm run ci:typecheck
 
       - name: Unit tests
+        if: steps.filter.outputs.backoffice == 'true' || github.event_name == 'workflow_dispatch'
         env:
           CHROME_BIN: ${{ env.CHROME_BIN }}
           CI: "true"
         run: npm run ci:test
 
       - name: Build
+        if: steps.filter.outputs.backoffice == 'true' || github.event_name == 'workflow_dispatch'
         run: npm run ci:build
+
+      - name: Skip unchanged BackOffice-Test
+        if: steps.filter.outputs.backoffice != 'true' && github.event_name != 'workflow_dispatch'
+        run: echo "No BackOffice-Test changes detected; required check passes without running the suite."

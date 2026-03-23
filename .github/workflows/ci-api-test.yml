@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  ci:
+  api_ci_v2:
     runs-on: ubuntu-latest
     defaults:
       run:

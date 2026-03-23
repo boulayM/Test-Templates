@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  ci:
+  backoffice_ci_v2:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     defaults:

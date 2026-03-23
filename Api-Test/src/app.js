@@ -19,10 +19,21 @@ const swaggerUiPath = swaggerUiDist.getAbsoluteFSPath();
 const app = express();
 
 const rawOrigins = process.env.FRONT_URL || "";
-const allowedOrigins = rawOrigins
+const configuredOrigins = rawOrigins
   .split(",")
   .map((o) => o.trim())
   .filter(Boolean);
+
+const devOrigins = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://localhost:3001",
+  "http://127.0.0.1:3001"
+];
+
+const allowedOrigins = Array.from(
+  new Set(process.env.NODE_ENV === "production" ? configuredOrigins : [...configuredOrigins, ...devOrigins])
+);
 
 if (process.env.NODE_ENV === "production" && allowedOrigins.length === 0) {
   throw new Error("FRONT_URL is required in production");
@@ -76,3 +87,5 @@ app.use("/api", apiRoutes);
 app.use(errorHandler);
 
 export default app;
+
+

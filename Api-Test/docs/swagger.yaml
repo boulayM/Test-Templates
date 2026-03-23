@@ -51,6 +51,13 @@ components:
       required: true
       schema:
         type: integer
+    CsrfHeaderParam:
+      in: header
+      name: x-csrf-token
+      required: true
+      schema:
+        type: string
+      description: Must match the csrfToken cookie value
     PageParam:
       in: query
       name: page
@@ -157,6 +164,14 @@ components:
         csrfToken:
           type: string
           description: Present only in test environment
+      example:
+        user:
+          id: 1
+          firstName: Marc
+          lastName: Boulay
+          email: marc@example.com
+          role: ADMIN
+          emailVerified: true
 
     RegisterInput:
       type: object
@@ -729,6 +744,8 @@ paths:
     post:
       tags: [Auth]
       summary: Logout
+      parameters:
+        - $ref: "#/components/parameters/CsrfHeaderParam"
       security:
         - cookieAuth: []
           csrfToken: []
@@ -742,6 +759,8 @@ paths:
     post:
       tags: [Auth]
       summary: Logout all sessions
+      parameters:
+        - $ref: "#/components/parameters/CsrfHeaderParam"
       security:
         - cookieAuth: []
           csrfToken: []
@@ -1885,3 +1904,4 @@ paths:
       responses:
         "200":
           description: Swagger UI HTML
+

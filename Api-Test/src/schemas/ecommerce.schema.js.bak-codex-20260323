@@ -10,15 +10,6 @@ const optionalDate = z
 const pageInt = z.coerce.number().int().min(1);
 const limitInt = z.coerce.number().int().min(1).max(100);
 
-const plainTextString = (max, min = 0) =>
-  z
-    .string()
-    .min(min)
-    .max(max)
-    .refine((value) => !/<[^>]+>/.test(value), {
-      message: "HTML is not allowed"
-    });
-
 export const idParamSchema = z
   .object({
     id: z.coerce.number().int().positive()
@@ -68,25 +59,25 @@ export const couponValidateQuerySchema = z
 
 export const categoryCreateSchema = z
   .object({
-    name: plainTextString(120, 2),
-    slug: plainTextString(160, 2),
+    name: z.string().min(2).max(120),
+    slug: z.string().min(2).max(160),
     parentId: z.coerce.number().int().positive().optional().nullable()
   })
   .strict();
 
 export const categoryUpdateSchema = z
   .object({
-    name: plainTextString(120, 2).optional(),
-    slug: plainTextString(160, 2).optional(),
+    name: z.string().min(2).max(120).optional(),
+    slug: z.string().min(2).max(160).optional(),
     parentId: z.coerce.number().int().positive().optional().nullable()
   })
   .strict();
 
 export const productCreateSchema = z
   .object({
-    name: plainTextString(180, 2),
-    slug: plainTextString(220, 2),
-    description: plainTextString(10000),
+    name: z.string().min(2).max(180),
+    slug: z.string().min(2).max(220),
+    description: z.string().max(10000),
     priceCents: moneyInt,
     currency: z.string().min(3).max(10),
     sku: z.string().min(2).max(120),
@@ -97,9 +88,9 @@ export const productCreateSchema = z
 
 export const productUpdateSchema = z
   .object({
-    name: plainTextString(180, 2).optional(),
-    slug: plainTextString(220, 2).optional(),
-    description: plainTextString(10000).optional(),
+    name: z.string().min(2).max(180).optional(),
+    slug: z.string().min(2).max(220).optional(),
+    description: z.string().max(10000).optional(),
     priceCents: moneyInt.optional(),
     currency: z.string().min(3).max(10).optional(),
     sku: z.string().min(2).max(120).optional(),
@@ -112,7 +103,7 @@ export const imageCreateSchema = z
   .object({
     productId: positiveInt,
     url: z.string().url(),
-    alt: plainTextString(300).optional().nullable(),
+    alt: z.string().max(300).optional().nullable(),
     sortOrder: z.number().int().min(0).optional()
   })
   .strict();
@@ -137,7 +128,7 @@ export const inventoryUpdateSchema = z
 
 export const couponCreateSchema = z
   .object({
-    code: plainTextString(80, 2),
+    code: z.string().min(2).max(80),
     type: z.enum(["PERCENT", "FIXED"]),
     value: moneyInt,
     minOrderCents: moneyInt.optional().nullable(),
@@ -150,7 +141,7 @@ export const couponCreateSchema = z
 
 export const couponUpdateSchema = z
   .object({
-    code: plainTextString(80, 2).optional(),
+    code: z.string().min(2).max(80).optional(),
     type: z.enum(["PERCENT", "FIXED"]).optional(),
     value: moneyInt.optional(),
     minOrderCents: moneyInt.optional().nullable(),
@@ -164,8 +155,8 @@ export const couponUpdateSchema = z
 export const shipmentCreateSchema = z
   .object({
     orderId: positiveInt,
-    carrier: plainTextString(120).optional().nullable(),
-    trackingNumber: plainTextString(150).optional().nullable(),
+    carrier: z.string().max(120).optional().nullable(),
+    trackingNumber: z.string().max(150).optional().nullable(),
     status: z.enum(["CREATED", "IN_TRANSIT", "DELIVERED", "LOST"]).optional(),
     shippedAt: optionalDate,
     deliveredAt: optionalDate
@@ -174,8 +165,8 @@ export const shipmentCreateSchema = z
 
 export const shipmentUpdateSchema = z
   .object({
-    carrier: plainTextString(120).optional().nullable(),
-    trackingNumber: plainTextString(150).optional().nullable(),
+    carrier: z.string().max(120).optional().nullable(),
+    trackingNumber: z.string().max(150).optional().nullable(),
     status: z.enum(["CREATED", "IN_TRANSIT", "DELIVERED", "LOST"]).optional(),
     shippedAt: optionalDate,
     deliveredAt: optionalDate
@@ -218,28 +209,28 @@ export const cartUpdateItemSchema = z
 
 export const addressCreateSchema = z
   .object({
-    label: plainTextString(80, 1),
-    fullName: plainTextString(160, 2),
-    phone: plainTextString(40, 5),
-    line1: plainTextString(200, 2),
-    line2: plainTextString(200).optional().nullable(),
-    postalCode: plainTextString(20, 2),
-    city: plainTextString(120, 2),
-    country: plainTextString(80, 2),
+    label: z.string().min(1).max(80),
+    fullName: z.string().min(2).max(160),
+    phone: z.string().min(5).max(40),
+    line1: z.string().min(2).max(200),
+    line2: z.string().max(200).optional().nullable(),
+    postalCode: z.string().min(2).max(20),
+    city: z.string().min(2).max(120),
+    country: z.string().min(2).max(80),
     isDefault: z.boolean().optional()
   })
   .strict();
 
 export const addressUpdateSchema = z
   .object({
-    label: plainTextString(80, 1).optional(),
-    fullName: plainTextString(160, 2).optional(),
-    phone: plainTextString(40, 5).optional(),
-    line1: plainTextString(200, 2).optional(),
-    line2: plainTextString(200).optional().nullable(),
-    postalCode: plainTextString(20, 2).optional(),
-    city: plainTextString(120, 2).optional(),
-    country: plainTextString(80, 2).optional(),
+    label: z.string().min(1).max(80).optional(),
+    fullName: z.string().min(2).max(160).optional(),
+    phone: z.string().min(5).max(40).optional(),
+    line1: z.string().min(2).max(200).optional(),
+    line2: z.string().max(200).optional().nullable(),
+    postalCode: z.string().min(2).max(20).optional(),
+    city: z.string().min(2).max(120).optional(),
+    country: z.string().min(2).max(80).optional(),
     isDefault: z.boolean().optional()
   })
   .strict();
@@ -256,7 +247,7 @@ export const paymentCreateSchema = z
   .object({
     orderId: positiveInt,
     provider: z.enum(["STRIPE", "PAYPAL", "MANUAL"]).optional(),
-    providerRef: plainTextString(190).optional().nullable()
+    providerRef: z.string().max(190).optional().nullable()
   })
   .strict();
 
@@ -264,14 +255,14 @@ export const reviewCreateSchema = z
   .object({
     productId: positiveInt,
     rating: z.number().int().min(1).max(5),
-    comment: plainTextString(2000).optional().nullable()
+    comment: z.string().max(2000).optional().nullable()
   })
   .strict();
 
 export const reviewUpdateSchema = z
   .object({
     rating: z.number().int().min(1).max(5).optional(),
-    comment: plainTextString(2000).optional().nullable()
+    comment: z.string().max(2000).optional().nullable()
   })
   .strict()
   .refine((v) => v.rating !== undefined || v.comment !== undefined, {

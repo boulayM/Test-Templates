@@ -3,18 +3,12 @@ name: CI Api-Test
 on:
   push:
     branches: ["main", "master"]
-    paths:
-      - "Api-Test/**"
-      - ".github/workflows/ci-api-test.yml"
   pull_request:
     branches: ["main", "master"]
-    paths:
-      - "Api-Test/**"
-      - ".github/workflows/ci-api-test.yml"
   workflow_dispatch:
 
 jobs:
-  ci:
+  api_ci_v2:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -48,8 +42,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect Api-Test changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            api:
+              - 'Api-Test/**'
+              - '.github/workflows/ci-api-test.yml'
 
       - name: Setup Node.js
+        if: steps.filter.outputs.api == 'true' || github.event_name == 'workflow_dispatch'
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -57,9 +63,11 @@ jobs:
           cache-dependency-path: Api-Test/package-lock.json
 
       - name: Install dependencies
+        if: steps.filter.outputs.api == 'true' || github.event_name == 'workflow_dispatch'
         run: npm ci
 
       - name: Prepare test environment
+        if: steps.filter.outputs.api == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           cat > .env.test <<'EOF'
           DATABASE_URL="postgresql://postgres:MabDev2025@localhost:5432/test-api?schema=public"
@@ -74,4 +82,9 @@ jobs:
           EOF
 
       - name: Run CI checks
+        if: steps.filter.outputs.api == 'true' || github.event_name == 'workflow_dispatch'
         run: npm run ci:check
+
+      - name: Skip unchanged Api-Test
+        if: steps.filter.outputs.api != 'true' && github.event_name != 'workflow_dispatch'
+        run: echo "No Api-Test changes detected; required check passes without running the suite."

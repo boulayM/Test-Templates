@@ -1,0 +1,15 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.landing-footer {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #44403c;
+  border-top: 1px solid #d6d3d1;
+  background: #f8f8f7;
+}

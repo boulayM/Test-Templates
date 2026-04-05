@@ -1,0 +1,19 @@
+.landing-navbar {
+  background: #f8f8f7;
+}
+
+.landing-brand {
+  color: #18181b;
+  font-weight: 700;
+  letter-spacing: 0.04rem;
+}
+
+.landing-search {
+  min-width: 320px;
+}
+
+@media (max-width: 991.98px) {
+  .landing-search {
+    min-width: 0;
+  }
+}

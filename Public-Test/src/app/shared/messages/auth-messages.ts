@@ -1,13 +1,14 @@
 export const AuthMessages = {
-  userOnly: 'Acces reserve aux clients',
-  adminOnly: 'Acces reserve aux administrateurs',
+  userOnly: 'Accès réservé aux clients',
+  adminOnly: 'Accès réservé aux administrateurs',
   loginInvalid: 'Identifiants invalides',
-  loginLimitReached: 'Limite de tentatives atteinte. Réessayez dans 15 minutes !',
+  loginLimitReached:
+    'Limite de tentatives atteinte. Réessayez dans 15 minutes !',
   loginRemaining: (remaining: number, total: number) =>
     `Tentatives restantes: ${remaining} / ${total}.`,
-  accessDeniedAuth: 'Acces refuse. Connectez-vous pour continuer.',
-  accessDeniedRole: 'Acces refuse. Droits insuffisants.',
-  serverError: 'Erreur serveur. Reessayez plus tard.',
+  accessDeniedAuth: 'Accès refusé. Connectez-vous pour continuer.',
+  accessDeniedRole: 'Accès refusé. Droits insuffisants.',
+  serverError: 'Erreur serveur. Réessayez plus tard.',
   genericError: 'Une erreur est survenue.',
   notFound: 'Page introuvable.',
 } as const;

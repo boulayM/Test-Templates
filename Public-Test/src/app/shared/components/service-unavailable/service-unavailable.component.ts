@@ -9,6 +9,7 @@ import { RouterModule } from '@angular/router';
 })
 export class ServiceUnavailableComponent {
   @Input() title = 'Service indisponible';
-  @Input() message = 'Cette fonctionnalite n est pas configuree dans cet environnement de demonstration.';
+  @Input() message =
+    'Cette fonctionnalité n est pas configurée dans cet environnement de demonstration.';
   @Input() backRoute = '/home';
 }

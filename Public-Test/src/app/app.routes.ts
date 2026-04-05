@@ -4,6 +4,7 @@ import { LoginComponent } from './features/auth/login.component';
 import { RegisterComponent } from './features/auth/register.component';
 import { VerifyEmailComponent } from './features/auth/verify-email.component';
 import { HomeComponent } from './features/public/home/home.component';
+import { LandingFigmaHomeComponent } from './features/public/home-figma/landing-figma-home.component';
 import { AuthenticatedLayoutComponent } from './layout/authenticated-layout/authenticated-layout.component';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
@@ -21,6 +22,19 @@ export const routes: Routes = [
           'Découvrez les produits de Ma Boutique et connectez-vous pour gérer votre panier.',
         indexable: true,
         canonicalPath: '/home',
+      },
+    },
+  },
+  {
+    path: 'home-figma',
+    component: LandingFigmaHomeComponent,
+    data: {
+      seo: {
+        title: 'Ma Boutique | Home Figma',
+        description:
+          "Variante de landing page dediee au prototypage et a l'import Figma.",
+        indexable: false,
+        canonicalPath: '/home-figma',
       },
     },
   },

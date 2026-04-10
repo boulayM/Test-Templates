@@ -17,6 +17,9 @@ coverage/
 playwright-report/
 test-results/
 
+# Legacy local snapshots
+Public-Test-Legacy/
+
 # Angular
 .angular/
 

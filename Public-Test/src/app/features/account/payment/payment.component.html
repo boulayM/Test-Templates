@@ -1,37 +1,38 @@
-@if (loading) {
-  <section class="container py-4"><p>Chargement...</p></section>
-} @else if (providerUnavailable) {
-  <app-service-unavailable
-    title="Paiement en ligne indisponible"
-    message="Le provider de paiement n est pas configure pour cette demonstration."
-    backRoute="/home"
-  />
-} @else {
-  <section class="container py-4">
-    <h2>Paiements commande #{{ orderId }}</h2>
-    <div class="card d-flex align-items-center gap-2 mb-3 flex-wrap">
-      <label for="provider">Provider</label>
-      <select id="provider" class="form-select w-auto" [(ngModel)]="provider">
-        <option value="MANUAL">MANUAL</option>
-        <option value="STRIPE">STRIPE</option>
-        <option value="PAYPAL">PAYPAL</option>
-      </select>
-      <button class="btn btn-primary btn-sm" (click)="createPayment()" [disabled]="creating">
-        {{ creating ? 'Creation...' : 'Creer un paiement' }}
-      </button>
-    </div>
+<section class="payment-page">
+  <p class="section-kicker">Paiement</p>
+  <h1>Paiement de la commande</h1>
 
-    @if (payments.length === 0) {
-      <div class="alert alert-info">Aucun paiement enregistre.</div>
-    } @else {
-      <ul class="card">
-        @for (payment of payments; track payment.id) {
-          <li>
-            {{ payment.provider }} - {{ payment.status }} -
-            {{ payment.amountCents / 100 | currency: payment.currency }}
-          </li>
+  @if (loading) {
+    <div class="alert alert-light border">Chargement des informations de paiement...</div>
+  } @else if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  } @else if (order) {
+    <div class="payment-layout">
+      <article class="card payment-card">
+        <h2>Commande #{{ order.id }}</h2>
+        <p>Statut de commande : <strong>{{ order.status }}</strong></p>
+        <p>Total : <strong>{{ order.totalCents / 100 | currency: order.currency }}</strong></p>
+        <p class="text-muted">{{ providerMessage }}</p>
+        <button class="btn btn-outline-dark" disabled>Paiement</button>
+        <p class="payment-note">Les paiements ne sont pas disponibles dans cette demo.</p>
+      </article>
+
+      <article class="card payment-card">
+        <h2>Historique des paiements</h2>
+        @if (payments.length > 0) {
+          <ul class="payment-list">
+            @for (payment of payments; track payment.id) {
+              <li>
+                <span>{{ payment.provider }} - {{ payment.status }}</span>
+                <strong>{{ payment.amountCents / 100 | currency: payment.currency }}</strong>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="alert alert-light border">Aucun paiement n a encore ete cree pour cette commande.</div>
         }
-      </ul>
-    }
-  </section>
-}
+        <a class="btn btn-outline-dark" routerLink="/account/orders">Retour aux commandes</a>
+      </article>
+    </div>
+  }
+</section>

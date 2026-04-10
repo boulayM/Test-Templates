@@ -1,0 +1,134 @@
+<section class="profile container py-4">
+  <h1 class="mb-3">Profil</h1>
+
+  @if (user()) {
+    <p class="mb-1"><strong>Prenom:</strong> {{ user()!.firstName }}</p>
+    <p class="mb-1"><strong>Nom:</strong> {{ user()!.lastName }}</p>
+    <p class="mb-3"><strong>Email:</strong> {{ user()!.email }}</p>
+
+    <h2>Adresses</h2>
+    <article class="card mt-3">
+      <h3>Ajouter une adresse</h3>
+      <form class="row g-2" [formGroup]="createAddressForm" (ngSubmit)="createAddress()">
+        <label class="col-md-6">
+          Label
+          <input class="form-control" type="text" formControlName="label" />
+        </label>
+        <label class="col-md-6">
+          Nom complet
+          <input class="form-control" type="text" formControlName="fullName" />
+        </label>
+        <label class="col-md-6">
+          Telephone
+          <input class="form-control" type="text" formControlName="phone" />
+        </label>
+        <label class="col-md-6">
+          Ligne 1
+          <input class="form-control" type="text" formControlName="line1" />
+        </label>
+        <label class="col-md-6">
+          Ligne 2
+          <input class="form-control" type="text" formControlName="line2" />
+        </label>
+        <label class="col-md-6">
+          Code postal
+          <input class="form-control" type="text" formControlName="postalCode" />
+        </label>
+        <label class="col-md-6">
+          Ville
+          <input class="form-control" type="text" formControlName="city" />
+        </label>
+        <label class="col-md-6">
+          Pays
+          <input class="form-control" type="text" formControlName="country" />
+        </label>
+        <div class="col-12 form-check mt-2">
+          <input class="form-check-input" id="newIsDefault" type="checkbox" formControlName="isDefault" />
+          <label class="form-check-label" for="newIsDefault">Adresse par defaut</label>
+        </div>
+        <div class="col-12 d-flex gap-2 mt-2">
+          <button class="btn btn-primary btn-sm" type="submit">Ajouter</button>
+        </div>
+      </form>
+    </article>
+
+    @if (addresses().length === 0) {
+      <div class="alert alert-warning">Aucune adresse enregistree.</div>
+    }
+
+    @for (address of addresses(); track address.id) {
+      <article class="card mt-3">
+        @if (editingAddressId() !== address.id) {
+          <p>
+            <strong>{{ address.label }}</strong>
+            @if (address.isDefault) {
+              <span class="badge text-bg-success">Defaut</span>
+            }
+          </p>
+          <p>{{ address.fullName }}</p>
+          <p>{{ address.phone }}</p>
+          <p>{{ address.line1 }}</p>
+          @if (address.line2) {
+            <p>{{ address.line2 }}</p>
+          }
+          <p>{{ address.postalCode }} {{ address.city }}</p>
+          <p>{{ address.country }}</p>
+          <div class="d-flex gap-2 mt-2">
+            <button class="btn btn-secondary btn-sm" type="button" (click)="startEdit(address)">Editer</button>
+            @if (!address.isDefault) {
+              <button class="btn btn-outline-secondary btn-sm" type="button" (click)="setDefault(address)">
+                Definir par defaut
+              </button>
+            }
+            <button class="btn btn-danger btn-sm" type="button" (click)="deleteAddress(address.id)">Supprimer</button>
+          </div>
+        } @else {
+          <form class="row g-2" [formGroup]="editAddressForm" (ngSubmit)="saveAddress(address.id)">
+            <label class="col-md-6">
+              Label
+              <input class="form-control" type="text" formControlName="label" />
+            </label>
+            <label class="col-md-6">
+              Nom complet
+              <input class="form-control" type="text" formControlName="fullName" />
+            </label>
+            <label class="col-md-6">
+              Telephone
+              <input class="form-control" type="text" formControlName="phone" />
+            </label>
+            <label class="col-md-6">
+              Ligne 1
+              <input class="form-control" type="text" formControlName="line1" />
+            </label>
+            <label class="col-md-6">
+              Ligne 2
+              <input class="form-control" type="text" formControlName="line2" />
+            </label>
+            <label class="col-md-6">
+              Code postal
+              <input class="form-control" type="text" formControlName="postalCode" />
+            </label>
+            <label class="col-md-6">
+              Ville
+              <input class="form-control" type="text" formControlName="city" />
+            </label>
+            <label class="col-md-6">
+              Pays
+              <input class="form-control" type="text" formControlName="country" />
+            </label>
+            <div class="col-12 form-check mt-2">
+              <input class="form-check-input" [id]="'editIsDefault-' + address.id" type="checkbox" formControlName="isDefault" />
+              <label class="form-check-label" [for]="'editIsDefault-' + address.id">Adresse par defaut</label>
+            </div>
+            <div class="col-12 d-flex gap-2 mt-2">
+              <button class="btn btn-primary btn-sm" type="submit">Enregistrer</button>
+              <button class="btn btn-secondary btn-sm" type="button" (click)="cancelEdit()">Annuler</button>
+            </div>
+          </form>
+        }
+      </article>
+    }
+  } @else {
+    <div class="alert alert-warning">Connexion requise pour acceder au profil.</div>
+  }
+</section>

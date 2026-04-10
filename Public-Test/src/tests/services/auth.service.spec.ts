@@ -39,7 +39,7 @@ describe('AuthService', () => {
     service = TestBed.inject(AuthService);
   });
 
-  it('should initAuth set user when /users/me succeeds', async () => {
+  it('should initAuth set user when /auth/me succeeds', async () => {
     const user = { id: 1, role: 'ADMIN' } as User;
     api.get.and.returnValue(of({ user }));
 
@@ -48,7 +48,7 @@ describe('AuthService', () => {
     expect(service.getCurrentUser()).toEqual(user);
   });
 
-  it('should initAuth set null when /users/me fails', async () => {
+  it('should initAuth set null when /auth/me fails', async () => {
     api.get.and.returnValue(throwError(() => new Error('fail')));
 
     await service.initAuth();
@@ -63,8 +63,7 @@ describe('AuthService', () => {
 
     service.login({ email: 'a@b.com', password: 'x' }).subscribe((result) => {
       expect(result).toEqual(user);
-      expect(modal.closeModalById).toHaveBeenCalledWith('loginModal');
-      expect(router.navigate).toHaveBeenCalledWith(['/catalog']);
+      expect(router.navigate).toHaveBeenCalledWith(['/account/profile']);
       done();
     });
   });

@@ -1,11 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ApiService } from './api.service';
 
 @Injectable({ providedIn: 'root' })
 export class CsrfService {
+  private api = inject(ApiService);
   private token: string | null = null;
-
-  constructor(private api: ApiService) {}
 
   getToken(): string | null {
     return this.token;

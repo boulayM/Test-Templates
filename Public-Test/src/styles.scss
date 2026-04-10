@@ -1,8 +1,18 @@
 @use "styles/bootstrap-partial";
 @use "styles/bootstrap-overrides";
+@use "styles/navbar-shell";
+@use "styles/home-shell";
+
+$ui-border-color: #dee2e6;
+$ui-surface-muted: #f3f5f7;
+$ui-text-muted: #4b5563;
+$ui-accent-red: #ff0505;
+$ui-accent-red-dark: #d60000;
+$ui-card-radius: 0.375rem;
 
 html,
 body {
+  font-family: "Inter", sans-serif;
   height: auto;
   min-height: 100%;
   margin: 0;
@@ -11,20 +21,24 @@ body {
   overflow-x: hidden;
 }
 
+body.modal-open {
+  padding-right: 0 !important;
+}
+
 .app-main {
-  padding-top: 72px;
+  padding-top: 2rem;
   padding-left: 1rem;
   padding-right: 1rem;
 }
 
-.ds-toast-container {
+.app-toast-container {
   position: fixed !important;
   top: 1rem !important;
   right: 1rem !important;
   z-index: 9999 !important;
 }
 
-.ds-toast {
+.app-toast {
   background: #16a34a !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.25) !important;
@@ -32,7 +46,7 @@ body {
   border-radius: 10px !important;
 }
 
-.ds-toast-header {
+.app-toast-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -41,18 +55,18 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.ds-toast-title {
+.app-toast-title {
   font-weight: 700;
 }
 
-.ds-toast-close {
+.app-toast-close {
   border: 0;
   background: transparent;
   color: #ffffff;
   cursor: pointer;
 }
 
-.ds-toast-body {
+.app-toast-body {
   padding: 0.65rem 0.75rem 0.75rem;
 }
 
@@ -87,7 +101,157 @@ body {
   font-weight: 600;
 }
 
-.card {
-  padding: 1rem;
+.badge {
+  align-items: center;
+  border-radius: 0.125rem;
+  display: inline-flex;
+  font-family: "Inter", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.25rem 0.5rem;
 }
 
+.ui-status-badge {
+  align-items: center;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  font-family: "Inter", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1;
+  min-height: 24px;
+  padding: 0.25rem 0.75rem;
+}
+
+.ui-status-badge--available {
+  background: #02930b;
+  color: #ffffff;
+}
+
+.ui-status-badge--unavailable {
+  background: rgba(33, 37, 41, 0.7);
+  color: #ffffff;
+}
+
+.badge.text-bg-dark {
+  background: #212529 !important;
+  color: #ffffff !important;
+}
+
+.badge.text-bg-success {
+  background: #02930b !important;
+  color: #ffffff !important;
+}
+
+.badge.text-bg-light {
+  background: #f8f9fa !important;
+  border: 1px solid #dee2e6;
+  color: #212529 !important;
+}
+
+.ui-section-link {
+  color: #0d6efd;
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.ui-section-kicker {
+  color: #212529;
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.ui-section-heading {
+  align-items: baseline;
+  display: flex;
+  gap: 1rem;
+}
+
+.ui-category-list {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-start;
+}
+
+.ui-category-list a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ui-product-visual {
+  background: $ui-surface-muted;
+  object-fit: contain;
+  padding: 0.75rem;
+}
+
+.ui-product-placeholder {
+  align-items: center;
+  background: #f8f9fa;
+  color: #6c757d;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.ui-dark-cta {
+  background: #946048 !important;
+  border-color: #1e1e1e !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+}
+
+.ui-dark-cta:hover,
+.ui-dark-cta:focus,
+.ui-dark-cta:active {
+  background: #946048 !important;
+  border-color: #1e1e1e !important;
+  color: #ffffff !important;
+}
+
+.ui-product-price {
+  color: #ff0505;
+  font-family: "Irish Grover", cursive;
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.ui-product-price--hero {
+  font-size: 3rem;
+}
+
+.ui-product-price--card {
+  font-size: 2rem;
+}
+
+.ui-product-price--catalog {
+  font-size: 1.65rem;
+}
+
+.ui-product-price--detail {
+  font-size: 2rem;
+}
+
+.ui-primary-cta {
+  background: $ui-accent-red !important;
+  border-color: $ui-accent-red-dark !important;
+  color: #ffffff !important;
+  white-space: nowrap;
+}
+
+.ui-primary-cta:hover,
+.ui-primary-cta:focus,
+.ui-primary-cta:active,
+.ui-primary-cta:disabled {
+  background: $ui-accent-red !important;
+  border-color: $ui-accent-red-dark !important;
+  color: #ffffff !important;
+}

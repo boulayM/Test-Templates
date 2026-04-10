@@ -1,0 +1,37 @@
+<section class="addresses-page">
+  <p class="section-kicker">Adresses</p>
+  <h1>Mes adresses</h1>
+
+  @if (loading) {
+    <div class="alert alert-light border">Chargement des adresses...</div>
+  } @else if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  } @else if (addresses.length === 0) {
+    <div class="alert alert-light border">Aucune adresse n est disponible pour ce compte.</div>
+  } @else {
+    <div class="row row-cols-1 row-cols-lg-2 g-4">
+      @for (address of addresses; track address.id) {
+        <div class="col">
+          <article class="card address-card">
+            <div class="address-card-header">
+              <strong>{{ address.label }}</strong>
+              @if (address.isDefault) {
+                <span class="badge text-bg-dark">Par defaut</span>
+              }
+            </div>
+            <p>{{ address.fullName }}</p>
+            <p>{{ address.line1 }}</p>
+            @if (address.line2) {
+              <p>{{ address.line2 }}</p>
+            }
+            <p>{{ address.postalCode }} {{ address.city }}</p>
+            <p>{{ address.country }}</p>
+            <p>{{ address.phone }}</p>
+          </article>
+        </div>
+      }
+    </div>
+  }
+
+  <p class="page-note">Les operations d edition des adresses ne sont pas disponibles sur cette demo.</p>
+</section>

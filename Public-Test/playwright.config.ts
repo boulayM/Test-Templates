@@ -10,7 +10,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'npx ng serve --port 4200',
+    command: 'npx ng serve --port 4200 --proxy-config proxy.e2e.conf.json',
     url: 'http://localhost:4200',
     reuseExistingServer: process.env['PW_REUSE_SERVER'] === 'true',
     timeout: 120000,

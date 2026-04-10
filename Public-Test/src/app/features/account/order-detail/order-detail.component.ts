@@ -1,51 +1,59 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { forkJoin } from 'rxjs';
+
 import { OrderService } from '../../../core/services/order.service';
-import { OrderRecord, Shipment } from '../../../shared/models/order.model';
-import { ToastService } from '../../../shared/services/toast.service';
+import { PaymentService } from '../../../core/services/payment.service';
+import {
+  Order,
+  PaymentSummary,
+  ShipmentSummary,
+} from '../../../shared/models/order.model';
 
 @Component({
   selector: 'app-order-detail',
   imports: [CommonModule, RouterModule],
   templateUrl: './order-detail.component.html',
+  styleUrls: ['./order-detail.component.scss'],
 })
 export class OrderDetailComponent implements OnInit {
-  loading = true;
-  order: OrderRecord | null = null;
-  shipments: Shipment[] = [];
+  private route = inject(ActivatedRoute);
+  private orderService = inject(OrderService);
+  private paymentService = inject(PaymentService);
 
-  constructor(
-    private route: ActivatedRoute,
-    private ordersService: OrderService,
-    private toast: ToastService,
-  ) {}
+  order: Order | null = null;
+  shipments: ShipmentSummary[] = [];
+  payments: PaymentSummary[] = [];
+  loading = true;
+  error: string | null = null;
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (Number.isNaN(id)) {
+    const orderId = Number(this.route.snapshot.paramMap.get('id'));
+    if (!orderId) {
+      this.error = 'Commande introuvable.';
       this.loading = false;
-      this.toast.show('Commande introuvable.');
       return;
     }
-    forkJoin({
-      order: this.ordersService.getMyOrder(id),
-      shipments: this.ordersService.getOrderShipments(id),
-    }).subscribe({
-      next: ({ order, shipments }) => {
+
+    this.orderService.getMyOrder(orderId).subscribe({
+      next: (order) => {
         this.order = order;
-        this.shipments = shipments;
         this.loading = false;
       },
       error: () => {
+        this.error = 'Impossible de charger cette commande.';
         this.loading = false;
-        this.toast.show('Impossible de charger la commande.');
       },
     });
-  }
 
-  canPay(): boolean {
-    return this.order?.status === 'PENDING';
+    this.orderService.getMyOrderShipments(orderId).subscribe({
+      next: (shipments) => (this.shipments = shipments),
+      error: () => undefined,
+    });
+
+    this.paymentService.getPaymentsByOrder(orderId).subscribe({
+      next: (payments) => (this.payments = payments),
+      error: () => undefined,
+    });
   }
 }

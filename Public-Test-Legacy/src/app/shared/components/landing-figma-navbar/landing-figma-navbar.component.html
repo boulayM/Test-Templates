@@ -1,0 +1,73 @@
+<nav class="landing-navbar navbar navbar-expand-lg border-bottom">
+  <div class="container-fluid">
+    <a class="navbar-brand landing-brand" [routerLink]="'/home-figma'">LOGO</a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      (click)="isCollapsed.set(!isCollapsed())"
+      aria-controls="landingFigmaNavbar"
+      [attr.aria-expanded]="!isCollapsed()"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="landingFigmaNavbar" class="collapse navbar-collapse" [ngbCollapse]="isCollapsed()">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="'/home-figma'" (click)="closeMenu()">Accueil</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="'/catalog'" (click)="closeMenu()">Catalogue</a>
+        </li>
+        <li class="nav-item dropdown" ngbDropdown>
+          <button class="nav-link dropdown-toggle btn btn-link text-decoration-none" ngbDropdownToggle type="button">
+            Categories
+          </button>
+          <div ngbDropdownMenu>
+            @for (category of categories(); track category.id) {
+              <button class="dropdown-item" type="button" (click)="goToCategory(category.name)">
+                {{ category.name }}
+              </button>
+            }
+            <a class="dropdown-item" [routerLink]="'/categories'" (click)="closeMenu()">Toutes les categories</a>
+          </div>
+        </li>
+      </ul>
+
+      <form class="d-flex landing-search me-2 mb-2 mb-lg-0" (submit)="$event.preventDefault(); runSearch()">
+        <input
+          class="form-control me-2"
+          type="search"
+          placeholder="Rechercher produit ou categorie"
+          [(ngModel)]="searchQuery"
+          name="landingFigmaSearch"
+        />
+        <button type="submit" class="btn btn-outline-secondary">Rechercher</button>
+      </form>
+
+      @if (!isLoggedIn()) {
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-dark" (click)="openLoginModal(loginModal)">Connexion</button>
+          <a class="btn btn-outline-secondary" [routerLink]="'/register'" (click)="closeMenu()">Inscription</a>
+        </div>
+      } @else {
+        <div class="d-flex align-items-center gap-2">
+          <span class="small text-muted">{{ user()?.email }}</span>
+          <button class="btn btn-outline-secondary btn-sm" (click)="logout()">Logout</button>
+        </div>
+      }
+    </div>
+  </div>
+</nav>
+
+<ng-template #loginModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Connexion</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <app-login></app-login>
+  </div>
+</ng-template>

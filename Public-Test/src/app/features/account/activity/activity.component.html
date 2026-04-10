@@ -1,85 +1,87 @@
-<!-- Message info pour USER -->
-@if (auth.isLoggedIn() && !auth.isAdmin()) {
-  <div class="alert alert-info text-center my-3">
-    Pour ajouter des produits, ouvrez la page <strong>Catalogue</strong> puis cliquez sur "Ajouter au panier".
+<section class="activity-container">
+  <div class="section-heading">
+    <div>
+      <p class="section-kicker">Panier</p>
+      <h1>Mon panier</h1>
+      <p>Ajoutez, mettez a jour ou retirez des articles avant le checkout.</p>
+    </div>
+    <a class="btn btn-outline-dark" routerLink="/catalog">Continuer les achats</a>
   </div>
-}
-<section class="container py-4">
-  @for (activityRecord of activityRecords; track activityRecord) {
-    <div class="card mb-3">
-      <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
-        <div>
-          <strong>Panier #{{ activityRecord.id }}</strong>
-          <span class="text-muted small">({{ activityRecord.status }})</span>
+
+  @if (loading) {
+    <div class="alert alert-light border">Chargement du panier...</div>
+  } @else if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  } @else if (!cart || cart.items.length === 0) {
+    <div class="alert alert-light border">Votre panier est vide.</div>
+  } @else {
+    <div class="cart-layout">
+      <article class="card">
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th>Quantite</th>
+                <th>Prix unitaire</th>
+                <th>Sous-total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of cart.items; track item.id) {
+                <tr>
+                  <td>
+                    <a [routerLink]="['/products', item.productId]">{{ item.product.name }}</a>
+                  </td>
+                  <td class="qty-cell">
+                    <input
+                      type="number"
+                      min="1"
+                      class="form-control"
+                      [(ngModel)]="item.quantity"
+                      (change)="updateQuantity(item)"
+                    />
+                  </td>
+                  <td>{{ item.unitPriceCents / 100 | currency: item.currency }}</td>
+                  <td>{{ (item.quantity * item.unitPriceCents) / 100 | currency: item.currency }}</td>
+                  <td class="text-end">
+                    <button class="btn btn-sm btn-outline-dark" (click)="removeItem(item.id)">Retirer</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-        <div class="d-flex gap-2">
-          <!-- Bouton ajouter element -->
-          <a
-            class="btn btn-primary btn-sm"
-            [routerLink]="['/catalog']"
-            [queryParams]="{ includeActivityId: activityRecord.id }"
-          >
-            Ajouter produit
-          </a>
-          <!-- Bouton supprimer l activite -->
-          <button
-            class="btn btn-secondary btn-sm"
-            (click)="deleteActivityRecord(activityRecord.id)"
-          >
-            Vider le panier
-          </button>
+      </article>
+
+      <aside class="card summary-card">
+        <h2>Recapitulatif</h2>
+        <div class="summary-row">
+          <span>Sous-total</span>
+          <strong>{{ subtotalCents / 100 | currency: 'EUR' }}</strong>
         </div>
-      </div>
-      <table class="table table-sm mt-3 mb-0">
-        <thead>
-          <tr>
-            <th>Produit</th>
-            <th>Quantite</th>
-            <th>Prix unitaire</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (item of activityRecord.items; track item) {
-            <tr>
-              <td>{{ item.contentItem.name }}</td>
-              <td>
-                <input
-                  type="number"
-                  min="1"
-                  [(ngModel)]="item.quantity"
-                  (change)="updateQuantity(activityRecord, item)"
-                  class="form-control form-control-sm"
-                />
-              </td>
-              <td>{{ item.price | currency: "EUR" }}</td>
-              <td>
-                <button
-                  class="btn btn-danger btn-sm"
-                  (click)="removeItem(activityRecord.id, item.contentItemId)"
-                >
-                  Retirer
-                </button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-      <div class="mt-2">
-        <strong>Total estime: {{ getTotal(activityRecord) | currency: "EUR" }}</strong>
-      </div>
-      <div class="d-flex gap-2 align-items-center mt-2 flex-wrap">
-        <input class="form-control w-auto" type="text" [(ngModel)]="couponCode" placeholder="Code promo" />
-        <button class="btn btn-secondary btn-sm" (click)="applyCoupon(activityRecord)">
-          Appliquer
-        </button>
-        @if (couponValid) {
-          <span class="text-success">Coupon applique au checkout</span>
+        <div class="summary-row">
+          <span>Reduction</span>
+          <strong>-{{ couponDiscountCents / 100 | currency: 'EUR' }}</strong>
+        </div>
+        <div class="summary-row total-row">
+          <span>Total</span>
+          <strong>{{ totalCents / 100 | currency: 'EUR' }}</strong>
+        </div>
+
+        <label class="form-label" for="couponCode">Coupon</label>
+        <div class="coupon-form">
+          <input id="couponCode" class="form-control" [(ngModel)]="couponCode" placeholder="Entrez un code coupon" />
+          <button class="btn btn-outline-dark" (click)="applyCoupon()">Verifier</button>
+        </div>
+
+        @if (couponMessage) {
+          <p class="coupon-message">{{ couponMessage }}</p>
         }
-      </div>
-      <div class="mt-2 d-flex justify-content-end">
-        <button class="btn btn-primary" (click)="goCheckout()">Commander</button>
-      </div>
+
+        <button class="btn btn-dark" (click)="goToCheckout()">Lancer la commande</button>
+      </aside>
     </div>
   }
 </section>

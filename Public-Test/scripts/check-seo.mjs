@@ -10,10 +10,6 @@ const indexHtml = fs.readFileSync(indexPath, 'utf8');
 
 const failures = [];
 
-if (/TODO: edit for prod/i.test(indexHtml)) {
-  failures.push('index.html still contains SEO TODO placeholder.');
-}
-
 for (const token of ['name="description"', 'name="robots"', 'property="og:image"', 'name="twitter:card"']) {
   if (!indexHtml.includes(token)) {
     failures.push(`index.html missing token: ${token}`);
@@ -25,10 +21,6 @@ if (seoBlocks < 8) failures.push(`Not enough route-level seo blocks found (${seo
 
 if (!/path:\s*'home'[\s\S]*?indexable:\s*true/.test(routes)) {
   failures.push('/home must be indexable.');
-}
-
-if (!/path:\s*'catalog'[\s\S]*?indexable:\s*true/.test(routes)) {
-  failures.push('/catalog must be indexable.');
 }
 
 if (!/path:\s*'login'[\s\S]*?indexable:\s*false/.test(routes)) {

@@ -1,42 +1,169 @@
-<section class="container py-4 d-grid gap-3">
-  @if (loading) {
-    <p>Chargement...</p>
-  } @else if (!product) {
-    <div class="alert alert-warning">Produit introuvable.</div>
-  } @else {
-    <div class="card">
-      <h2>{{ product.name }}</h2>
-      <p>{{ product.description }}</p>
-      <p><strong>{{ product.price | currency: 'EUR' }}</strong></p>
-    </div>
+<main class="container product-main">
+  @if (loading()) {
+    <div class="alert alert-light border">Chargement du produit...</div>
+  } @else if (error()) {
+    <div class="alert alert-danger">{{ error() }}</div>
+  } @else if (product(); as product) {
+    <section class="product-layout">
+      <article class="card product-gallery">
+        <img
+          class="ui-product-visual"
+          [src]="product.images[0]?.imageUrl || placeholderImage"
+          [alt]="product.images[0]?.altText || product.name"
+          (error)="onImageError($event)"
+        />
+      </article>
 
-    @if (auth.isLoggedIn()) {
-      <div class="card">
-        <h3>Laisser un avis</h3>
-        <label class="form-label">Note (1-5)</label>
-        <input class="form-control mb-2" type="number" min="1" max="5" [(ngModel)]="rating" />
-        <label class="form-label">Commentaire</label>
-        <textarea class="form-control mb-2" rows="3" [(ngModel)]="comment"></textarea>
-        <button class="btn btn-primary btn-sm" (click)="submitReview()">Publier</button>
-      </div>
-    }
-
-    <div class="card">
-      <h3>Avis</h3>
-      @if (reviews.length === 0) {
-        <p>Aucun avis.</p>
-      } @else {
-        <ul>
-          @for (review of reviews; track review.id) {
-            <li>
-              <strong>{{ review.rating }}/5</strong> - {{ review.comment || 'Sans commentaire' }}
-              @if (canDeleteReview(review)) {
-                <button class="btn btn-danger btn-sm" (click)="deleteReview(review.id)">Supprimer</button>
-              }
-            </li>
+      <article class="card product-summary">
+        <p class="section-kicker ui-section-kicker">Detail produit</p>
+        <h1>{{ product.name }}</h1>
+        <p>
+          {{
+            product.description ||
+              "Aucune description détaillée n'est disponible."
+          }}
+        </p>
+        <div class="summary-meta">
+          <strong class="ui-product-price ui-product-price--detail">{{
+            product.priceCents / 100 | currency: product.currency
+          }}</strong>
+          <span class="ui-status-badge ui-status-badge--available"
+            >Disponible</span
+          >
+        </div>
+        <p class="product-rating">
+          @if (product.averageRating !== null) {
+            Note moyenne : {{ product.averageRating | number: "1.1-1" }}/5
+            <span class="rating-count">({{ product.reviewCount }} avis)</span>
+          } @else {
+            Note moyenne : indisponible
           }
-        </ul>
+        </p>
+        <div class="category-list ui-category-list">
+          @for (category of product.categories; track category.id) {
+            <a
+              [routerLink]="['/catalog']"
+              [queryParams]="{ category: category.slug }"
+              >{{ category.name }}</a
+            >
+          }
+        </div>
+        <div class="summary-actions">
+          <button class="btn summary-buy-button ui-primary-cta" (click)="handleBuyAction()">
+            ACHETER
+          </button>
+          <a class="summary-catalog-link" routerLink="/catalog"
+            >Retour au catalogue</a
+          >
+        </div>
+      </article>
+    </section>
+
+    <section class="card reviews-card">
+      <div class="section-heading ui-section-heading">
+        <h2>Avis produits</h2>
+        <span>{{ reviews().length }} avis</span>
+      </div>
+
+      @if (auth.isLoggedIn() && canReview()) {
+        <form class="review-form" (ngSubmit)="submitReview()">
+          <div>
+            <label class="form-label" for="reviewRating">Note</label>
+            <select
+              id="reviewRating"
+              class="form-select"
+              [(ngModel)]="reviewRating"
+              name="reviewRating"
+            >
+              @for (rating of [5, 4, 3, 2, 1]; track rating) {
+                <option [value]="rating">{{ rating }}/5</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="reviewComment">Commentaire</label>
+            <textarea
+              id="reviewComment"
+              class="form-control"
+              rows="3"
+              [(ngModel)]="reviewComment"
+              name="reviewComment"
+            ></textarea>
+          </div>
+          @if (reviewError) {
+            <div class="alert alert-warning">{{ reviewError }}</div>
+          }
+          <button class="btn btn-dark" type="submit" [disabled]="reviewSaving">
+            {{ reviewSaving ? "Enregistrement..." : "Envoyer mon avis" }}
+          </button>
+        </form>
+      } @else if (auth.isLoggedIn()) {
+        <p class="text-muted">
+          Le formulaire d avis n est visible qu apres achat du produit.
+        </p>
+      } @else {
+        <p class="text-muted">
+          Connectez-vous pour verifier si vous pouvez deposer un avis.
+        </p>
       }
-    </div>
+
+      <div class="reviews-list">
+        @for (review of reviews(); track review.id) {
+          <article class="review-card border-top">
+            <div class="review-header">
+              <strong>{{ review.rating }}/5</strong>
+              <span>{{ review.createdAt | date: "longDate" }}</span>
+            </div>
+            <p>{{ review.comment || "Aucun commentaire détaillé." }}</p>
+          </article>
+        } @empty {
+          <div class="alert alert-light border">
+            Aucun avis n est encore disponible pour ce produit.
+          </div>
+        }
+      </div>
+    </section>
   }
-</section>
+</main>
+
+<ng-template #buyAccessModal let-modal>
+  <div class="modal-header">
+    <h2 class="modal-title fs-5">Achat</h2>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Fermer"
+      (click)="modal.dismiss('cancel')"
+    ></button>
+  </div>
+  <div class="modal-body buy-access-modal-body">
+    <p class="buy-access-message">
+      Vous devez être connecté pour pouvoir acheter
+    </p>
+    <button
+      type="button"
+      class="btn btn-link buy-access-link"
+      (click)="openLoginModal()"
+    >
+      Se connecter
+    </button>
+    <a class="buy-access-link" routerLink="/register" (click)="closeModal()"
+      >Créer un compte</a
+    >
+  </div>
+</ng-template>
+
+<ng-template #loginModalContent let-modal>
+  <div class="modal-header">
+    <h2 class="modal-title fs-5">Connexion</h2>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Fermer"
+      (click)="modal.dismiss('cancel')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <app-login [embedded]="true" (loggedIn)="closeModal()"></app-login>
+  </div>
+</ng-template>

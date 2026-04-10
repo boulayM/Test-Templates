@@ -1,13 +1,15 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  private readonly BASE_URL = environment.apiUrl;
+  private readonly BASE_URL =
+    (window as Window & { __env?: { API_URL?: string } }).__env?.API_URL || environment.apiUrl;
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
+  constructor() {
     if (environment.showSanityLogs) {
       console.log('API BASE URL =', this.BASE_URL);
     }
@@ -41,3 +43,4 @@ export class ApiService {
     });
   }
 }
+

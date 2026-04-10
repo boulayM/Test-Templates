@@ -14,12 +14,10 @@ if (Test-Path $envFile) {
 $apiUrl = $env:E2E_API_URL
 if (-not $apiUrl) { $apiUrl = "http://localhost:3001/api" }
 
-$defaultApiPath = "F:\Marc\Marc\DevWeb\Templates\TESTS\Test-Templates\Api-Test"
 $apiPath = $env:E2E_API_PATH
-if (-not $apiPath) { $apiPath = $defaultApiPath }
 
 Write-Host ("Using API URL: " + $apiUrl)
-Write-Host ("Using API path: " + $apiPath)
+Write-Host ("Using API path: " + $(if ($apiPath) { $apiPath } else { "(not set)" }))
 
 function Test-TcpPortOpen {
   param(
@@ -61,51 +59,64 @@ function Get-HttpStatusCodeSafe {
   }
 }
 
-if (-not (Test-Path $apiPath)) {
-  Write-Host "Warning: API path not found (seed skipped)"
+$apiUri = [Uri]$apiUrl
+$retryCount = 6
+$retryDelayMs = 1500
+$isApiReachable = $false
+
+for ($attemptIndex = 1; $attemptIndex -le $retryCount; $attemptIndex++) {
+  $isPortOpen = Test-TcpPortOpen -HostName $apiUri.Host -PortNumber $apiUri.Port
+  if ($isPortOpen) {
+    $isApiReachable = $true
+    break
+  }
+  Start-Sleep -Milliseconds $retryDelayMs
+}
+
+if ($isApiReachable) {
+  Write-Host ("API reachable (TCP " + $apiUri.Host + ":" + $apiUri.Port + ")")
+  $csrfStatusCode = Get-HttpStatusCodeSafe -Url ($apiUrl + "/csrf")
+  if ($csrfStatusCode -eq 200) {
+    Write-Host "API probe /csrf: 200 OK"
+  } elseif ($csrfStatusCode) {
+    Write-Host ("API probe /csrf returned status: " + $csrfStatusCode)
+  } else {
+    Write-Host "API probe /csrf: no HTTP response"
+  }
 } else {
-  $apiUri = [Uri]$apiUrl
-  $retryCount = 6
-  $retryDelayMs = 1500
-  $isApiReachable = $false
+  Write-Host ("Warning: API not reachable at " + $apiUri.Host + ":" + $apiUri.Port)
+}
 
-  for ($attemptIndex = 1; $attemptIndex -le $retryCount; $attemptIndex++) {
-    $isPortOpen = Test-TcpPortOpen -HostName $apiUri.Host -PortNumber $apiUri.Port
-    if ($isPortOpen) {
-      $isApiReachable = $true
-      break
-    }
-    Start-Sleep -Milliseconds $retryDelayMs
+if (([string]$env:E2E_RUN_SEED).ToLower() -eq "true") {
+  if (([string]$env:E2E_ALLOW_SEED).ToLower() -ne "isolated") {
+    Write-Error "Refusing to seed: set E2E_ALLOW_SEED=isolated to confirm an isolated e2e database."
+    exit 1
   }
 
-  if ($isApiReachable) {
-    Write-Host ("API reachable (TCP " + $apiUri.Host + ":" + $apiUri.Port + ")")
-    $csrfStatusCode = Get-HttpStatusCodeSafe -Url ($apiUrl + "/csrf")
-    if ($csrfStatusCode -eq 200) {
-      Write-Host "API probe /csrf: 200 OK"
-    } elseif ($csrfStatusCode) {
-      Write-Host ("API probe /csrf returned status: " + $csrfStatusCode)
-    } else {
-      Write-Host "API probe /csrf: no HTTP response"
-    }
-  } else {
-    Write-Host ("Warning: API not reachable at " + $apiUri.Host + ":" + $apiUri.Port)
+  if ($apiUri.Port -ne 3001) {
+    Write-Error ("Refusing to seed API target on port " + $apiUri.Port + "; only the isolated e2e port 3001 is allowed.")
+    exit 1
   }
 
-  $seedMode = ([string]$env:E2E_RUN_SEED).Trim().ToLower()
-  if (-not $seedMode) { $seedMode = "true" }
-
-  if ($seedMode -eq "true") {
-    try {
-      Push-Location $apiPath
-      Write-Host "Running prisma db seed with .env.e2e..."
-      npx dotenv -e .env.e2e -- prisma db seed
-    } catch {
-      Write-Host "Error: seed failed"
-    } finally {
-      Pop-Location
-    }
-  } else {
-    Write-Host ("Seed skipped (E2E_RUN_SEED=" + $seedMode + ")")
+  if (-not $apiPath) {
+    Write-Error "Refusing to seed: E2E_API_PATH must be set explicitly."
+    exit 1
   }
+
+  if (-not (Test-Path $apiPath)) {
+    Write-Error "Refusing to seed: API path not found."
+    exit 1
+  }
+
+  try {
+    Push-Location $apiPath
+    Write-Host "Running prisma db seed with .env.e2e..."
+    npx dotenv -e .env.e2e -- prisma db seed
+  } catch {
+    Write-Host "Error: seed failed"
+  } finally {
+    Pop-Location
+  }
+} else {
+  Write-Host "Seed skipped (set E2E_RUN_SEED=true to enable)"
 }

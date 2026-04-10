@@ -7,7 +7,9 @@ export const AuthMessages = {
     `Tentatives restantes: ${remaining} / ${total}.`,
   accessDeniedAuth: 'Acces refuse. Connectez-vous pour continuer.',
   accessDeniedRole: 'Acces refuse. Droits insuffisants.',
+  sessionExpired: 'Votre session a expire. Reconnectez-vous pour continuer.',
   serverError: 'Erreur serveur. Reessayez plus tard.',
+  serviceUnavailable: 'Service temporairement indisponible. Reessayez plus tard.',
   genericError: 'Une erreur est survenue.',
   notFound: 'Page introuvable.',
 } as const;

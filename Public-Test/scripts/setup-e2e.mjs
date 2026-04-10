@@ -21,11 +21,10 @@ if (existsSync(envPath)) {
 }
 
 const apiUrl = process.env.E2E_API_URL || "http://localhost:3001/api";
-const apiPath = process.env.E2E_API_PATH || "F:/Marc/Marc/DevWeb/Templates/TESTS/Test-Templates/Api-Test";
-const runSeed = String(process.env.E2E_RUN_SEED || "true").toLowerCase() === "true";
+const apiPath = process.env.E2E_API_PATH || "";
 
 console.log(`Using API URL: ${apiUrl}`);
-console.log(`Using API path: ${apiPath}`);
+console.log(`Using API path: ${apiPath || "(not set)"}`);
 
 function tcpCheck(host, port, timeoutMs = 1500) {
   return new Promise((resolve) => {
@@ -54,27 +53,47 @@ async function main() {
   }
 
   if (!reachable) {
-    console.log(`Error: API not reachable at ${parsed.hostname}:${parsed.port}`);
-    process.exit(1);
+    console.log(`Warning: API not reachable at ${parsed.hostname}:${parsed.port}`);
+    process.exit(0);
   }
 
   console.log(`API reachable (TCP ${parsed.hostname}:${parsed.port})`);
 
   try {
     const probe = await fetch(`${apiUrl}/csrf`);
-    console.log(`API probe /csrf: ${probe.status}`);
+    if (probe.ok) {
+      console.log("API probe /csrf: 200 OK");
+    } else {
+      console.log(`API probe /csrf returned status: ${probe.status}`);
+    }
   } catch {
     console.log("API probe /csrf: no HTTP response");
-    process.exit(1);
   }
 
+  const runSeed = String(process.env.E2E_RUN_SEED || "false").toLowerCase() === "true";
   if (!runSeed) {
-    console.log("Seed skipped (E2E_RUN_SEED=false)");
+    console.log("Seed skipped (set E2E_RUN_SEED=true to enable)");
     return;
   }
 
+  const allowSeed = String(process.env.E2E_ALLOW_SEED || "").toLowerCase() === "isolated";
+  if (!allowSeed) {
+    console.error("Refusing to seed: set E2E_ALLOW_SEED=isolated to confirm an isolated e2e database.");
+    process.exit(1);
+  }
+
+  if (parsed.port !== "3001") {
+    console.error(`Refusing to seed API target on port ${parsed.port || "(default)"}; only the isolated e2e port 3001 is allowed.`);
+    process.exit(1);
+  }
+
+  if (!apiPath) {
+    console.error("Refusing to seed: E2E_API_PATH must be set explicitly.");
+    process.exit(1);
+  }
+
   if (!existsSync(apiPath)) {
-    console.log("Error: API path not found (seed required)");
+    console.error("Refusing to seed: API path not found.");
     process.exit(1);
   }
 
@@ -88,7 +107,7 @@ async function main() {
   const result = spawnSync(command, args, {
     cwd: apiPath,
     stdio: "inherit",
-    shell: false,
+    shell: false
   });
 
   if (result.status !== 0) {

@@ -1,87 +1,119 @@
-import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiService } from './api.service';
-import { ApiMessage } from '../../shared/models/api-message.model';
-import { ContentItem, ContentItemDraft } from '../../shared/models/content-item.model';
 
-type ApiProduct = {
+import { ApiService } from './api.service';
+import { Category, Product, ProductListQuery } from '../../shared/models/product.model';
+import { Review } from '../../shared/models/review.model';
+import { environment } from '../../../environments/environment';
+
+type ProductApi = {
   id: number;
   name: string;
-  description?: string | null;
+  slug: string;
+  description: string;
   priceCents: number;
+  currency: string;
+  sku: string;
   isActive: boolean;
-  inventory?: { quantity: number; reserved: number } | null;
-  categories?: Array<
-    | { category?: { name?: string | null } | null }
-    | { name?: string | null }
-    | string
-  >;
+  averageRating?: number | null;
+  reviewCount?: number;
+  images?: Array<{
+    id: number;
+    url?: string;
+    alt?: string | null;
+    imageUrl?: string;
+    altText?: string | null;
+    sortOrder: number;
+  }>;
+  categories?: Array<{
+    category: Category;
+  }>;
+  inventory?: {
+    quantity: number;
+    reserved: number;
+  } | null;
 };
 
-const extractCategoryName = (
-  entry: { category?: { name?: string | null } | null } | { name?: string | null } | string,
-): string => {
-  if (typeof entry === 'string') return entry;
-  if (entry && typeof entry === 'object') {
-    if ('category' in entry) {
-      const cat = (entry as { category?: unknown }).category;
-      if (typeof cat === 'string') return cat;
-      if (cat && typeof cat === 'object' && 'name' in cat) {
-        return String((cat as { name?: unknown }).name ?? '');
-      }
-      return '';
-    }
-    if ('categoryName' in entry) return String((entry as { categoryName?: unknown }).categoryName ?? '');
-    if ('name' in entry) return entry.name || '';
-  }
-  return '';
+const getConfiguredApiUrl = (): string =>
+  (window as Window & { __env?: { API_URL?: string } }).__env?.API_URL || environment.apiUrl;
+
+const getApiOrigin = (): string => {
+  const baseUrl = getConfiguredApiUrl().replace(/\/+$/, '');
+  return baseUrl.endsWith('/api') ? baseUrl.slice(0, -4) : baseUrl;
 };
 
-const mapProduct = (product: ApiProduct): ContentItem => ({
+const resolveImageUrl = (imageUrl?: string): string => {
+  if (!imageUrl) return '';
+  if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
+  return `${getApiOrigin()}${imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`}`;
+};
+
+const mapProduct = (product: ProductApi): Product => ({
   id: product.id,
   name: product.name,
-  description: product.description || '',
-  price: product.priceCents / 100,
+  slug: product.slug,
+  description: product.description,
+  priceCents: product.priceCents,
+  currency: product.currency,
+  sku: product.sku,
   isActive: product.isActive,
-  isAvailable:
-    product.inventory == null
-      ? product.isActive
-      : product.isActive && product.inventory.quantity - product.inventory.reserved > 0,
-  categories: (product.categories || [])
-    .map((entry) => extractCategoryName(entry))
-    .map((name) => name.trim())
-    .filter((name) => !!name),
+  averageRating: product.averageRating ?? null,
+  reviewCount: product.reviewCount ?? 0,
+  images: (product.images || []).map((image) => ({
+    id: image.id,
+    imageUrl: resolveImageUrl(image.url || image.imageUrl),
+    altText: image.alt ?? image.altText ?? null,
+    sortOrder: image.sortOrder,
+  })),
+  categories: (product.categories || []).map((item) => item.category),
+  inventory: product.inventory || null,
 });
 
 @Injectable({ providedIn: 'root' })
 export class ContentService {
-  constructor(private api: ApiService) {}
+  private api = inject(ApiService);
 
-  getContentItems(): Observable<ContentItem[]> {
+  getProducts(query: ProductListQuery = {}): Observable<Product[]> {
+    const params = new URLSearchParams();
+    if (query.activeOnly) params.set('activeOnly', 'true');
+    if (query.q) params.set('q', query.q.trim());
+    if (query.limit) params.set('limit', String(query.limit));
+    const suffix = params.toString() ? `?${params.toString()}` : '';
+
     return this.api
-      .get<{ data: ApiProduct[] }>('/public/products?page=1&limit=20&activeOnly=true')
+      .get<{ data: ProductApi[] }>(`/public/products${suffix}`)
       .pipe(map((res) => (res.data || []).map(mapProduct)));
   }
 
-  getContentItemById(contentItemId: number): Observable<ContentItem> {
+  getProductById(productId: number): Observable<Product> {
     return this.api
-      .get<{ product: ApiProduct }>(`/public/products/${contentItemId}`)
+      .get<{ product: ProductApi }>(`/public/products/${productId}`)
       .pipe(map((res) => mapProduct(res.product)));
   }
 
-  createContentItem(_contentItem: ContentItemDraft): Observable<ContentItem> {
-    return throwError(() => new Error('Not supported on public API'));
+  getCategories(): Observable<Category[]> {
+    return this.api
+      .get<{ data: Category[] }>('/public/categories')
+      .pipe(map((res) => res.data || []));
   }
 
-  updateContentItem(
-    _contentItemId: number,
-    _contentItem: Partial<ContentItemDraft>,
-  ): Observable<ContentItem> {
-    return throwError(() => new Error('Not supported on public API'));
+  getReviews(productId: number): Observable<Review[]> {
+    return this.api
+      .get<{ data: Review[] }>(`/public/reviews?productId=${productId}`)
+      .pipe(map((res) => res.data || []));
   }
 
-  deleteContentItem(_contentItemId: number): Observable<ApiMessage> {
-    return throwError(() => new Error('Not supported on public API'));
+  createReview(payload: { productId: number; rating: number; comment: string }): Observable<Review> {
+    return this.api
+      .post<{ review: Review }>('/public/reviews', payload)
+      .pipe(map((res) => res.review));
+  }
+
+  updateReview(reviewId: number, payload: { rating: number; comment: string }): Observable<Review> {
+    return this.api
+      .patch<{ review: Review }>(`/public/reviews/${reviewId}`, payload)
+      .pipe(map((res) => res.review));
   }
 }
+

@@ -1,103 +1,112 @@
-import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
+
 import { ActivityService } from '../../../core/services/activity.service';
-import { ContentService } from '../../../core/services/content.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { UiMessages } from '../../../shared/messages/ui-messages';
-import { ActivityRecord } from '../../../shared/models/activity.model';
-import { ContentItem } from '../../../shared/models/content-item.model';
+import { ContentService } from '../../../core/services/content.service';
+import { Category, Product } from '../../../shared/models/product.model';
 import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-content',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './content.component.html',
   styleUrls: ['./content.component.scss'],
 })
-export class ContentComponent implements OnInit {
-  contentItems: ContentItem[] = [];
-  filteredContentItems: ContentItem[] = [];
-  activeActivityRecordId: number | null = null;
-  includedContentItems: number[] = [];
-  searchQuery = '';
+export class ContentComponent implements OnInit, OnDestroy {
+  private contentService = inject(ContentService);
+  private activityService = inject(ActivityService);
+  auth = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private toast = inject(ToastService);
 
-  constructor(
-    private contentService: ContentService,
-    private activityService: ActivityService,
-    private route: ActivatedRoute,
-    public auth: AuthService,
-    private toast: ToastService,
-  ) {}
+  readonly placeholderImage = '/assets/image-placeholder.svg';
+  products: Product[] = [];
+  filteredProducts: Product[] = [];
+  categories: Category[] = [];
+  selectedCategory = '';
+  searchTerm = '';
+  loading = true;
+  error: string | null = null;
+  private readonly subscriptions = new Subscription();
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe((params) => {
-      this.searchQuery = (params.get('q') || '').trim().toLowerCase();
-      this.applyFilter();
+    this.subscriptions.add(
+      this.route.queryParams.subscribe((params) => {
+        this.selectedCategory = params['category'] || '';
+        this.searchTerm = params['q'] || '';
+        this.loadCatalog();
+      }),
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  loadCatalog(): void {
+    this.loading = true;
+    this.error = null;
+
+    this.contentService.getCategories().subscribe({
+      next: (categories) => (this.categories = categories),
+      error: () => undefined,
     });
-    this.loadContentItems();
+
+    this.contentService
+      .getProducts({ activeOnly: true, limit: 100 })
+      .subscribe({
+        next: (products) => {
+          this.products = products;
+          this.applyFilters();
+          this.loading = false;
+        },
+        error: () => {
+          this.error = 'Impossible de charger le catalogue.';
+          this.loading = false;
+        },
+      });
   }
 
-  @HostListener('window:focus')
-  onWindowFocus(): void {
-    this.loadContentItems();
-  }
+  private applyFilters(): void {
+    const query = this.searchTerm.trim().toLowerCase();
+    this.filteredProducts = this.products.filter((product) => {
+      const matchesCategory =
+        !this.selectedCategory ||
+        product.categories.some(
+          (category) => category.slug === this.selectedCategory,
+        );
+      const matchesQuery =
+        !query ||
+        product.name.toLowerCase().includes(query) ||
+        product.slug.toLowerCase().includes(query) ||
+        product.categories.some((category) =>
+          category.name.toLowerCase().includes(query),
+        );
 
-  loadContentItems(): void {
-    this.contentService.getContentItems().subscribe({
-      next: (res) => {
-        this.contentItems = res;
-        this.applyFilter();
-      },
-      error: () => this.toast.show('Impossible de charger le catalogue.'),
+      return matchesCategory && matchesQuery;
     });
   }
 
-  private applyFilter(): void {
-    if (!this.searchQuery) {
-      this.filteredContentItems = [...this.contentItems];
-      return;
-    }
-    this.filteredContentItems = this.contentItems.filter((item) => {
-      const inName = item.name.toLowerCase().includes(this.searchQuery);
-      const inDescription = (item.description || '')
-        .toLowerCase()
-        .includes(this.searchQuery);
-      const inCategory = (item.categories || []).some((category) =>
-        category.toLowerCase().includes(this.searchQuery),
-      );
-      return inName || inDescription || inCategory;
+  addToCart(product: Product): void {
+    this.activityService.addProduct(product.id, 1).subscribe({
+      next: () => this.toast.show(`${product.name} a ete ajoute au panier.`),
+      error: () =>
+        this.toast.show('Impossible d ajouter ce produit au panier.'),
     });
   }
 
-  includeContentItem(contentItem: ContentItem): void {
-    if (!this.activeActivityRecordId) {
-      this.activityService
-        .createActivityRecord([{ contentItemId: contentItem.id!, quantity: 1 }])
-        .subscribe({
-          next: (res: ActivityRecord) => {
-            this.activeActivityRecordId = res.id;
-            this.includedContentItems.push(contentItem.id!);
-            this.toast.show(UiMessages.activity.created(contentItem.name));
-          },
-          error: () => this.toast.show('Impossible d ajouter le produit au panier.'),
-        });
-    } else {
-      this.activityService
-        .addContentItemToActivityRecord(this.activeActivityRecordId, contentItem.id!, 1)
-        .subscribe({
-          next: () => {
-            if (!this.includedContentItems.includes(contentItem.id!)) {
-              this.includedContentItems.push(contentItem.id!);
-            }
-            this.toast.show(UiMessages.activity.addedToActive(contentItem.name));
-          },
-          error: () => this.toast.show('Impossible d ajouter le produit au panier.'),
-        });
-    }
+  isAvailable(product: Product): boolean {
+    if (!product.isActive) return false;
+    if (!product.inventory) return true;
+    return product.inventory.quantity - product.inventory.reserved > 0;
   }
 
-  isIncluded(contentItem: ContentItem): boolean {
-    return this.includedContentItems.includes(contentItem.id!);
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = this.placeholderImage;
   }
 }

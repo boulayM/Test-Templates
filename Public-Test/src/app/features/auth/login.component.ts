@@ -1,27 +1,46 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+
 import { AuthService } from '../../core/services/auth.service';
-import { AuthMessages } from '../../shared/messages/auth-messages';
 import { FormAlertComponent } from '../../shared/components/form-alert/form-alert.component';
+import { AuthMessages } from '../../shared/messages/auth-messages';
 import { ValidationMessages } from '../../shared/messages/validation-messages';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, FormAlertComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    FormAlertComponent,
+  ],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
+  private auth = inject(AuthService);
+  private router = inject(Router);
+
   private readonly fb = inject(FormBuilder);
   readonly form = this.fb.nonNullable.group({
-    email: ['admin@example.com', [Validators.required, Validators.email]],
-    password: ['Admin123!', [Validators.required]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]],
   });
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly alertItems = signal<string[]>([]);
   readonly hasError = computed(() => !!this.error());
-
-  constructor(private auth: AuthService) {}
+  @Input() embedded = false;
+  @Output() loggedIn = new EventEmitter<void>();
 
   submit(): void {
     this.form.markAllAsTouched();
@@ -41,10 +60,7 @@ export class LoginComponent {
     this.auth.clearLoginError();
 
     this.auth
-      .login({
-        email,
-        password,
-      })
+      .login({ email, password }, { redirectToProfile: !this.embedded })
       .subscribe((user) => {
         this.loading.set(false);
         if (!user) {
@@ -66,9 +82,15 @@ export class LoginComponent {
             } else {
               this.error.set(baseMessage);
             }
-            this.alertItems.set(this.error() ? [this.error() as string] : []);
           }
-          this.form.patchValue({ email: '', password: '' });
+          this.alertItems.set(this.error() ? [this.error() as string] : []);
+          this.form.patchValue({ password: '' });
+          return;
+        }
+
+        this.loggedIn.emit();
+        if (!this.embedded) {
+          this.router.navigate(['/home']);
         }
       });
   }

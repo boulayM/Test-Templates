@@ -1,13 +1,15 @@
 import { TestBed } from '@angular/core/testing';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+
 import { NavbarComponent } from '../../app/shared/components/navbar/navbar.component';
 import { AuthService } from '../../app/core/services/auth.service';
+import { ContentService } from '../../app/core/services/content.service';
 import { User } from '../../app/shared/models/user.model';
 
 describe('NavbarComponent', () => {
-  it('should update isLoggedIn when user changes', () => {
+  it('should expose current user when auth changes', () => {
     const user$ = new BehaviorSubject<User | null>(null);
     const auth = {
       currentUser$: user$.asObservable(),
@@ -18,22 +20,21 @@ describe('NavbarComponent', () => {
       imports: [NavbarComponent, RouterTestingModule],
       providers: [
         { provide: AuthService, useValue: auth },
+        { provide: ContentService, useValue: { getCategories: () => of([]) } },
       ],
     });
 
     const fixture = TestBed.createComponent(NavbarComponent);
     fixture.detectChanges();
-    const router = TestBed.inject(Router);
-    spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
 
     const component = fixture.componentInstance;
-    user$.next({ id: 1, role: 'ADMIN' } as User);
+    user$.next({ id: 1, role: 'USER', firstName: 'Lea', lastName: 'D', email: 'lea@test.dev' });
     fixture.detectChanges();
 
-    expect(component.isLoggedIn()).toBeTrue();
+    expect(component.currentUser?.firstName).toBe('Lea');
   });
 
-  it('should call logout and navigate home', () => {
+  it('should delegate logout to auth service', () => {
     const user$ = new BehaviorSubject<User | null>(null);
     const auth = {
       currentUser$: user$.asObservable(),
@@ -44,6 +45,7 @@ describe('NavbarComponent', () => {
       imports: [NavbarComponent, RouterTestingModule],
       providers: [
         { provide: AuthService, useValue: auth },
+        { provide: ContentService, useValue: { getCategories: () => of([]) } },
       ],
     });
 
@@ -55,6 +57,5 @@ describe('NavbarComponent', () => {
     component.logout();
 
     expect(auth.logout).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/home']);
   });
 });

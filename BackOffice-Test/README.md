@@ -74,3 +74,37 @@ Validation complete passee sur cette base:
 
 - Ce projet n est plus un socle minimal: c est une adaptation metier de reference.
 - Pour un nouveau projet, partir du socle front (`BackOffice-Angular-Shell`) puis appliquer le playbook d adaptation.
+
+## Docker local
+
+Une dockerisation locale standalone est disponible pour lancer le back-office comme application statique servie par Nginx.
+
+### Fichiers
+
+- `Dockerfile`
+- `.dockerignore`
+- `docker/nginx/default.conf`
+- `docker/nginx/docker-entrypoint.sh`
+- `public/env.js`
+
+### Build
+
+```powershell
+docker build -t backoffice-test .
+```
+
+### Run
+
+```powershell
+docker run --rm -p 4201:80 -e API_URL=http://localhost:3000/api backoffice-test
+```
+
+### URL utile
+
+- Back-office : `http://localhost:4201`
+
+### Notes
+
+- `API_URL` est injectee au runtime via `env.js`.
+- En local Docker, le back-office peut parler a l API exposee sur `http://localhost:3000/api`.
+- Cette dockerisation n a pas d impact sur le lancement Angular classique via `npm start`.

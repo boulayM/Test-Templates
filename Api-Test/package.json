@@ -32,6 +32,7 @@
     "preflight:e2e": "node scripts/preflight.mjs e2e",
     "predev:e2e": "npm run preflight:e2e",
     "pretest:db": "npm run preflight:test",
+    "seed:dev": "npm run preflight:dev && dotenv -e .env.dev -- prisma db seed",
     "seed:e2e": "npm run preflight:e2e && dotenv -e .env.e2e -- prisma db seed",
     "seed:test": "npm run preflight:test && dotenv -e .env.test -- prisma db seed",
     "ci:lint": "npm run lint",

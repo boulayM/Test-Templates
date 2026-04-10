@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { Inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -13,17 +13,17 @@ type LegacySeoRouteData = {
 
 @Injectable({ providedIn: 'root' })
 export class SeoService {
-  constructor(
-    private title: Title,
-    private meta: Meta,
-    private router: Router,
-    @Inject(DOCUMENT) private document: Document,
-  ) {}
+  private title = inject(Title);
+  private meta = inject(Meta);
+  private router = inject(Router);
+  private document = inject<Document>(DOCUMENT);
 
   init(): void {
-    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-      this.applyFromCurrentRoute();
-    });
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.applyFromCurrentRoute();
+      });
 
     this.applyFromCurrentRoute();
   }
@@ -34,11 +34,11 @@ export class SeoService {
 
     const title =
       legacy?.title ??
-      (typeof route.title === 'string' ? route.title : 'Ma Boutique');
+      (typeof route.title === 'string' ? route.title : 'Public Shell');
     const description =
       legacy?.description ??
       (route.data?.['description'] as string | undefined) ??
-      'Ma Boutique - catalogue et parcours client e-commerce.';
+      'Frontend public Angular connecte a une API securisee.';
     const robots = legacy
       ? legacy.indexable === false
         ? 'noindex,nofollow'
@@ -61,7 +61,10 @@ export class SeoService {
     this.meta.updateTag({ property: 'og:type', content: 'website' });
     this.meta.updateTag({ property: 'og:image', content: imageUrl });
 
-    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+    this.meta.updateTag({
+      name: 'twitter:card',
+      content: 'summary_large_image',
+    });
     this.meta.updateTag({ name: 'twitter:title', content: title });
     this.meta.updateTag({ name: 'twitter:description', content: description });
     this.meta.updateTag({ name: 'twitter:image', content: imageUrl });
@@ -69,7 +72,9 @@ export class SeoService {
     this.upsertJsonLd(robots === 'index,follow', canonicalUrl, title);
   }
 
-  private getDeepestRoute(route: ActivatedRouteSnapshot): ActivatedRouteSnapshot {
+  private getDeepestRoute(
+    route: ActivatedRouteSnapshot,
+  ): ActivatedRouteSnapshot {
     let current = route;
     while (current.firstChild) {
       current = current.firstChild;
@@ -84,7 +89,9 @@ export class SeoService {
   }
 
   private upsertCanonical(url: string): void {
-    let link = this.document.querySelector("link[rel='canonical']") as HTMLLinkElement | null;
+    let link = this.document.querySelector(
+      "link[rel='canonical']",
+    ) as HTMLLinkElement | null;
     if (!link) {
       link = this.document.createElement('link');
       link.setAttribute('rel', 'canonical');
@@ -93,7 +100,11 @@ export class SeoService {
     link.setAttribute('href', url);
   }
 
-  private upsertJsonLd(indexable: boolean, canonicalUrl: string, pageTitle: string): void {
+  private upsertJsonLd(
+    indexable: boolean,
+    canonicalUrl: string,
+    pageTitle: string,
+  ): void {
     const existing = this.document.getElementById('app-jsonld-seo');
     if (!indexable) {
       if (existing) existing.remove();
@@ -103,11 +114,11 @@ export class SeoService {
     const schema = {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: 'Ma Boutique',
+      name: 'Public Shell',
       url: this.document.location.origin,
       potentialAction: {
         '@type': 'SearchAction',
-        target: `${this.document.location.origin}/catalog?q={search_term_string}`,
+        target: `${this.document.location.origin}/public/content?q={search_term_string}`,
         'query-input': 'required name=search_term_string',
       },
       inLanguage: 'fr-FR',

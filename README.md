@@ -86,3 +86,6 @@ GitHub proposera ensuite l'ouverture des ports du Codespace. Les ports utiles so
 ```
 
 Le Codespace appartient a l'utilisateur qui l'ouvre et consomme ses propres quotas GitHub Codespaces. Il ne s'agit pas d'une demo publique permanente : pour une consultation simple, les liens Render restent preferables.
+
+https://public-angular.onrender.com
+https://backoffice-angular-kdsd.onrender.com

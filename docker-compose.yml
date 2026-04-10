@@ -1,0 +1,89 @@
+name: test-templates
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: api_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - test_templates_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d api_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./Api-Test
+      dockerfile: Dockerfile
+    profiles:
+      - demo
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/api_test?schema=public
+      FRONT_URL: http://localhost:4201,http://localhost:4202
+      ACCESS_TOKEN_SECRET: change-me-access
+      REFRESH_TOKEN_SECRET: change-me-refresh
+      ACCESS_TOKEN_EXPIRE: 15m
+      REFRESH_TOKEN_EXPIRE: 7d
+      EMAIL_VERIFICATION_EXPIRE: 24h
+      ENABLE_AUDIT_LOG: "false"
+      REGISTRATION_ENABLED: "true"
+      EMAIL_VERIFICATION_REQUIRED: "true"
+      REGISTRATION_CAPTCHA_REQUIRED: "false"
+      COOKIE_DOMAIN: localhost
+      VERIFY_EMAIL_URL: http://localhost:4202/verify-email
+    ports:
+      - "3000:3000"
+
+  seed:
+    build:
+      context: ./Api-Test
+      dockerfile: Dockerfile
+    profiles:
+      - demo
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/api_test?schema=public
+    command: ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed"]
+
+  backoffice:
+    build:
+      context: ./BackOffice-Test
+      dockerfile: Dockerfile
+    profiles:
+      - demo
+    depends_on:
+      api:
+        condition: service_started
+    environment:
+      API_URL: http://localhost:3000/api
+    ports:
+      - "4201:80"
+
+  public:
+    build:
+      context: ./Public-Test
+      dockerfile: Dockerfile
+    profiles:
+      - demo
+    depends_on:
+      api:
+        condition: service_started
+    environment:
+      API_URL: http://localhost:3000/api
+    ports:
+      - "4202:80"
+
+volumes:
+  test_templates_pgdata:

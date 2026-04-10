@@ -14,14 +14,14 @@ test.describe('seo', () => {
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', /Ma Boutique/);
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /og-default\.svg/);
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
-
     await expect(page.locator('script#app-jsonld-seo[type="application/ld+json"]')).toHaveCount(1);
   });
 
   test('auth page is noindex', async ({ page }) => {
     await page.goto('/verify-email?token=dummy');
     await expect(page).toHaveURL(/\/verify-email\?token=dummy$/);
-    await expect(page).toHaveTitle(/Verification email/);
+    await expect(page).toHaveTitle(/Ma Boutique \| Verification email/);
+
     const robots = await page.locator('meta[name="robots"]').getAttribute('content');
     expect(robots).toBe('noindex,nofollow');
   });

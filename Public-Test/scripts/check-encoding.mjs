@@ -47,7 +47,7 @@ function walk(dir) {
       continue;
     }
 
-    if (/Ã[A-Za-z0-9]/u.test(text) || /Â[A-Za-z0-9]/u.test(text) || text.includes("�")) {
+    if (/Ã[A-Za-z0-9]/u.test(text) || /Â[A-Za-z0-9]/u.test(text) || text.includes("\ufffd")) {
       console.log(`Verification failed: mojibake signature found in ${filePath}`);
       hasError = true;
     }

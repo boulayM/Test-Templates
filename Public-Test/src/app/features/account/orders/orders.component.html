@@ -1,20 +1,29 @@
-<section class="container py-4">
-  <div class="content-header">
-    <h2>Mes commandes</h2>
-  </div>
+<section class="orders-page">
+  <p class="section-kicker">Commandes</p>
+  <h1>Historique des commandes</h1>
 
   @if (loading) {
-    <p>Chargement...</p>
+    <div class="alert alert-light border">Chargement des commandes...</div>
+  } @else if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
   } @else if (orders.length === 0) {
-    <div class="alert alert-warning">Aucune commande.</div>
+    <div class="alert alert-light border">Aucune commande n est encore disponible.</div>
   } @else {
-    <div class="grid grid-gap-md">
+    <div class="orders-list">
       @for (order of orders; track order.id) {
-        <a class="card d-block text-reset text-decoration-none" [routerLink]="['/account/orders', order.id]">
-          <p><strong>Commande #{{ order.id }}</strong></p>
-          <p>Statut: {{ order.status }}</p>
-          <p>Total: {{ order.totalCents / 100 | currency: order.currency }}</p>
-        </a>
+        <article class="card order-card">
+          <div>
+            <strong>Commande #{{ order.id }}</strong>
+            <p>{{ order.createdAt | date: 'longDate' }}</p>
+          </div>
+          <div>
+            <span class="badge text-bg-dark">{{ order.status }}</span>
+          </div>
+          <div>
+            <strong>{{ order.totalCents / 100 | currency: order.currency }}</strong>
+          </div>
+          <a class="btn btn-outline-dark" [routerLink]="['/account/orders', order.id]">Voir le detail</a>
+        </article>
       }
     </div>
   }

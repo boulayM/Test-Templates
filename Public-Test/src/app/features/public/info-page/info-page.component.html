@@ -1,0 +1,187 @@
+<main class="info-page">
+  <section class="container info-page-shell">
+    <div class="info-page-card">
+      <p class="ui-section-kicker">{{ kicker() }}</p>
+      <h1>{{ title() }}</h1>
+      @if (isLegalPage()) {
+        <div class="info-page-legal">
+          <section class="info-page-section">
+            <h2>Éditeur du site</h2>
+            <p>Le présent site est édité par :</p>
+            <p>Marc Boulay</p>
+            <p>Contact : macboulay2@gmail.com</p>
+            <p>Directeur de la publication : Marc Boulay</p>
+          </section>
+
+          <section class="info-page-section">
+            <h2>Hébergement</h2>
+            <p>Le front du site est hébergé sur :</p>
+            <p>Render</p>
+            <p>Site web :</p>
+            <p>
+              <a href="https://render.com" target="_blank" rel="noreferrer"
+                >https://render.com</a
+              >
+            </p>
+            <p>L’API du site est hébergée sur :</p>
+            <p>
+              Alwaysdata - 91 rue du Faubourg Saint Honoré 75008 - Paris –
+              France
+            </p>
+            <p>Site web :</p>
+            <p>
+              <a
+                href="https://www.alwaysdata.com"
+                target="_blank"
+                rel="noreferrer"
+                >https://www.alwaysdata.com</a
+              >
+            </p>
+          </section>
+
+          <section class="info-page-section">
+            <h2>Nature du site</h2>
+            <p>
+              Le présent site est un projet de démonstration technique à
+              vocation de présentation, de test et d’illustration d’une
+              interface e-commerce.
+            </p>
+            <p>
+              Il ne constitue pas une boutique en ligne exploitée
+              commercialement au sens habituel du terme. Certaines
+              fonctionnalités, données, pages, contenus ou parcours peuvent être
+              proposés à titre de simulation, de maquette ou d’exemple.
+            </p>
+          </section>
+
+          <section class="info-page-section">
+            <h2>Informations produits</h2>
+            <p>
+              Les produits, prix, descriptions, visuels, avis, disponibilités et
+              autres contenus affichés sur le site peuvent être fournis à titre
+              illustratif dans le cadre de la démonstration.
+            </p>
+            <p>Ils ne constituent pas une offre commerciale.</p>
+          </section>
+
+          <section class="info-page-section">
+            <h2>Images et illustrations</h2>
+            <p>
+              Les images présentes sur le site sont utilisées dans un objectif
+              de démonstration visuelle de l’interface.
+            </p>
+            <p>Elles peuvent provenir :</p>
+            <ul>
+              <li>de ressources libres ou sous licence adaptée</li>
+              <li>de contenus modifiés pour les besoins du projet</li>
+              <li>de visuels utilisés a titre purement illustratif</li>
+            </ul>
+            <p>
+              Sauf mention contraire, les images affichées n’ont pas vocation à
+              identifier un produit réellement commercialisé par l’éditeur.
+              Lorsqu’un élément visuel, un objet, une forme ou un style évoque
+              un produit existant, cela ne vaut ni affiliation, ni approbation,
+              ni partenariat avec une marque, un fabricant ou un titulaire de
+              droits.
+            </p>
+          </section>
+
+          <section class="info-page-section">
+            <h2>Propriété intellectuelle</h2>
+            <p>
+              Les éléments spécifiques au projet, notamment la structure de
+              l’interface, les textes originaux, les composants visuels, la mise
+              en page, les choix graphiques, les icônes, les logos et les
+              développements réalisés pour ce site, sont protégés par les règles
+              applicables en matière de propriété intellectuelle.
+            </p>
+            <p>
+              Toute reproduction, représentation, adaptation ou exploitation,
+              totale ou partielle, sans autorisation préalable, est interdite,
+              sauf dispositions légales contraires.
+            </p>
+          </section>
+
+          <section class="info-page-section">
+            <h2>Données personnelles</h2>
+            <p>
+              Le site peut traiter certaines données nécessaires au
+              fonctionnement technique des fonctionnalités proposées, notamment
+              dans le cadre :
+            </p>
+            <ul>
+              <li>de l’inscription</li>
+              <li>de la connexion</li>
+              <li>de la gestion d’un compte utilisateur</li>
+              <li>de l’utilisation de formulaires</li>
+              <li>de la navigation technique</li>
+            </ul>
+            <p>
+              Le site étant un projet de démonstration, les données
+              éventuellement saisies ne doivent pas être considérées comme
+              destinées a un usage commercial effectif sans information
+              complémentaire explicite.
+            </p>
+          </section>
+
+          <section class="info-page-section">
+            <h2>Cookies</h2>
+            <p>
+              Le site peut utiliser des cookies ou mécanismes similaires
+              strictement nécessaires au fonctionnement technique, à la gestion
+              de session, à la sécurisation des échanges et a l’amélioration de
+              l’expérience utilisateur.
+            </p>
+          </section>
+
+          <section class="info-page-section">
+            <h2>Responsabilité</h2>
+            <p>
+              L’éditeur s’efforce d’assurer la disponibilité et le bon
+              fonctionnement du site, sans garantir l’absence d’erreurs,
+              d’omissions, d’interruptions ou de contenus temporaires
+              incohérents.
+            </p>
+            <p>
+              Le site étant un projet de démonstration, certaines pages peuvent
+              être inachevées, certaines informations peuvent être simplifiées,
+              et certaines fonctionnalités peuvent être volontairement limitées.
+            </p>
+          </section>
+
+          <section class="info-page-section">
+            <h2>Droit applicable</h2>
+            <p>
+              Les présentes mentions légales sont soumises au droit français.
+            </p>
+            <p>
+              En cas de litige, et sous réserve des règles légales applicables,
+              compétence est attribuée aux juridictions françaises compétentes.
+            </p>
+          </section>
+        </div>
+      } @else if (isContactPage()) {
+        <div class="info-page-contact">
+          <p>Marc Boulay</p>
+          <p>Développeur Web et Web mobile</p>
+          <p>e-mail: macboulay2@gmail.com</p>
+          <p>
+            site:
+            <a
+              href="http://mabdev.onrender.com"
+              target="_blank"
+              rel="noreferrer"
+            >
+              http://mabdev.onrender.com
+            </a>
+          </p>
+        </div>
+      } @else {
+        <p class="info-page-message">
+          EN CONSTRUCTION. DISPONIBLE TRÈS PROCHAINEMENT
+        </p>
+      }
+      <a class="info-page-home-link" routerLink="/home">Retour à l'accueil</a>
+    </div>
+  </section>
+</main>

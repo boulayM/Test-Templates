@@ -3,9 +3,11 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/login.component';
 import { RegisterComponent } from './features/auth/register.component';
 import { VerifyEmailComponent } from './features/auth/verify-email.component';
+import { ProductDetailComponent } from './features/public/product-detail/product-detail.component';
 import { HomeComponent } from './features/public/home/home.component';
-import { LandingFigmaHomeComponent } from './features/public/home-figma/landing-figma-home.component';
+import { InfoPageComponent } from './features/public/info-page/info-page.component';
 import { AuthenticatedLayoutComponent } from './layout/authenticated-layout/authenticated-layout.component';
+import { PublicLayoutComponent } from './layout/public-layout/public-layout.component';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { ErrorPageComponent } from './shared/components/error-page/error-page.component';
@@ -13,30 +15,57 @@ import { ErrorPageComponent } from './shared/components/error-page/error-page.co
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
-    path: 'home',
-    component: HomeComponent,
-    data: {
-      seo: {
-        title: 'Ma Boutique | Accueil',
-        description:
-          'Découvrez les produits de Ma Boutique et connectez-vous pour gérer votre panier.',
-        indexable: true,
-        canonicalPath: '/home',
+    path: '',
+    component: PublicLayoutComponent,
+    children: [
+      {
+        path: 'home',
+        component: HomeComponent,
+        data: {
+          seo: {
+            title: 'Ma Boutique | Accueil',
+            description: 'Produit du mois, categories et acces rapide au catalogue.',
+            indexable: true,
+            canonicalPath: '/home',
+          },
+        },
       },
-    },
-  },
-  {
-    path: 'home-figma',
-    component: LandingFigmaHomeComponent,
-    data: {
-      seo: {
-        title: 'Ma Boutique | Home Figma',
-        description:
-          "Variante de landing page dediee au prototypage et a l'import Figma.",
-        indexable: false,
-        canonicalPath: '/home-figma',
+      {
+        path: 'catalog',
+        loadComponent: () =>
+          import('./features/public/content/content.component').then((m) => m.ContentComponent),
+        data: {
+          seo: {
+            title: 'Ma Boutique | Catalogue',
+            description: 'Catalogue public des produits disponibles par categorie.',
+            indexable: true,
+            canonicalPath: '/catalog',
+          },
+        },
       },
-    },
+      {
+        path: 'products/:id',
+        component: ProductDetailComponent,
+        data: {
+          seo: {
+            title: 'Ma Boutique | Produit',
+            description: 'Detail produit, avis clients et acces au panier.',
+            indexable: true,
+          },
+        },
+      },
+      {
+        path: 'info/:slug',
+        component: InfoPageComponent,
+        data: {
+          seo: {
+            title: 'Ma Boutique | Information',
+            description: 'Page informative temporairement indisponible.',
+            indexable: true,
+          },
+        },
+      },
+    ],
   },
   {
     path: 'login',
@@ -45,7 +74,7 @@ export const routes: Routes = [
     data: {
       seo: {
         title: 'Ma Boutique | Connexion',
-        description: 'Connectez-vous a votre espace client Ma Boutique.',
+        description: 'Connexion a l espace client.',
         indexable: false,
         canonicalPath: '/login',
       },
@@ -58,8 +87,7 @@ export const routes: Routes = [
     data: {
       seo: {
         title: 'Ma Boutique | Inscription',
-        description:
-          'Créez votre compte client pour commander sur Ma Boutique.',
+        description: 'Inscription client non disponible dans cette demo.',
         indexable: false,
         canonicalPath: '/register',
       },
@@ -71,7 +99,7 @@ export const routes: Routes = [
     data: {
       seo: {
         title: 'Ma Boutique | Verification email',
-        description: 'Verification de votre adresse email.',
+        description: 'Validation de votre adresse email.',
         indexable: false,
         canonicalPath: '/verify-email',
       },
@@ -81,11 +109,70 @@ export const routes: Routes = [
     path: 'access-denied',
     component: ErrorPageComponent,
     data: {
-      reason: 'forbidden',
+      reason: 'auth',
       seo: {
-        title: 'Ma Boutique | Accès refusé',
-        description:
-          'Vous ne disposez pas des droits nécessaires pour accéder à cette page.',
+        title: 'Public Shell | Acces refuse',
+        description: 'Vous ne disposez pas des droits necessaires.',
+        indexable: false,
+      },
+    },
+  },
+  {
+    path: 'forbidden',
+    component: ErrorPageComponent,
+    data: {
+      reason: 'role',
+      seo: {
+        title: 'Public Shell | Droits insuffisants',
+        description: 'Vous ne disposez pas des droits necessaires.',
+        indexable: false,
+      },
+    },
+  },
+  {
+    path: 'session-expired',
+    component: ErrorPageComponent,
+    data: {
+      reason: 'session',
+      seo: {
+        title: 'Public Shell | Session expiree',
+        description: 'Votre session a expire. Reconnectez-vous pour continuer.',
+        indexable: false,
+      },
+    },
+  },
+  {
+    path: 'service-unavailable',
+    component: ErrorPageComponent,
+    data: {
+      reason: 'unavailable',
+      seo: {
+        title: 'Public Shell | Service indisponible',
+        description: 'Le service est temporairement indisponible.',
+        indexable: false,
+      },
+    },
+  },
+  {
+    path: 'server-error',
+    component: ErrorPageComponent,
+    data: {
+      reason: 'server',
+      seo: {
+        title: 'Public Shell | Erreur serveur',
+        description: 'Une erreur serveur est survenue.',
+        indexable: false,
+      },
+    },
+  },
+  {
+    path: 'error',
+    component: ErrorPageComponent,
+    data: {
+      reason: 'generic',
+      seo: {
+        title: 'Public Shell | Erreur',
+        description: 'Une erreur est survenue.',
         indexable: false,
       },
     },
@@ -93,151 +180,111 @@ export const routes: Routes = [
   {
     path: '',
     component: AuthenticatedLayoutComponent,
+    canActivate: [authGuard],
+    canActivateChild: [authGuard],
     children: [
       {
-        path: 'catalog',
-        loadComponent: () =>
-          import('./features/public/content/content.component').then(
-            (m) => m.ContentComponent,
-          ),
-        data: {
-          seo: {
-            title: 'Ma Boutique | Catalogue',
-            description:
-              'Consultez le catalogue produits et ajoutez des articles au panier.',
-            indexable: true,
-            canonicalPath: '/catalog',
-          },
-        },
-      },
-      {
-        path: 'catalog/:id',
-        loadComponent: () =>
-          import('./features/public/product-detail/product-detail.component').then(
-            (m) => m.ProductDetailComponent,
-          ),
-        data: {
-          seo: {
-            title: 'Ma Boutique | Detail produit',
-            description: "Consultez la fiche détaillée d'un produit.",
-            indexable: true,
-            canonicalPath: '/catalog',
-          },
-        },
-      },
-      {
-        path: 'categories',
-        loadComponent: () =>
-          import('./features/public/categories/categories.component').then(
-            (m) => m.CategoriesComponent,
-          ),
-        data: {
-          seo: {
-            title: 'Ma Boutique | Categories',
-            description: 'Parcourez les catégories du catalogue.',
-            indexable: true,
-            canonicalPath: '/categories',
-          },
-        },
+        path: 'dashboard',
+        redirectTo: 'account/profile',
+        pathMatch: 'full',
       },
       {
         path: 'account',
         canActivate: [authGuard],
-        canActivateChild: [authGuard],
         children: [
           { path: '', redirectTo: 'profile', pathMatch: 'full' },
           {
-            path: 'cart',
-            loadComponent: () =>
-              import('./features/account/activity/activity.component').then(
-                (m) => m.ActivityComponent,
-              ),
+            path: 'addresses',
             data: {
               seo: {
-                title: 'Ma Boutique | Panier',
-                description: 'Consultez et mettez à jour votre panier.',
+                title: 'Ma Boutique | Mes adresses',
+                description: 'Consultation des adresses de livraison et de facturation.',
+                indexable: false,
+                canonicalPath: '/account/addresses',
+              },
+            },
+            loadComponent: () =>
+              import('./features/account/addresses/addresses.component').then((m) => m.AddressesComponent),
+          },
+          {
+            path: 'cart',
+            data: {
+              seo: {
+                title: 'Ma Boutique | Mon panier',
+                description: 'Gestion du panier et validation des coupons.',
                 indexable: false,
                 canonicalPath: '/account/cart',
               },
             },
-          },
-          {
-            path: 'profile',
             loadComponent: () =>
-              import('./features/account/profile/profile.component').then(
-                (m) => m.ProfileComponent,
-              ),
-            data: {
-              seo: {
-                title: 'Ma Boutique | Profil',
-                description: 'Consultez votre profil client.',
-                indexable: false,
-                canonicalPath: '/account/profile',
-              },
-            },
+              import('./features/account/activity/activity.component').then((m) => m.ActivityComponent),
           },
           {
             path: 'orders',
-            loadComponent: () =>
-              import('./features/account/orders/orders.component').then(
-                (m) => m.OrdersComponent,
-              ),
             data: {
               seo: {
                 title: 'Ma Boutique | Mes commandes',
-                description: "Consultez l'historique de vos commandes.",
+                description: 'Historique des commandes et suivi.',
                 indexable: false,
                 canonicalPath: '/account/orders',
               },
             },
+            loadComponent: () =>
+              import('./features/account/orders/orders.component').then((m) => m.OrdersComponent),
           },
           {
             path: 'orders/:id',
+            data: {
+              seo: {
+                title: 'Ma Boutique | Detail commande',
+                description: 'Detail d une commande, paiements et livraison.',
+                indexable: false,
+              },
+            },
             loadComponent: () =>
               import('./features/account/order-detail/order-detail.component').then(
                 (m) => m.OrderDetailComponent,
               ),
-            data: {
-              seo: {
-                title: 'Ma Boutique | Detail commande',
-                description: 'Consultez le détail de votre commande.',
-                indexable: false,
-              },
-            },
           },
           {
-            path: 'orders/:id/payment',
-            loadComponent: () =>
-              import('./features/account/payment/payment.component').then(
-                (m) => m.PaymentComponent,
-              ),
+            path: 'profile',
             data: {
               seo: {
-                title: 'Ma Boutique | Paiement',
-                description:
-                  'Consultez et initiez le paiement de votre commande.',
+                title: 'Ma Boutique | Mon compte',
+                description: 'Consultation des informations du compte client.',
                 indexable: false,
+                canonicalPath: '/account/profile',
               },
             },
+            loadComponent: () =>
+              import('./features/account/profile/profile.component').then((m) => m.ProfileComponent),
           },
         ],
       },
       {
         path: 'checkout',
-        canActivate: [authGuard],
-        loadComponent: () =>
-          import('./features/account/checkout/checkout.component').then(
-            (m) => m.CheckoutComponent,
-          ),
         data: {
           seo: {
             title: 'Ma Boutique | Checkout',
-            description:
-              'Validez votre commande avec adresses et récapitulatif.',
+            description: 'Confirmation de commande et choix des adresses.',
             indexable: false,
             canonicalPath: '/checkout',
           },
         },
+        loadComponent: () =>
+          import('./features/account/checkout/checkout.component').then((m) => m.CheckoutComponent),
+      },
+      {
+        path: 'payment/:orderId',
+        data: {
+          seo: {
+            title: 'Ma Boutique | Paiement',
+            description: 'Page de paiement de demonstration.',
+            indexable: false,
+          },
+        },
+        loadComponent: () =>
+          import('./features/account/payment/payment.component').then((m) => m.PaymentComponent),
       },
     ],
   },
@@ -247,8 +294,8 @@ export const routes: Routes = [
     data: {
       reason: 'not-found',
       seo: {
-        title: 'Ma Boutique | Page introuvable',
-        description: 'La page demandée est introuvable.',
+        title: 'Public Shell | Page introuvable',
+        description: 'La page demandee est introuvable.',
         indexable: false,
       },
     },

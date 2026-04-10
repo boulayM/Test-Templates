@@ -28,7 +28,9 @@ const devOrigins = [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
   "http://localhost:3001",
-  "http://127.0.0.1:3001"
+  "http://127.0.0.1:3001",
+  "http://localhost:4200",
+  "http://127.0.0.1:4200"
 ];
 
 const allowedOrigins = Array.from(
@@ -53,7 +55,11 @@ app.use(
   })
 );
 
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+  })
+);
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
@@ -81,6 +87,7 @@ app.get("/api/swagger.json", (req, res) => {
 
 app.use("/swagger-ui", express.static(swaggerUiPath));
 app.use("/swagger", express.static(path.join(__dirname, "public/swagger")));
+app.use("/media", express.static(path.join(__dirname, "public/media")));
 
 app.use("/api", apiRoutes);
 

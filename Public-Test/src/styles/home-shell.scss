@@ -1,0 +1,300 @@
+.home-main {
+  background: #ffffff;
+  display: grid;
+  gap: 2.25rem;
+  min-height: 100vh;
+  padding-bottom: 2.5rem;
+  padding-top: 1.625rem;
+}
+
+.hero {
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  display: grid;
+  grid-template-columns: minmax(360px, 1.02fr) minmax(430px, 1fr);
+  overflow: hidden;
+}
+
+.hero-media,
+.hero-media img {
+  height: 100%;
+  width: 100%;
+}
+
+.hero-media {
+  background: #f8fafc;
+  min-height: 395px;
+  padding: 1rem 1rem 1.25rem;
+}
+
+.hero-media img {
+  border: 1px dashed #b4beca;
+}
+
+.hero-body {
+  display: grid;
+  gap: 1.125rem;
+  padding: 1.5rem 1.75rem;
+}
+
+.hero-body h1 {
+  color: #212529;
+  font-family: "Barlow", sans-serif;
+  font-size: 3rem;
+  font-weight: 500;
+  line-height: 1;
+  margin: 0;
+  max-width: 18rem;
+}
+
+.hero-description {
+  color: #4b5563;
+  font-family: "Barlow", sans-serif;
+  font-size: 1rem;
+  line-height: 1.45;
+  margin: 0;
+  max-width: 30rem;
+}
+
+.hero-actions,
+.section-heading {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+}
+
+.carousel-section {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.carousel-stage {
+  align-items: stretch;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.carousel-viewport {
+  overflow: hidden;
+  scroll-behavior: smooth;
+}
+
+.carousel-track {
+  display: grid;
+  gap: 1rem;
+  grid-auto-columns: calc((100% - 2rem) / 3);
+  grid-auto-flow: column;
+}
+
+.custom-carousel-control {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  display: inline-flex;
+  justify-content: center;
+  opacity: 1;
+  position: static;
+  width: 2.25rem;
+}
+
+.custom-carousel-control[disabled] {
+  opacity: 0.28;
+  pointer-events: none;
+}
+
+.carousel-control-symbol {
+  color: #212529;
+  display: inline-block;
+  fill: currentColor;
+  height: 1.65rem;
+  width: 1.65rem;
+}
+
+.mobile-control-symbol {
+  display: none;
+}
+
+.carousel-card {
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  color: inherit;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100%;
+  text-decoration: none;
+}
+
+.carousel-card-media,
+.carousel-card-media img {
+  height: 220px;
+  width: 100%;
+}
+
+.carousel-card-media img {
+  border: 1px dashed #b3becc;
+}
+
+.carousel-card-body {
+  display: grid;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem 1.125rem;
+}
+
+.carousel-card-body h3 {
+  color: #212529;
+  font-family: "Barlow", sans-serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.carousel-card-body p {
+  color: #37404a;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.carousel-card-footer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  gap: 0.75rem;
+}
+
+.carousel-card-link {
+  border-radius: 0.375rem;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.95rem;
+  font-weight: 500;
+  justify-content: center;
+  padding: 0.625rem 1rem;
+}
+
+.carousel-card-footer .ui-product-price {
+  flex: 0 0 auto;
+}
+
+.section-heading h2 {
+  color: #212529;
+  font-family: "Barlow", sans-serif;
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.hero-actions .btn {
+  border-radius: 0.375rem;
+  font-size: 0.95rem;
+  padding: 0.625rem 1rem;
+}
+
+.hero-cta-group {
+  display: inline-flex;
+  gap: 1rem;
+}
+
+.hero-actions {
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: auto;
+  width: 100%;
+}
+
+.hero-status-badge {
+  align-self: flex-end;
+  margin-left: 1rem;
+}
+
+.hero-actions .ui-dark-cta:hover,
+.hero-actions .ui-dark-cta:focus,
+.hero-actions .ui-dark-cta:active {
+  background: #1e1e1e !important;
+  border-color: #1e1e1e !important;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-media {
+    min-height: 220px;
+    padding: 1rem;
+  }
+
+  .carousel-stage {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .carousel-viewport {
+    max-height: 460px;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: none;
+    touch-action: pan-y;
+  }
+
+  .carousel-viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .carousel-track {
+    grid-auto-columns: 100%;
+    grid-auto-flow: row;
+  }
+
+  .hero-body h1,
+  .section-heading h2,
+  .carousel-card-body h3,
+  .ui-product-price--hero {
+    font-size: 2rem;
+  }
+
+  .hero-actions,
+  .hero-cta-group {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-status-badge {
+    margin-left: 0;
+  }
+
+  .custom-carousel-control {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .carousel-card-footer {
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .carousel-card-link {
+    font-size: 0.875rem;
+    padding: 0.625rem 0.875rem;
+  }
+
+  .carousel-card-footer .ui-product-price--card {
+    font-size: 1.75rem;
+  }
+
+  .desktop-control-symbol {
+    display: none;
+  }
+
+  .mobile-control-symbol {
+    display: inline-block;
+  }
+}

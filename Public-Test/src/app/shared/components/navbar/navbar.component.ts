@@ -1,115 +1,91 @@
-import {
-  Component,
-  computed,
-  signal,
-  OnInit,
-  OnDestroy,
-  TemplateRef,
-  HostListener,
-} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
-import { CategoryService } from '../../../core/services/category.service';
-import { LoginComponent } from '../../../features/auth/login.component';
 import { Subscription } from 'rxjs';
-import { User } from '../../../shared/models/user.model';
-import { CategoryItem } from '../../../shared/models/category-item.model';
-import {
-  NgbCollapseModule,
-  NgbDropdownModule,
-  NgbModal,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbCollapseModule, NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
+import { AuthService } from '../../../core/services/auth.service';
+import { ContentService } from '../../../core/services/content.service';
+import { Category } from '../../models/product.model';
+import { User } from '../../models/user.model';
+import { LoginComponent } from '../../../features/auth/login.component';
 
 @Component({
   selector: 'app-navbar',
-  imports: [
-    RouterModule,
-    FormsModule,
-    LoginComponent,
-    NgbCollapseModule,
-    NgbDropdownModule,
-  ],
+  imports: [CommonModule, FormsModule, RouterModule, LoginComponent, NgbModalModule, NgbCollapseModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
 })
 export class NavbarComponent implements OnInit, OnDestroy {
-  user = signal<User | null>(null);
-  isLoggedIn = computed(() => !!this.user());
-  isCollapsed = signal(true);
-  searchQuery = signal('');
-  categories = signal<CategoryItem[]>([]);
-
-  private authSub?: Subscription;
-
-  constructor(
-    private auth: AuthService,
-    private categoryService: CategoryService,
-    private router: Router,
-    private modalService: NgbModal,
-  ) {}
+  private auth = inject(AuthService);
+  private contentService = inject(ContentService);
+  private router = inject(Router);
+  private modalService = inject(NgbModal);
+  @ViewChild('loginModalContent') loginModalContent?: TemplateRef<unknown>;
+  categories: Category[] = [];
+  currentUser: User | null = null;
+  searchTerm = '';
+  isPrimaryCollapsed = true;
+  private modalRef: NgbModalRef | null = null;
+  private readonly subscriptions = new Subscription();
 
   ngOnInit(): void {
-    this.authSub = this.auth.currentUser$.subscribe((user) => {
-      this.user.set(user);
+    this.contentService.getCategories().subscribe({
+      next: (categories) => (this.categories = categories),
+      error: () => undefined,
     });
-    this.loadCategories();
-  }
 
-  @HostListener('window:focus')
-  onWindowFocus(): void {
-    this.loadCategories();
-  }
-
-  private loadCategories(): void {
-    this.categoryService.getCategories().subscribe({
-      next: (items) => this.categories.set(items),
-      error: () => this.categories.set([]),
-    });
+    this.subscriptions.add(
+      this.auth.currentUser$.subscribe((user) => {
+        this.currentUser = user;
+        if (user) {
+          this.closeLoginModal();
+        }
+      }),
+    );
   }
 
   ngOnDestroy(): void {
-    this.authSub?.unsubscribe();
+    this.closeLoginModal();
+    this.subscriptions.unsubscribe();
   }
 
-  closeMenu(): void {
-    this.isCollapsed.set(true);
-  }
-
-  openLoginModal(content: TemplateRef<unknown>): void {
-    this.closeMenu();
-    this.modalService.open(content, {
-      centered: true,
-      size: 'lg',
-      backdrop: true,
+  submitSearch(): void {
+    this.closePrimaryMenu();
+    this.router.navigate(['/catalog'], {
+      queryParams: this.searchTerm.trim() ? { q: this.searchTerm.trim() } : undefined,
     });
   }
 
-  runSearch(): void {
-    const query = this.searchQuery().trim();
-    this.router
-      .navigate(['/catalog'], {
-        queryParams: query ? { q: query } : {},
-      })
-      .then(() => this.closeMenu());
+  togglePrimaryMenu(): void {
+    this.isPrimaryCollapsed = !this.isPrimaryCollapsed;
   }
 
-  goToCategory(categoryName: string): void {
-    this.router
-      .navigate(['/catalog'], {
-        queryParams: categoryName ? { q: categoryName } : {},
-      })
-      .then(() => this.closeMenu());
+  closePrimaryMenu(): void {
+    this.isPrimaryCollapsed = true;
   }
 
-  navigate(path: string) {
-    this.router.navigate([path]).then(() => this.closeMenu());
+  openLoginModal(): void {
+    this.closePrimaryMenu();
+    if (!this.loginModalContent || this.modalRef) return;
+    this.modalRef = this.modalService.open(this.loginModalContent, {
+      centered: true,
+      size: 'lg',
+      scrollable: true,
+    });
+    this.modalRef.result.finally(() => {
+      this.modalRef = null;
+    });
   }
 
-  logout() {
+  closeLoginModal(): void {
+    this.modalRef?.close();
+    this.modalRef = null;
+  }
+
+  logout(): void {
+    this.closePrimaryMenu();
     this.auth.logout();
-    this.router.navigate(['/home']);
-    this.closeMenu();
-    this.modalService.dismissAll();
   }
 }

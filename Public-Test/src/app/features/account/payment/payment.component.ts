@@ -1,75 +1,62 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+
+import { OrderService } from '../../../core/services/order.service';
 import { PaymentService } from '../../../core/services/payment.service';
-import { ServiceUnavailableComponent } from '../../../shared/components/service-unavailable/service-unavailable.component';
-import { Payment } from '../../../shared/models/order.model';
-import { ToastService } from '../../../shared/services/toast.service';
+import { Order, PaymentSummary } from '../../../shared/models/order.model';
 
 @Component({
   selector: 'app-payment',
-  imports: [CommonModule, FormsModule, ServiceUnavailableComponent],
+  imports: [CommonModule, RouterModule],
   templateUrl: './payment.component.html',
+  styleUrls: ['./payment.component.scss'],
 })
 export class PaymentComponent implements OnInit {
-  orderId = 0;
-  loading = true;
-  creating = false;
-  providerUnavailable = false;
-  payments: Payment[] = [];
-  provider: 'MANUAL' | 'STRIPE' | 'PAYPAL' = 'MANUAL';
+  private route = inject(ActivatedRoute);
+  private orderService = inject(OrderService);
+  private paymentService = inject(PaymentService);
 
-  constructor(
-    private route: ActivatedRoute,
-    private paymentsService: PaymentService,
-    private toast: ToastService,
-  ) {}
+  order: Order | null = null;
+  payments: PaymentSummary[] = [];
+  providerMessage = '';
+  loading = true;
+  error: string | null = null;
 
   ngOnInit(): void {
-    this.orderId = Number(this.route.snapshot.paramMap.get('id'));
-    this.paymentsService.getProviderStatus().subscribe({
-      next: () => {
-        this.refreshPayments();
+    const orderId = Number(this.route.snapshot.paramMap.get('orderId'));
+    if (!orderId) {
+      this.error = 'Commande introuvable.';
+      this.loading = false;
+      return;
+    }
+
+    this.orderService.getMyOrder(orderId).subscribe({
+      next: (order) => (this.order = order),
+      error: () => (this.error = 'Impossible de charger la commande.'),
+    });
+
+    this.paymentService.getPaymentsByOrder(orderId).subscribe({
+      next: (payments) => {
+        this.payments = payments;
+        this.loading = false;
       },
       error: () => {
-        this.providerUnavailable = true;
+        this.error = 'Impossible de charger les paiements.';
         this.loading = false;
       },
     });
-  }
 
-  refreshPayments(): void {
-    this.paymentsService.getOrderPayments(this.orderId).subscribe({
-      next: (items) => {
-        this.payments = items;
-        this.loading = false;
+    this.paymentService.getProviderStatus().subscribe({
+      next: (status) => {
+        this.providerMessage =
+          'providerEnabled' in status
+            ? `Fournisseurs actifs: ${status.providers.join(', ')}`
+            : status.message;
       },
-      error: () => {
-        this.loading = false;
-        this.toast.show('Impossible de charger les paiements.');
-      },
+      error: () =>
+        (this.providerMessage =
+          'Les paiements ne sont pas disponibles dans cette demo.'),
     });
-  }
-
-  createPayment(): void {
-    this.creating = true;
-    this.paymentsService
-      .createPayment({
-        orderId: this.orderId,
-        provider: this.provider,
-      })
-      .subscribe({
-        next: () => {
-          this.creating = false;
-          this.toast.show('Paiement cree.');
-          this.refreshPayments();
-        },
-        error: (err) => {
-          this.creating = false;
-          const message = err?.error?.message || 'Impossible de creer le paiement.';
-          this.toast.show(message);
-        },
-      });
   }
 }

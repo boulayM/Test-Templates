@@ -1,38 +1,176 @@
-<app-navbar></app-navbar>
-
-<main class="container home-main">
-  <section class="home-hero card">
-    <p class="hero-kicker">Boutique en ligne</p>
-    <h1>Bienvenue chez Ma Boutique</h1>
-    <p>
-      Decouvrez nos produits, connectez-vous pour gerer votre panier et suivre vos commandes.
-    </p>
-  </section>
-
-  <h2 class="home-section-title">Produits disponibles</h2>
-
-  <div class="row row-cols-1 row-cols-md-3 g-3 home-grid">
-    @for (contentItem of contentItems; track contentItem.id) {
-      <div class="col home-grid-item">
-        <div class="card home-card">
-          <div class="home-card-body">
-            <h5 class="card-title">{{ contentItem.name }}</h5>
-            <p class="home-card-text">{{ contentItem.description }}</p>
-            <p class="home-card-text"><strong>Prix:</strong> {{ contentItem.price | currency: 'EUR' }}</p>
-            @if ((contentItem.categories || []).length > 0) {
-              <p class="home-card-text"><strong>Categories:</strong> {{ contentItem.categories?.join(', ') }}</p>
-            }
-            @if (contentItem.isActive && contentItem.isAvailable !== false) {
-              <span class="badge text-bg-success">Disponible</span>
-            } @else {
-              <span class="badge text-bg-secondary">Indisponible</span>
-            }
-          </div>
-        </div>
+<main class="home-main">
+  @if (loading()) {
+    <div class="container">
+      <div class="alert alert-light border mt-4">
+        Chargement de la vitrine...
       </div>
-    }
-  </div>
+    </div>
+  } @else if (error()) {
+    <div class="container">
+      <div class="alert alert-danger mt-4">{{ error() }}</div>
+    </div>
+  } @else if (featuredProduct; as featuredProduct) {
+    <section class="hero-banner">
+      <div class="container">
+        <article class="hero card">
+          <div class="hero-media">
+            <img
+              class="ui-product-visual"
+              [src]="featuredProduct.images[0]?.imageUrl || placeholderImage"
+              [alt]="featuredProduct.images[0]?.altText || featuredProduct.name"
+              (error)="onImageError($event)"
+            />
+          </div>
 
+          <div class="hero-body">
+            <p class="hero-kicker ui-section-kicker">Produit du mois</p>
+            <h1>{{ featuredProduct.name }}</h1>
+            <p class="hero-description">
+              {{
+                featuredProduct.description ||
+                  "Une selection mise en avant pour démarrer la visite."
+              }}
+            </p>
+            <strong class="ui-product-price ui-product-price--hero">{{
+              featuredProduct.priceCents / 100
+                | currency: featuredProduct.currency
+            }}</strong>
+            <div class="hero-actions">
+              <div class="hero-cta-group">
+                <a
+                  class="btn ui-primary-cta"
+                  [routerLink]="['/products', featuredProduct.id]"
+                >
+                  Voir le produit
+                </a>
+                <a class="btn ui-dark-cta" routerLink="/catalog"
+                  >Explorer le catalogue</a
+                >
+              </div>
+              <span
+                class="ui-status-badge ui-status-badge--available hero-status-badge"
+                >Disponible</span
+              >
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="container carousel-section">
+      <div class="section-heading ui-section-heading">
+        <h2>Autres produits references</h2>
+        <a class="ui-section-link" routerLink="/catalog">Aller au catalogue</a>
+      </div>
+
+      @if (carouselSourceProducts.length > 0) {
+        <div class="carousel-stage">
+          @if (hasCarouselControls) {
+            <button
+              class="carousel-control-prev custom-carousel-control"
+              type="button"
+              (click)="previousSlide()"
+              [disabled]="!canScrollPrev()"
+              aria-label="Slide precedente"
+            >
+              <svg
+                class="carousel-control-symbol desktop-control-symbol"
+                aria-hidden="true"
+              >
+                <use
+                  href="/assets/icons/home-controls.sprite.svg#bi-caret-left"
+                ></use>
+              </svg>
+              <svg
+                class="carousel-control-symbol mobile-control-symbol"
+                aria-hidden="true"
+              >
+                <use
+                  href="/assets/icons/home-controls.sprite.svg#bi-caret-up"
+                ></use>
+              </svg>
+              <span class="visually-hidden">Precedent</span>
+            </button>
+          }
+
+          <div
+            #carouselViewport
+            class="carousel-viewport"
+            (scroll)="updateCarouselControls()"
+          >
+            <div class="carousel-track">
+              @for (product of carouselSourceProducts; track product.id) {
+                <a
+                  class="carousel-card card"
+                  [routerLink]="['/products', product.id]"
+                >
+                  <div class="carousel-card-media">
+                    <img
+                      class="ui-product-visual"
+                      [src]="product.images[0]?.imageUrl || placeholderImage"
+                      [alt]="product.images[0]?.altText || product.name"
+                      (error)="onImageError($event)"
+                    />
+                  </div>
+                  <div class="carousel-card-body">
+                    <h3>{{ product.name }}</h3>
+                    <p>
+                      {{
+                        product.description ||
+                          "Consultez le detail et les disponibilités."
+                      }}
+                    </p>
+                    <div class="carousel-card-footer">
+                      <strong class="ui-product-price ui-product-price--card">{{
+                        product.priceCents / 100 | currency: product.currency
+                      }}</strong>
+                      <span class="carousel-card-link ui-primary-cta">Voir le produit</span>
+                    </div>
+                  </div>
+                </a>
+              }
+            </div>
+          </div>
+
+          @if (hasCarouselControls) {
+            <button
+              class="carousel-control-next custom-carousel-control"
+              type="button"
+              (click)="nextSlide()"
+              [disabled]="!canScrollNext()"
+              aria-label="Slide suivante"
+            >
+              <svg
+                class="carousel-control-symbol desktop-control-symbol"
+                aria-hidden="true"
+              >
+                <use
+                  href="/assets/icons/home-controls.sprite.svg#bi-caret-right"
+                ></use>
+              </svg>
+              <svg
+                class="carousel-control-symbol mobile-control-symbol"
+                aria-hidden="true"
+              >
+                <use
+                  href="/assets/icons/home-controls.sprite.svg#bi-caret-down"
+                ></use>
+              </svg>
+              <span class="visually-hidden">Suivant</span>
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="alert alert-light border">
+          Aucun autre produit actif n est disponible.
+        </div>
+      }
+    </section>
+  } @else {
+    <div class="container">
+      <div class="alert alert-light border mt-4">
+        Aucun produit n est disponible pour la vitrine.
+      </div>
+    </div>
+  }
 </main>
-
-<app-footer></app-footer>

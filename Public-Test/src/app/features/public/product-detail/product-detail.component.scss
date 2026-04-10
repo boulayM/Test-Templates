@@ -1,0 +1,97 @@
+.product-main {
+  display: grid;
+  gap: 1.5rem;
+  padding-block: 2rem 3rem;
+}
+
+.product-layout {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 1fr);
+}
+
+.product-gallery,
+.product-gallery img {
+  width: 100%;
+}
+
+.product-gallery img {
+  background: #f3f5f7;
+  display: block;
+  max-height: 480px;
+  object-fit: contain;
+  padding: 1rem;
+}
+
+.product-summary,
+.reviews-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.summary-meta,
+.summary-actions,
+.category-list,
+.review-header,
+.section-heading {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.review-form,
+.reviews-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.product-rating {
+  color: #4b5563;
+  margin: 0;
+}
+
+.rating-count,
+.summary-catalog-link {
+  color: inherit;
+}
+
+.summary-catalog-link {
+  text-decoration: none;
+}
+
+.summary-buy-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.buy-access-modal-body {
+  align-items: center;
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+  text-align: center;
+}
+
+.buy-access-message {
+  margin: 0;
+}
+
+.buy-access-link {
+  color: #0d6efd;
+  display: inline-flex;
+  padding: 0;
+  text-decoration: none;
+}
+
+.review-card {
+  padding-top: 1rem;
+}
+
+@media (max-width: 992px) {
+  .product-layout {
+    grid-template-columns: 1fr;
+  }
+}

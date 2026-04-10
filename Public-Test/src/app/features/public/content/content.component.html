@@ -1,52 +1,67 @@
-<div class="content-header">
-  <h2>Catalogue</h2>
-</div>
+<main class="container catalog-main">
+  <section class="catalog-header">
+    <div>
+      <p class="catalog-kicker ui-section-kicker">Catalogue public</p>
+      <h1>Produits disponibles</h1>
+    </div>
+  </section>
 
-@if (filteredContentItems.length === 0) {
-  <div class="alert alert-warning">
-    Aucun produit ne correspond a la recherche.
-  </div>
-}
+  @if (loading) {
+    <div class="alert alert-light border">Chargement du catalogue...</div>
+  } @else if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  } @else if (filteredProducts.length === 0) {
+    <div class="alert alert-light border">Aucun produit ne correspond aux filtres en cours.</div>
+  } @else {
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+      @for (product of filteredProducts; track product.id) {
+        <div class="col">
+          <article class="card product-card h-100">
+            <a class="product-card-media" [routerLink]="['/products', product.id]">
+              <img
+                class="ui-product-visual"
+                [src]="product.images[0]?.imageUrl || placeholderImage"
+                [alt]="product.images[0]?.altText || product.name"
+                (error)="onImageError($event)"
+              />
+            </a>
 
-<div class="row row-cols-1 row-cols-md-3 g-3 content-grid">
-  @for (contentItem of filteredContentItems; track contentItem.id) {
-    <div class="col content-grid-item">
-      <div class="card content-card">
-        <div class="content-card-body">
-          <h5 class="card-title">{{ contentItem.name }}</h5>
-          <p class="content-desc">{{ contentItem.description }}</p>
-          <p>
-            <strong>{{ contentItem.price | currency: 'EUR' }}</strong>
-          </p>
-          @if ((contentItem.categories || []).length > 0) {
-            <p class="content-categories">
-              <strong>Categories:</strong> {{ contentItem.categories?.join(', ') }}
-            </p>
-          }
-          @if (!contentItem.isActive || contentItem.isAvailable === false) {
-            <span class="badge text-bg-warning">Indisponible</span>
-          } @else {
-            <span class="badge text-bg-success">Disponible</span>
-          }
+            <div class="card-body">
+              <h2>
+                <a [routerLink]="['/products', product.id]">{{ product.name }}</a>
+              </h2>
+              <p>{{ product.description || 'Consultez le detail de ce produit et les avis associes.' }}</p>
+
+              <div class="category-list ui-category-list">
+                @for (category of product.categories; track category.id) {
+                  <a [routerLink]="['/catalog']" [queryParams]="{ category: category.slug }">{{ category.name }}</a>
+                }
+              </div>
+            </div>
+
+            <div class="card-footer product-card-footer">
+              <a class="btn product-card-cta ui-primary-cta" [routerLink]="['/products', product.id]">Voir le detail</a>
+              <div class="product-card-topline">
+                <span class="ui-product-price ui-product-price--catalog">
+                  {{ product.priceCents / 100 | currency: product.currency }}
+                </span>
+                <span
+                  class="ui-status-badge"
+                  [class.ui-status-badge--available]="isAvailable(product)"
+                  [class.ui-status-badge--unavailable]="!isAvailable(product)"
+                >
+                  {{ isAvailable(product) ? 'Disponible' : 'Indisponible' }}
+                </span>
+              </div>
+              @if (auth.isLoggedIn()) {
+                <button class="btn btn-dark" (click)="addToCart(product)" [disabled]="!isAvailable(product)">
+                  Ajouter au panier
+                </button>
+              }
+            </div>
+          </article>
         </div>
-        <div class="content-card-footer">
-          <a class="btn btn-outline-secondary w-100" [routerLink]="['/catalog', contentItem.id]">
-            Voir le detail
-          </a>
-          @if (auth.isLoggedIn()) {
-            <button
-              class="btn w-100"
-              [ngClass]="isIncluded(contentItem) ? 'btn-secondary' : 'btn-primary'"
-              (click)="includeContentItem(contentItem)"
-              [disabled]="isIncluded(contentItem)"
-            >
-              {{ isIncluded(contentItem) ? 'Deja dans le panier' : 'Ajouter au panier' }}
-            </button>
-          } @else {
-            <small class="text-muted">Connectez-vous pour ajouter ce produit au panier.</small>
-          }
-        </div>
-      </div>
+      }
     </div>
   }
-</div>
+</main>

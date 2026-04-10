@@ -1,139 +1,110 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+
 import { ActivityService } from '../../../core/services/activity.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { CouponService } from '../../../core/services/coupon.service';
-import { UiMessages } from '../../../shared/messages/ui-messages';
-import { ActivityRecord, ActivityItem } from '../../../shared/models/activity.model';
-import { ToastService } from '../../../shared/services/toast.service';
-import { environment } from '../../../../environments/environment';
-import {
-  computeCartSubtotalCents,
-  computeCartSubtotalEuros,
-} from '../../../shared/utils/cart-totals';
+import { Cart, CartItem } from '../../../shared/models/cart.model';
 
 @Component({
   selector: 'app-activity',
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './activity.component.html',
+  styleUrls: ['./activity.component.scss'],
 })
 export class ActivityComponent implements OnInit {
-  activityRecords: ActivityRecord[] = [];
-  couponCode = '';
-  couponValid = false;
+  private activityService = inject(ActivityService);
+  private router = inject(Router);
 
-  constructor(
-    private activityService: ActivityService,
-    private couponService: CouponService,
-    private router: Router,
-    public auth: AuthService,
-    private toast: ToastService,
-  ) {}
+  cart: Cart | null = null;
+  couponCode = '';
+  couponMessage: string | null = null;
+  couponDiscountCents = 0;
+  loading = true;
+  error: string | null = null;
 
   ngOnInit(): void {
     this.loadActivityRecords();
   }
 
   loadActivityRecords(): void {
-    this.activityService.getActivityRecords().subscribe({
-      next: (res) => {
-        this.activityRecords = res;
-      },
-      error: (err) => {
-        if (environment.showSanityLogs) {
-          console.error(err);
-        }
-      },
-    });
-  }
-
-  getTotal(activityRecord: ActivityRecord): number {
-    return computeCartSubtotalEuros(activityRecord.items);
-  }
-
-  updateQuantity(activityRecord: ActivityRecord, item: ActivityItem): void {
-    if (item.quantity < 1) item.quantity = 1;
-
-    this.activityService
-      .updateQuantity(activityRecord.id, item.contentItemId, item.quantity)
-      .subscribe({
-        next: () => {
-          const targetActivityRecord = this.activityRecords.find((record) => record.id === activityRecord.id);
-          if (targetActivityRecord) {
-            const targetItem = targetActivityRecord.items.find(
-              (recordItem) => recordItem.contentItemId === item.contentItemId,
-            );
-            if (targetItem) targetItem.quantity = item.quantity;
-          }
-        },
-        error: (err) => {
-          if (environment.showSanityLogs) {
-            console.error(err);
-          }
-        },
-      });
-  }
-
-  removeItem(activityRecordId: number, contentItemId: number): void {
-    if (!confirm(UiMessages.activity.removeItemConfirm)) return;
-    this.activityService.removeContentItem(activityRecordId, contentItemId).subscribe({
-      next: () => {
-        const activityRecord = this.activityRecords.find((record) => record.id === activityRecordId);
-        if (activityRecord) {
-          activityRecord.items = activityRecord.items.filter(
-            (recordItem) => recordItem.contentItemId !== contentItemId,
-          );
-        }
-      },
-      error: (err) => {
-        if (environment.showSanityLogs) {
-          console.error(err);
-        }
-      },
-    });
-  }
-
-  deleteActivityRecord(activityRecordId: number): void {
-    if (!confirm(UiMessages.activity.deleteConfirm)) return;
-    this.activityService.deleteActivityRecord(activityRecordId).subscribe({
-      next: () => {
-        this.activityRecords = this.activityRecords.filter(
-          (record) => record.id !== activityRecordId,
-        );
-      },
-      error: (err) => {
-        if (environment.showSanityLogs) {
-          console.error(err);
-        }
-      },
-    });
-  }
-
-  includeContentItem(activityRecordId: number): void {
-    this.router.navigate(['/catalog'], {
-      queryParams: { includeActivityId: activityRecordId },
-    });
-  }
-
-  applyCoupon(activityRecord: ActivityRecord): void {
-    const totalCents = computeCartSubtotalCents(activityRecord.items);
-    this.couponService.validateCoupon(this.couponCode.trim(), totalCents).subscribe({
-      next: (res) => {
-        this.couponValid = res.valid;
-        this.toast.show(res.valid ? 'Coupon valide.' : 'Coupon invalide.');
+    this.activityService.getCart().subscribe({
+      next: (cart) => {
+        this.cart = cart;
+        this.loading = false;
       },
       error: () => {
-        this.couponValid = false;
-        this.toast.show('Impossible de valider le coupon.');
+        this.error = 'Impossible de charger le panier.';
+        this.loading = false;
       },
     });
   }
 
-  goCheckout(): void {
-    void this.router.navigate(['/checkout'], {
-      queryParams: this.couponCode.trim() ? { couponCode: this.couponCode.trim() } : {},
+  get subtotalCents(): number {
+    return (this.cart?.items || []).reduce(
+      (sum, item) => sum + item.quantity * item.unitPriceCents,
+      0,
+    );
+  }
+
+  get totalCents(): number {
+    return Math.max(this.subtotalCents - this.couponDiscountCents, 0);
+  }
+
+  updateQuantity(item: CartItem): void {
+    if (item.quantity < 1) item.quantity = 1;
+
+    this.activityService.updateQuantity(item.id, item.quantity).subscribe({
+      next: () => undefined,
+      error: () => (this.error = 'La quantite n a pas pu etre mise a jour.'),
+    });
+  }
+
+  removeItem(itemId: number): void {
+    this.activityService.removeItem(itemId).subscribe({
+      next: () => {
+        if (this.cart) {
+          this.cart = {
+            ...this.cart,
+            items: this.cart.items.filter((item) => item.id !== itemId),
+          };
+        }
+      },
+      error: () =>
+        (this.error = 'Impossible de retirer cet article du panier.'),
+    });
+  }
+
+  applyCoupon(): void {
+    const code = this.couponCode.trim();
+    if (!code) {
+      this.couponMessage = 'Saisissez un code coupon avant validation.';
+      this.couponDiscountCents = 0;
+      return;
+    }
+
+    this.activityService.validateCoupon(code, this.subtotalCents).subscribe({
+      next: (result) => {
+        if (!result.valid) {
+          this.couponDiscountCents = 0;
+          this.couponMessage = `Coupon invalide ou indisponible (${result.reason || 'erreur'}).`;
+          return;
+        }
+        this.couponDiscountCents = result.discountCents || 0;
+        this.couponMessage = `Coupon ${result.coupon?.code} applique.`;
+      },
+      error: () => {
+        this.couponDiscountCents = 0;
+        this.couponMessage = 'Impossible de verifier ce coupon.';
+      },
+    });
+  }
+
+  goToCheckout(): void {
+    this.router.navigate(['/checkout'], {
+      queryParams: this.couponCode.trim()
+        ? { coupon: this.couponCode.trim() }
+        : undefined,
     });
   }
 }

@@ -1,84 +1,171 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-  <div class="container-fluid">
-    <a class="navbar-brand fw-bold" [routerLink]="'/home'">LOGO</a>
+<nav
+  class="navbar navbar-expand-lg navbar-light bg-white border-bottom navbar-primary"
+>
+  <div class="container">
+    <a class="navbar-brand brand-mark" routerLink="/home">
+      <span class="brand-icon-wrap">
+        <img src="/assets/logo-ma-boutique.svg" alt="Logo Ma Boutique" />
+      </span>
+    </a>
 
     <button
       class="navbar-toggler"
       type="button"
-      (click)="isCollapsed.set(!isCollapsed())"
-      aria-controls="mainNavbar"
-      [attr.aria-expanded]="!isCollapsed()"
-      aria-label="Toggle navigation"
+      aria-controls="primaryNavbarMenu"
+      [attr.aria-expanded]="!isPrimaryCollapsed"
+      aria-label="Afficher le menu"
+      (click)="togglePrimaryMenu()"
     >
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div id="mainNavbar" class="collapse navbar-collapse" [ngbCollapse]="isCollapsed()">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" [routerLink]="'/home'" (click)="closeMenu()">Accueil</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" [routerLink]="'/catalog'" (click)="closeMenu()">Catalogue</a>
-        </li>
-        <li class="nav-item dropdown" ngbDropdown>
-          <button class="nav-link dropdown-toggle btn btn-link text-decoration-none" ngbDropdownToggle type="button">
-            Categories
-          </button>
-          <div ngbDropdownMenu>
-            @for (category of categories(); track category.id) {
-              <button class="dropdown-item" type="button" (click)="goToCategory(category.name)">
-                {{ category.name }}
+    <div
+      id="primaryNavbarMenu"
+      class="navbar-collapse navbar-panel-collapse"
+      [ngbCollapse]="isPrimaryCollapsed"
+    >
+      <div class="navbar-panel">
+        <div class="navbar-left">
+          <ul class="navbar-nav mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                routerLink="/home"
+                routerLinkActive="active"
+                (click)="closePrimaryMenu()"
+                >Accueil</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                routerLink="/catalog"
+                routerLinkActive="active"
+                (click)="closePrimaryMenu()"
+                >Catalogue</a
+              >
+            </li>
+          </ul>
+
+          <form class="quick-search" (ngSubmit)="submitSearch()">
+            <input
+              type="search"
+              class="form-control"
+              [(ngModel)]="searchTerm"
+              name="searchTerm"
+              placeholder="Rechercher un produit ou une categorie"
+            />
+            <button
+              type="submit"
+              class="btn btn-link search-submit"
+              aria-label="Rechercher"
+            >
+              <svg class="search-submit-icon" aria-hidden="true">
+                <use
+                  href="/assets/icons/navbar-icons.sprite.svg#bi-search"
+                ></use>
+              </svg>
+            </button>
+          </form>
+        </div>
+
+        <div class="navbar-actions">
+          @if (!currentUser) {
+            <div class="guest-links">
+              <button
+                class="btn btn-link login-trigger"
+                type="button"
+                (click)="openLoginModal()"
+              >
+                <svg class="login-trigger-icon" aria-hidden="true">
+                  <use
+                    href="/assets/icons/navbar-icons.sprite.svg#bi-person"
+                  ></use>
+                </svg>
+                <span class="fw-semibold">Connexion</span>
               </button>
-            }
-            <a class="dropdown-item" [routerLink]="'/categories'" (click)="closeMenu()">Toutes les categories</a>
-          </div>
-        </li>
-        @if (isLoggedIn()) {
-          <li class="nav-item">
-            <a class="nav-link" [routerLink]="'/account/orders'" (click)="closeMenu()">Commandes</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" [routerLink]="'/account/cart'" (click)="closeMenu()">Panier</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" [routerLink]="'/account/profile'" (click)="closeMenu()">Profil</a>
-          </li>
-        }
-      </ul>
-
-      <form class="d-flex me-2 mb-2 mb-lg-0" (submit)="$event.preventDefault(); runSearch()">
-        <input
-          class="form-control me-2"
-          type="search"
-          placeholder="Rechercher produit ou categorie"
-          [(ngModel)]="searchQuery"
-          name="navbarSearch"
-        />
-        <button type="submit" class="btn btn-outline-secondary">Rechercher</button>
-      </form>
-
-      @if (!isLoggedIn()) {
-        <div class="d-flex gap-2">
-          <button class="btn btn-primary" (click)="openLoginModal(loginModal)">Connexion</button>
-          <a class="btn btn-success" [routerLink]="'/register'" (click)="closeMenu()">Inscription</a>
+              <a
+                class="nav-inline-link signup-link"
+                routerLink="/register"
+                (click)="closePrimaryMenu()"
+                >Inscription</a
+              >
+            </div>
+          } @else {
+            <a
+              class="btn btn-link nav-inline-link"
+              routerLink="/account/profile"
+              (click)="closePrimaryMenu()"
+              >Mon compte</a
+            >
+            <a
+              class="btn btn-link nav-inline-link"
+              routerLink="/account/addresses"
+              (click)="closePrimaryMenu()"
+              >Mes adresses</a
+            >
+            <a
+              class="btn btn-link nav-inline-link"
+              routerLink="/account/cart"
+              (click)="closePrimaryMenu()"
+              >Mon panier</a
+            >
+            <a
+              class="btn btn-link nav-inline-link"
+              routerLink="/account/orders"
+              (click)="closePrimaryMenu()"
+              >Mes commandes</a
+            >
+            <div class="user-links">
+              <div class="welcome-block">
+                <svg class="login-trigger-icon" aria-hidden="true">
+                  <use
+                    href="/assets/icons/navbar-icons.sprite.svg#bi-person"
+                  ></use>
+                </svg>
+                <span>Bienvenue {{ currentUser.firstName }}</span>
+              </div>
+              <button
+                class="btn btn-link nav-inline-link logout-trigger"
+                type="button"
+                (click)="logout()"
+              >
+                Deconnexion
+              </button>
+            </div>
+          }
         </div>
-      } @else {
-        <div class="d-flex align-items-center gap-2">
-          <span class="small text-muted">{{ user()?.email }}</span>
-          <button class="btn btn-outline-secondary" (click)="logout()">Logout</button>
-        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<nav class="navbar navbar-dark bg-dark navbar-secondary">
+  <div class="container category-row">
+    <div class="category-row-track">
+      @for (category of categories; track category.id) {
+        <a
+          [routerLink]="['/catalog']"
+          [queryParams]="{ category: category.slug }"
+        >
+          {{ category.name }}
+        </a>
       }
     </div>
   </div>
 </nav>
 
-<ng-template #loginModal let-modal>
+<ng-template #loginModalContent let-modal>
   <div class="modal-header">
-    <h5 class="modal-title">Connexion</h5>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    <h2 class="modal-title fs-5">Connexion</h2>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Fermer"
+      (click)="modal.dismiss('cancel')"
+    ></button>
   </div>
   <div class="modal-body">
-    <app-login></app-login>
+    <app-login [embedded]="true" (loggedIn)="closeLoginModal()"></app-login>
   </div>
 </ng-template>

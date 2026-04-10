@@ -154,3 +154,45 @@ Notes QA:
   - `docs/adaptation-final-report.md`
 - Stratégie DTO: `docs/adr/ADR-001-dto-strategy.md`.
 
+
+## Docker local
+
+Une dockerisation locale isolee est disponible pour lancer l API avec un PostgreSQL local, sans impact sur la production.
+
+### Fichiers
+
+- `Dockerfile`
+- `.dockerignore`
+- `docker-compose.yml`
+
+### Lancement
+
+```powershell
+docker compose up --build
+```
+
+### Arret
+
+```powershell
+docker compose down
+```
+
+### Arret avec suppression du volume PostgreSQL local
+
+```powershell
+docker compose down -v
+```
+
+### URLs utiles
+
+- API : `http://localhost:3000`
+- Swagger JSON : `http://localhost:3000/api/swagger.json`
+- Docs : `http://localhost:3000/api/docs`
+- Media : `http://localhost:3000/media/...`
+
+### Notes
+
+- Cette configuration Docker est locale et isolee.
+- Elle utilise une base PostgreSQL Docker dediee, distincte de toute base Alwaysdata.
+- Les migrations Prisma sont appliquees au demarrage du conteneur API via `prisma migrate deploy`.
+- Les audit logs Mongo sont desactives par defaut dans cette configuration (`ENABLE_AUDIT_LOG=false`).

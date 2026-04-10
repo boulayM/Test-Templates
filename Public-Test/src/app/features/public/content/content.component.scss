@@ -1,39 +1,91 @@
-.content-header {
+.catalog-main {
+  display: grid;
+  gap: 1.5rem;
+  padding-block: 2rem 3rem;
+}
+
+.catalog-header,
+.filters-card {
+  padding: 1.25rem;
+}
+
+.catalog-kicker { margin-bottom: 0.5rem; }
+
+.filters-grid {
+  align-items: end;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+
+.filters-note {
+  grid-column: 1 / -1;
+}
+
+.product-card {
+  border-color: #dee2e6;
+}
+
+.product-card .card-body {
   display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.product-card-media,
+.product-card-media img {
+  display: block;
+  height: 220px;
+  width: 100%;
+}
+
+.product-card-media img {
+  background: #f3f5f7;
+  object-fit: contain;
+  padding: 0.75rem;
+}
+
+.product-card-topline,
+.product-card-footer,
+.category-list {
   align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   justify-content: space-between;
-  margin-bottom: 1rem;
 }
 
-.content-grid {
-  margin-top: 0.75rem;
-}
-
-.content-card {
-  display: flex;
+.product-card-topline {
+  align-items: flex-end;
   flex-direction: column;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.product-card h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.product-card h2 {
+  font-family: "Barlow", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+}
+
+.product-card-footer {
+  align-items: flex-end;
+  background: transparent;
+  border-top: 0;
+  display: flex;
+  gap: 1rem;
   justify-content: space-between;
-  min-height: 100%;
 }
 
-.content-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.content-desc {
-  color: #374151;
-}
-
-.content-categories {
-  margin: 0;
-  color: #4b5563;
-  font-size: 0.9rem;
-}
-
-.content-card-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+@media (max-width: 768px) {
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -7,18 +7,18 @@ import { ModalCleanupService } from './core/services/modal-cleanup.service';
 import { ToastService } from './shared/services/toast.service';
 
 @Component({
-  selector: 'app-root',
-  imports: [RouterModule],
-  templateUrl: './app.component.html',
+    selector: 'app-root',
+    imports: [RouterModule],
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
   private destroyRef = inject(DestroyRef);
+  private router = inject(Router);
+  private modalCleanup = inject(ModalCleanupService);
   toast = inject(ToastService);
 
-  constructor(
-    private router: Router,
-    private modalCleanup: ModalCleanupService,
-  ) {
+  constructor() {
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationStart),

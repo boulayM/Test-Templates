@@ -1,72 +1,63 @@
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
+
 import { ActivityComponent } from '../../app/features/account/activity/activity.component';
 import { ActivityService } from '../../app/core/services/activity.service';
-import { AuthService } from '../../app/core/services/auth.service';
 
 describe('ActivityComponent', () => {
-  it('should load activity records on init', () => {
+  it('should load cart on init', () => {
     const activityService = jasmine.createSpyObj('ActivityService', [
-      'getActivityRecords',
-      'deleteActivityRecord',
-      'removeContentItem',
+      'getCart',
+      'removeItem',
       'updateQuantity',
+      'validateCoupon',
     ]);
-    activityService.getActivityRecords.and.returnValue(of([]));
+    activityService.getCart.and.returnValue(of({ id: 1, status: 'ACTIVE', items: [] }));
 
     TestBed.configureTestingModule({
-      imports: [ActivityComponent],
+      imports: [ActivityComponent, RouterTestingModule],
       providers: [
         { provide: ActivityService, useValue: activityService },
-        {
-          provide: Router,
-          useValue: jasmine.createSpyObj('Router', ['navigate']),
-        },
-        {
-          provide: AuthService,
-          useValue: { isLoggedIn: () => true, isAdmin: () => false },
-        },
+        { provide: ActivatedRoute, useValue: { queryParams: of({}) } },
       ],
     });
 
     const fixture = TestBed.createComponent(ActivityComponent);
     fixture.detectChanges();
 
-    expect(activityService.getActivityRecords).toHaveBeenCalled();
+    expect(activityService.getCart).toHaveBeenCalled();
   });
 
-  it('should delete activity when confirmed', () => {
+  it('should remove item from cart', () => {
     const activityService = jasmine.createSpyObj('ActivityService', [
-      'getActivityRecords',
-      'deleteActivityRecord',
+      'getCart',
+      'removeItem',
+      'updateQuantity',
+      'validateCoupon',
     ]);
-    activityService.getActivityRecords.and.returnValue(of([]));
-    activityService.deleteActivityRecord.and.returnValue(of({}));
-
-    spyOn(window, 'confirm').and.returnValue(true);
+    activityService.getCart.and.returnValue(of({ id: 1, status: 'ACTIVE', items: [] }));
+    activityService.removeItem.and.returnValue(of({ message: 'ok' }));
 
     TestBed.configureTestingModule({
-      imports: [ActivityComponent],
+      imports: [ActivityComponent, RouterTestingModule],
       providers: [
         { provide: ActivityService, useValue: activityService },
-        {
-          provide: Router,
-          useValue: jasmine.createSpyObj('Router', ['navigate']),
-        },
-        {
-          provide: AuthService,
-          useValue: { isLoggedIn: () => true, isAdmin: () => false },
-        },
+        { provide: ActivatedRoute, useValue: { queryParams: of({}) } },
       ],
     });
 
     const fixture = TestBed.createComponent(ActivityComponent);
     const component = fixture.componentInstance;
-    component.activityRecords = [{ id: 1, activityDate: '', status: '', items: [] } as any];
+    component.cart = {
+      id: 1,
+      status: 'ACTIVE',
+      items: [{ id: 8, productId: 2, quantity: 1, unitPriceCents: 1000, currency: 'EUR', product: {} as any }],
+    };
 
-    component.deleteActivityRecord(1);
+    component.removeItem(8);
 
-    expect(activityService.deleteActivityRecord).toHaveBeenCalledWith(1);
+    expect(activityService.removeItem).toHaveBeenCalledWith(8);
   });
 });

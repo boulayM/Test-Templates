@@ -8,6 +8,7 @@ import { AuthMessages } from '../../messages/auth-messages';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './error-page.component.html',
+  styleUrl: './error-page.component.scss'
 })
 export class ErrorPageComponent {
   private route = inject(ActivatedRoute);
@@ -27,14 +28,37 @@ export class ErrorPageComponent {
       case 'admin':
       case 'role':
         return AuthMessages.accessDeniedRole;
+      case 'session':
+        return AuthMessages.sessionExpired;
       case 'rate':
         return AuthMessages.loginLimitReached;
       case 'server':
         return AuthMessages.serverError;
+      case 'unavailable':
+        return AuthMessages.serviceUnavailable;
       case 'not-found':
         return AuthMessages.notFound;
       default:
         return AuthMessages.genericError;
+    }
+  }
+
+  get title(): string {
+    switch (this.reason) {
+      case 'auth':
+      case 'admin':
+      case 'role':
+        return 'Acces refuse';
+      case 'session':
+        return 'Session expiree';
+      case 'server':
+        return 'Erreur serveur';
+      case 'unavailable':
+        return 'Service indisponible';
+      case 'not-found':
+        return 'Page introuvable';
+      default:
+        return 'Erreur';
     }
   }
 }

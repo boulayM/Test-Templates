@@ -1,33 +1,32 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
+
 import { OrderService } from '../../../core/services/order.service';
-import { OrderRecord } from '../../../shared/models/order.model';
-import { ToastService } from '../../../shared/services/toast.service';
+import { Order } from '../../../shared/models/order.model';
 
 @Component({
   selector: 'app-orders',
   imports: [CommonModule, RouterModule],
   templateUrl: './orders.component.html',
+  styleUrls: ['./orders.component.scss'],
 })
 export class OrdersComponent implements OnInit {
-  loading = true;
-  orders: OrderRecord[] = [];
+  private orderService = inject(OrderService);
 
-  constructor(
-    private ordersService: OrderService,
-    private toast: ToastService,
-  ) {}
+  orders: Order[] = [];
+  loading = true;
+  error: string | null = null;
 
   ngOnInit(): void {
-    this.ordersService.listMyOrders().subscribe({
-      next: (data) => {
-        this.orders = data;
+    this.orderService.getMyOrders().subscribe({
+      next: (orders) => {
+        this.orders = orders;
         this.loading = false;
       },
       error: () => {
+        this.error = 'Impossible de charger les commandes.';
         this.loading = false;
-        this.toast.show('Impossible de charger les commandes.');
       },
     });
   }

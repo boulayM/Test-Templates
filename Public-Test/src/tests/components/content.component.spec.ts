@@ -1,87 +1,78 @@
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { BehaviorSubject, of } from 'rxjs';
+
 import { ContentComponent } from '../../app/features/public/content/content.component';
 import { ContentService } from '../../app/core/services/content.service';
 import { ActivityService } from '../../app/core/services/activity.service';
 import { AuthService } from '../../app/core/services/auth.service';
+import { ToastService } from '../../app/shared/services/toast.service';
+import { User } from '../../app/shared/models/user.model';
 
 describe('ContentComponent', () => {
-  it('should load content on init', () => {
-    const contentService = jasmine.createSpyObj('ContentService', [
-      'getContentItems',
-    ]);
-    const activityService = jasmine.createSpyObj('ActivityService', [
-      'createActivityRecord',
-      'addContentItemToActivityRecord',
-    ]);
-    contentService.getContentItems.and.returnValue(of([]));
+  it('should load products and categories on init', () => {
+    const contentService = jasmine.createSpyObj('ContentService', ['getProducts', 'getCategories']);
+    const activityService = jasmine.createSpyObj('ActivityService', ['addProduct']);
+    const authUser$ = new BehaviorSubject<User | null>(null);
+    const authService = {
+      currentUser$: authUser$.asObservable(),
+      isLoggedIn: () => false,
+      logout: jasmine.createSpy('logout'),
+    };
+    contentService.getProducts.and.returnValue(of([]));
+    contentService.getCategories.and.returnValue(of([]));
 
     TestBed.configureTestingModule({
-      imports: [ContentComponent],
+      imports: [ContentComponent, RouterTestingModule],
       providers: [
         { provide: ContentService, useValue: contentService },
         { provide: ActivityService, useValue: activityService },
-        {
-          provide: AuthService,
-          useValue: { isAdmin: () => false, isLoggedIn: () => true },
-        },
-        {
-          provide: Router,
-          useValue: jasmine.createSpyObj('Router', ['navigate']),
-        },
-        {
-          provide: ActivatedRoute,
-          useValue: { queryParamMap: of(new Map() as any), snapshot: { queryParamMap: new Map() as any } },
-        },
+        { provide: AuthService, useValue: authService },
+        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['show']) },
+        { provide: ActivatedRoute, useValue: { queryParams: of({}) } },
       ],
     });
 
     const fixture = TestBed.createComponent(ContentComponent);
     fixture.detectChanges();
 
-    expect(contentService.getContentItems).toHaveBeenCalled();
+    expect(contentService.getProducts).toHaveBeenCalled();
+    expect(contentService.getCategories).toHaveBeenCalled();
   });
 
-  it('should create activity when no active activity', () => {
-    const contentService = jasmine.createSpyObj('ContentService', [
-      'getContentItems',
-    ]);
-    const activityService = jasmine.createSpyObj('ActivityService', [
-      'createActivityRecord',
-      'addContentItemToActivityRecord',
-    ]);
-    contentService.getContentItems.and.returnValue(of([]));
-    activityService.createActivityRecord.and.returnValue(of({ id: 1 }));
-
-    spyOn(window, 'alert');
+  it('should add product to cart', () => {
+    const contentService = jasmine.createSpyObj('ContentService', ['getProducts', 'getCategories']);
+    const activityService = jasmine.createSpyObj('ActivityService', ['addProduct']);
+    const authUser$ = new BehaviorSubject<User | null>({ id: 1, role: 'USER' } as User);
+    const toastService = jasmine.createSpyObj('ToastService', ['show']);
+    const authService = {
+      currentUser$: authUser$.asObservable(),
+      isLoggedIn: () => true,
+      logout: jasmine.createSpy('logout'),
+    };
+    contentService.getProducts.and.returnValue(of([]));
+    contentService.getCategories.and.returnValue(of([]));
+    activityService.addProduct.and.returnValue(of({}));
 
     TestBed.configureTestingModule({
-      imports: [ContentComponent],
+      imports: [ContentComponent, RouterTestingModule],
       providers: [
         { provide: ContentService, useValue: contentService },
         { provide: ActivityService, useValue: activityService },
-        {
-          provide: AuthService,
-          useValue: { isAdmin: () => false, isLoggedIn: () => true },
-        },
-        {
-          provide: Router,
-          useValue: jasmine.createSpyObj('Router', ['navigate']),
-        },
-        {
-          provide: ActivatedRoute,
-          useValue: { queryParamMap: of(new Map() as any), snapshot: { queryParamMap: new Map() as any } },
-        },
+        { provide: AuthService, useValue: authService },
+        { provide: ToastService, useValue: toastService },
+        { provide: ActivatedRoute, useValue: { queryParams: of({}) } },
       ],
     });
 
     const fixture = TestBed.createComponent(ContentComponent);
     const component = fixture.componentInstance;
-    const contentItem = { id: 1, name: 'P', price: 1, isActive: true } as any;
+    const product = { id: 1, name: 'Produit', isActive: true } as any;
 
-    component.includeContentItem(contentItem);
+    component.addToCart(product);
 
-    expect(activityService.createActivityRecord).toHaveBeenCalled();
+    expect(activityService.addProduct).toHaveBeenCalledWith(1, 1);
+    expect(toastService.show).toHaveBeenCalled();
   });
 });

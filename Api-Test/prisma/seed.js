@@ -4,6 +4,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { catalogSeed } from "./catalog.seed-data.js";
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -60,6 +61,19 @@ function shipmentStatusByOrderStatus(orderStatus) {
   return null;
 }
 
+function slugify(value) {
+  return String(value)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+const imageExtensionOverrides = new Map([
+  ["machine-a-cafe", "jpeg"]
+]);
+
 async function main() {
   await resetDatabase();
 
@@ -103,18 +117,10 @@ async function main() {
 
   const customerUsers = users.filter((u) => u.role === "USER");
 
-  const categoriesData = [
-    { name: "Electronics", slug: "electronics" },
-    { name: "Computers", slug: "computers" },
-    { name: "Phones", slug: "phones" },
-    { name: "Home", slug: "home" },
-    { name: "Kitchen", slug: "kitchen" },
-    { name: "Sports", slug: "sports" },
-    { name: "Outdoors", slug: "outdoors" },
-    { name: "Fashion", slug: "fashion" },
-    { name: "Beauty", slug: "beauty" },
-    { name: "Books", slug: "books" }
-  ];
+  const categoriesData = catalogSeed.categories.map((category) => ({
+    name: category.name,
+    slug: category.slug
+  }));
 
   const createdCategories = [];
   for (const c of categoriesData) {
@@ -131,58 +137,50 @@ async function main() {
   await prisma.category.update({ where: { id: bySlug.beauty }, data: { parentId: bySlug.fashion } });
 
   const products = [];
-  for (let i = 1; i <= 12; i += 1) {
-    const price = 990 + i * 250;
-    const product = await prisma.product.create({
-      data: {
-        name: `Product ${String(i).padStart(2, "0")}`,
-        slug: `product-${String(i).padStart(2, "0")}`,
-        description: `Visual QA product ${i}`,
-        priceCents: price,
-        currency: "EUR",
-        sku: `SKU-${String(i).padStart(4, "0")}`,
-        isActive: i <= 10
-      }
-    });
-    products.push(product);
-  }
-
-  for (let i = 0; i < products.length; i += 1) {
-    const p = products[i];
-    const c1 = createdCategories[i % createdCategories.length];
-    const c2 = createdCategories[(i + 3) % createdCategories.length];
-
-    await prisma.productCategory.createMany({
-      data: [
-        { productId: p.id, categoryId: c1.id },
-        { productId: p.id, categoryId: c2.id }
-      ]
-    });
-
-    await prisma.productImage.createMany({
-      data: [
-        {
-          productId: p.id,
-          url: `https://picsum.photos/seed/product-${p.id}-1/600/400`,
-          alt: `Image 1 of ${p.name}`,
-          sortOrder: 0
-        },
-        {
-          productId: p.id,
-          url: `https://picsum.photos/seed/product-${p.id}-2/600/400`,
-          alt: `Image 2 of ${p.name}`,
-          sortOrder: 1
+  const ratingsByProductId = new Map();
+  let productIndex = 0;
+  for (const category of catalogSeed.categories) {
+    for (let i = 0; i < category.products.length; i += 1) {
+      const input = category.products[i];
+      productIndex += 1;
+      const product = await prisma.product.create({
+        data: {
+          name: input.name,
+          slug: slugify(input.name),
+          description: input.description,
+          priceCents: input.priceCents,
+          currency: "EUR",
+          sku: `${category.slug.toUpperCase()}-${String(i + 1).padStart(3, "0")}`,
+          isActive: true
         }
-      ]
-    });
+      });
+      products.push(product);
+      ratingsByProductId.set(product.id, input.rating);
 
-    await prisma.inventory.create({
-      data: {
-        productId: p.id,
-        quantity: i % 4 === 0 ? 0 : 20 + i * 3,
-        reserved: i % 5 === 0 ? 2 : i % 3
-      }
-    });
+      await prisma.productCategory.create({
+        data: { productId: product.id, categoryId: bySlug[category.slug] }
+      });
+
+      const imageSlug = slugify(input.name);
+      const imageExtension = imageExtensionOverrides.get(imageSlug) ?? "jpg";
+      const imageBaseName = `${imageSlug}-1.${imageExtension}`;
+      await prisma.productImage.create({
+        data: {
+          productId: product.id,
+          url: `/media/products/${category.slug}/${imageBaseName}`,
+          alt: input.name,
+          sortOrder: 0
+        }
+      });
+
+      await prisma.inventory.create({
+        data: {
+          productId: product.id,
+          quantity: productIndex % 9 === 0 ? 0 : 18 + productIndex * 2,
+          reserved: productIndex % 4
+        }
+      });
+    }
   }
 
   const addressesByUser = new Map();
@@ -389,19 +387,21 @@ async function main() {
     }
   }
 
-  let reviewCount = 0;
-  for (let i = 0; i < customerUsers.length && reviewCount < 30; i += 1) {
-    for (let j = 0; j < products.length && reviewCount < 30; j += 1) {
-      if ((i + j) % 4 !== 0) continue;
+  for (let i = 0; i < customerUsers.length; i += 1) {
+    const user = customerUsers[i];
+    for (let j = 0; j < products.length; j += 1) {
+      if ((i + j) % 5 !== 0) continue;
+      const product = products[j];
+      const ratingBase = ratingsByProductId.get(product.id) ?? 4;
+      const seededRating = Math.max(1, Math.min(5, Math.round(ratingBase + ((i % 3) - 1))));
       await prisma.review.create({
         data: {
-          userId: customerUsers[i].id,
-          productId: products[j].id,
-          rating: 1 + ((i + j) % 5),
-          comment: `Review ${reviewCount + 1} for product ${products[j].id}`
+          userId: user.id,
+          productId: product.id,
+          rating: seededRating,
+          comment: `Avis seed pour ${product.name}`
         }
       });
-      reviewCount += 1;
     }
   }
 

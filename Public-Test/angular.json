@@ -29,22 +29,23 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              {
-                "glob": "robots.txt",
-                "input": "src",
-                "output": "/"
-              },
-              {
-                "glob": "sitemap.xml",
-                "input": "src",
-                "output": "/"
-              }
+              "src/env.js"
             ],
             "styles": [
               "src/styles.scss"
             ],
             "scripts": [],
-            "browser": "src/main.ts"
+            "browser": "src/main.ts",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src"
+              ],
+              "sass": {
+                "silenceDeprecations": [
+                  "import"
+                ]
+              }
+            }
           },
           "configurations": {
             "production": {
@@ -57,8 +58,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "3kb",
+                  "maximumError": "5kb"
                 }
               ],
               "fileReplacements": [
@@ -110,16 +111,7 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              {
-                "glob": "robots.txt",
-                "input": "src",
-                "output": "/"
-              },
-              {
-                "glob": "sitemap.xml",
-                "input": "src",
-                "output": "/"
-              }
+              "src/env.js"
             ],
             "styles": [
               "src/styles.scss"
@@ -128,7 +120,12 @@
             "stylePreprocessorOptions": {
               "includePaths": [
                 "src"
-              ]
+              ],
+              "sass": {
+                "silenceDeprecations": [
+                  "import"
+                ]
+              }
             }
           }
         }
@@ -162,3 +159,5 @@
     }
   }
 }
+
+

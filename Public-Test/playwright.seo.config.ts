@@ -15,7 +15,5 @@ export default defineConfig({
     reuseExistingServer: process.env['PW_REUSE_SERVER'] === 'true',
     timeout: 120000,
   },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-  ],
+  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 });

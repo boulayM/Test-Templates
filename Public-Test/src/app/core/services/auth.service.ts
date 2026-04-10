@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { switchMap, tap, catchError, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -8,10 +8,13 @@ import { User } from '../../shared/models/user.model';
 import { ModalCleanupService } from './modal-cleanup.service';
 import { CsrfService } from './csrf.service';
 import { AuthMessages } from '../../shared/messages/auth-messages';
-import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private api = inject(ApiService);
+  private router = inject(Router);
+  private modalCleanup = inject(ModalCleanupService);
+  private csrf = inject(CsrfService);
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private userLoadedSubject = new BehaviorSubject<boolean>(false);
 
@@ -44,23 +47,20 @@ export class AuthService {
     this.lastLoginLimitRemaining = null;
   }
 
-  constructor(
-    private api: ApiService,
-    private router: Router,
-    private modalCleanup: ModalCleanupService,
-    private csrf: CsrfService,
-  ) {}
-
   /** LOGIN */
   login(credentials: {
     email: string;
     password: string;
+  }, options?: {
+    redirectToProfile?: boolean;
   }): Observable<User | null> {
     this.userLoadedSubject.next(false);
     this.clearLoginError();
 
+    const redirectToProfile = options?.redirectToProfile ?? true;
+
     return this.api.post('/auth/login', credentials).pipe(
-      switchMap(() => this.api.get<{ user: User }>('/users/me')),
+      switchMap(() => this.api.get<{ user: User }>('/auth/me')),
       map((res) => res.user),
       switchMap((user) => {
         if (user?.role && user.role !== 'USER') {
@@ -80,16 +80,15 @@ export class AuthService {
         this.currentUserSubject.next(user);
         this.userLoadedSubject.next(true);
         void this.csrf.init();
-        this.modalCleanup.closeModalById('loginModal');
-        // Navigation vers dashboard
-        this.router.navigate(['/catalog']).then(() => {
+        const navigation = redirectToProfile
+          ? this.router.navigate(['/account/profile'])
+          : Promise.resolve(true);
+        navigation.then(() => {
           this.modalCleanup.closeAll();
         });
       }),
       catchError((err: HttpErrorResponse) => {
-        if (environment.showSanityLogs) {
-          console.error('[Auth] login failed', err);
-        }
+        console.error('[Auth] login failed', err);
         this.currentUserSubject.next(null);
         this.userLoadedSubject.next(true);
         this.lastLoginError = 'INVALID_CREDENTIALS';
@@ -125,7 +124,7 @@ export class AuthService {
       this.userLoadedSubject.next(false);
 
       this.api
-        .get<{ user: User }>('/users/me')
+        .get<{ user: User }>('/auth/me')
         .pipe(
           map((res) => res.user),
           catchError(() => of(null)),
@@ -147,9 +146,7 @@ export class AuthService {
     this.api.post('/auth/logout', {}).subscribe({
       next: () => this.csrf.clear(),
       error: (err) => {
-        if (environment.showSanityLogs) {
-          console.error('[Auth] logout failed', err);
-        }
+        console.error('[Auth] logout failed', err);
       },
     });
   }

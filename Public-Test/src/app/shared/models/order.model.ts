@@ -1,8 +1,6 @@
-import { ActivityStatus } from './activity.model';
-
 export interface OrderItem {
   id: number;
-  productId: number;
+  productId: number | null;
   productName: string;
   productSku: string;
   quantity: number;
@@ -10,36 +8,48 @@ export interface OrderItem {
   currency: string;
 }
 
-export interface Shipment {
+export interface PaymentSummary {
   id: number;
-  orderId: number;
-  carrier?: string | null;
-  trackingNumber?: string | null;
-  status: 'CREATED' | 'IN_TRANSIT' | 'DELIVERED' | 'LOST';
-  shippedAt?: string | null;
-  deliveredAt?: string | null;
-}
-
-export interface Payment {
-  id: number;
-  orderId: number;
   provider: string;
-  status: 'CREATED' | 'AUTHORIZED' | 'CAPTURED' | 'FAILED' | 'REFUNDED';
   amountCents: number;
   currency: string;
-  createdAt?: string;
+  status: string;
+  createdAt: string;
 }
 
-export interface OrderRecord {
+export interface ShipmentSummary {
   id: number;
-  status: ActivityStatus;
+  carrier: string;
+  trackingNumber: string | null;
+  status: string;
+  shippedAt: string | null;
+  deliveredAt: string | null;
+}
+
+export interface OrderCouponSummary {
+  id: number;
+  couponId: number;
+  coupon?: {
+    code: string;
+    type: string;
+    value: number;
+  };
+}
+
+export interface Order {
+  id: number;
+  userId: number;
+  shippingAddressId: number;
+  billingAddressId: number;
+  status: string;
   subtotalCents: number;
   shippingCents: number;
   discountCents: number;
   totalCents: number;
   currency: string;
-  createdAt?: string;
+  createdAt: string;
   items: OrderItem[];
-  payments?: Payment[];
-  shipments?: Shipment[];
+  payments: PaymentSummary[];
+  shipments: ShipmentSummary[];
+  coupons: OrderCouponSummary[];
 }

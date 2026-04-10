@@ -7,6 +7,20 @@ function parsePage(query) {
   return { page, limit, skip };
 }
 
+function attachRatingSummary(product) {
+  const reviews = Array.isArray(product.reviews) ? product.reviews : [];
+  const reviewCount = reviews.length;
+  const averageRating = reviewCount
+    ? Math.round((reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount) * 10) / 10
+    : null;
+  return {
+    ...product,
+    averageRating,
+    reviewCount,
+    reviews: undefined
+  };
+}
+
 export async function listProducts(req, res, next) {
   try {
     const { page, limit, skip } = parsePage(req.query);
@@ -29,12 +43,13 @@ export async function listProducts(req, res, next) {
         include: {
           images: { orderBy: { sortOrder: "asc" } },
           categories: { include: { category: true } },
-          inventory: true
+          inventory: true,
+          reviews: { select: { rating: true } }
         }
       }),
       prisma.product.count({ where })
     ]);
-    res.json({ data, page, limit, total });
+    res.json({ data: data.map(attachRatingSummary), page, limit, total });
   } catch (err) {
     next(err);
   }
@@ -49,11 +64,12 @@ export async function getProduct(req, res, next) {
       include: {
         images: { orderBy: { sortOrder: "asc" } },
         categories: { include: { category: true } },
-        inventory: true
+        inventory: true,
+        reviews: { select: { rating: true } }
       }
     });
     if (!product) return res.status(404).json({ message: "Product not found" });
-    res.json({ product });
+    res.json({ product: attachRatingSummary(product) });
   } catch (err) {
     next(err);
   }

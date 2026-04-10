@@ -1,6 +1,31 @@
-<footer>
-  <p>
-    &copy; {{ currentYear }} Marc Boulay. Projet Templates/API Postgres - Prisma
-    - Front Angular 21. Tous droits r&eacute;serv&eacute;s.
-  </p>
+<footer class="footer-shell border-top">
+  <div class="container footer-content">
+    <div class="footer-brand">
+      <span class="footer-logo-wrap">
+        <img
+          src="/assets/logo-ma-boutique-white.svg"
+          alt="Logo Ma Boutique"
+        />
+      </span>
+      <span>18 rue des Demoiselles, 75000 Paris</span>
+    </div>
+
+    <div class="footer-social">
+      <svg class="footer-social-icon" aria-hidden="true">
+        <use href="/assets/icons/footer-icons.sprite.svg#bi-twitter-x"></use>
+      </svg>
+      <svg class="footer-social-icon" aria-hidden="true">
+        <use href="/assets/icons/footer-icons.sprite.svg#bi-instagram"></use>
+      </svg>
+      <svg class="footer-social-icon" aria-hidden="true">
+        <use href="/assets/icons/footer-icons.sprite.svg#bi-facebook"></use>
+      </svg>
+    </div>
+
+    <div class="footer-links">
+      <a routerLink="/home">Accueil</a>
+      <a routerLink="/info/contact">Contact</a>
+      <a routerLink="/info/mentions-legales">Mentions legales</a>
+    </div>
+  </div>
 </footer>

@@ -1,0 +1,32 @@
+.addresses-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.section-kicker {
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.address-card {
+  display: grid;
+  gap: 0.4rem;
+  padding: 1.25rem;
+}
+
+.address-card-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.address-card p,
+.page-note {
+  margin: 0;
+}
+
+.page-note {
+  color: #6c757d;
+}

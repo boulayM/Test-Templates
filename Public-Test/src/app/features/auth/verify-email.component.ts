@@ -1,18 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 
 @Component({
-    selector: 'app-verify-email',
-    imports: [RouterLink],
-    templateUrl: './verify-email.component.html'
+  selector: 'app-verify-email',
+  imports: [RouterLink],
+  templateUrl: './verify-email.component.html',
 })
 export class VerifyEmailComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private api = inject(ApiService);
+
   loading = true;
   message = 'Verification en cours...';
-
-  constructor(private route: ActivatedRoute, private api: ApiService) {}
 
   ngOnInit(): void {
     const token = this.route.snapshot.queryParamMap.get('token');

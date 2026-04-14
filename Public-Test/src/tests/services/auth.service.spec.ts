@@ -40,12 +40,24 @@ describe('AuthService', () => {
   });
 
   it('should initAuth set user when /auth/me succeeds', async () => {
-    const user = { id: 1, role: 'ADMIN' } as User;
+    const user = { id: 1, role: 'USER' } as User;
     api.get.and.returnValue(of({ user }));
 
     await service.initAuth();
 
     expect(service.getCurrentUser()).toEqual(user);
+  });
+
+  it('should initAuth reject non-user roles returned by /auth/me', async () => {
+    const user = { id: 1, role: 'ADMIN' } as User;
+    api.get.and.returnValue(of({ user }));
+    api.post.and.returnValue(of({}));
+
+    await service.initAuth();
+
+    expect(service.getCurrentUser()).toBeNull();
+    expect(api.post).toHaveBeenCalledWith('/auth/logout', {});
+    expect(router.navigate).toHaveBeenCalledWith(['/home']);
   });
 
   it('should initAuth set null when /auth/me fails', async () => {

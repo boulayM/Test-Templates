@@ -130,6 +130,15 @@ export class AuthService {
           catchError(() => of(null)),
         )
         .subscribe((user) => {
+          if (user?.role && user.role !== 'USER') {
+            this.currentUserSubject.next(null);
+            this.userLoadedSubject.next(true);
+            this.lastLoginError = 'ROLE_NOT_ALLOWED';
+            this.lastLoginErrorMessage = AuthMessages.userOnly;
+            this.logout();
+            resolve();
+            return;
+          }
           this.currentUserSubject.next(user);
           this.userLoadedSubject.next(true);
           resolve();

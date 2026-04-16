@@ -27,6 +27,7 @@ Public-Test-Legacy/
 logs
 *.log
 *.report.html
+Api-Test/postman/reports/
 lh*.json
 chromewebdata_*.report.html
 
